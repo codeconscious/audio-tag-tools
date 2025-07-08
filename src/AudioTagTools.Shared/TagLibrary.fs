@@ -1,30 +1,24 @@
 module TagLibrary
 
-open FSharp.Data
+open System
+open System.Text.Json
 
-[<Literal>]
-let private tagSample = """
-[
-  {
-    "FileNameOnly": "text",
-    "DirectoryName": "text",
-    "Artists": ["text"],
-    "AlbumArtists": ["text"],
-    "Album": "text",
-    "TrackNo": 0,
-    "Title": "text",
-    "Year": 0,
-    "Genres": ["text"],
-    "Duration": "00:00:00",
-    "LastWriteTime": "2023-09-13T13:49:44+09:00"
-  }
-]"""
+type LibraryTags =
+    {
+        FileNameOnly: string
+        DirectoryName: string
+        Artists: string array
+        AlbumArtists: string array
+        Album: string
+        TrackNo: uint
+        Title: string
+        Year: uint
+        Genres: string array
+        Duration: TimeSpan
+        LastWriteTime: DateTimeOffset
+    }
 
-type TagJsonProvider = JsonProvider<tagSample>
-type FileTags = TagJsonProvider.Root
-type FileTagCollection = FileTags array
-type FilteredTagCollection = FileTags array
+let parseJsonToTags (json: string) : Result<LibraryTags array, string> =
+    try Ok (JsonSerializer.Deserialize<LibraryTags array>(json))
+    with e -> Error e.Message
 
-let parseToTags (json: string) : Result<FileTagCollection, string> =
-    try Ok (TagJsonProvider.Parse json)
-    with ex -> Error ex.Message

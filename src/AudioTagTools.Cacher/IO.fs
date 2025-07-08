@@ -3,6 +3,7 @@ module IO
 open System.IO
 open Errors
 open Utilities
+open TagLibrary
 
 type TaggedFile = TagLib.File
 
@@ -22,6 +23,10 @@ let getFileInfos (dirPath: DirectoryInfo) : Result<FileInfo seq, Error> =
         |> Ok
     with
     | e -> Error (GeneralIoError e.Message)
+
+let parseJsonToTags (json: string) : Result<LibraryTags array, Error> =
+    parseJsonToTags json
+    |> Result.mapError ParseError
 
 let parseFileTags (filePath: string) : Result<TaggedFile, Error> =
     try Ok (TaggedFile.Create filePath)

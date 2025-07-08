@@ -15,7 +15,7 @@ let private run (args: string array) : Result<unit, Error> =
         let! output =
             tagLibraryFile
             |> IO.readFile
-            >>= IO.parseToTags
+            >>= IO.parseJsonToTags
             <.> fun tags -> printfn $"Parsed tags for {formatInt tags.Length} files from the tag library."
             <!> getArtistsWithGenres
             <.> fun xs -> printfn $"Prepared {formatInt xs.Length} artist-genre pairs."

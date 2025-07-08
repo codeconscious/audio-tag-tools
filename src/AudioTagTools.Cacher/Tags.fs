@@ -7,21 +7,8 @@ open Errors
 open Operators
 open Utilities
 open FsToolkit.ErrorHandling
+open TagLibrary
 
-type LibraryTags =
-    {
-        FileNameOnly: string
-        DirectoryName: string
-        Artists: string array
-        AlbumArtists: string array
-        Album: string
-        TrackNo: uint
-        Title: string
-        Year: uint
-        Genres: string array
-        Duration: TimeSpan
-        LastWriteTime: DateTimeOffset
-    }
 
 type TagMap = Map<string, LibraryTags>
 
@@ -35,9 +22,6 @@ type CategorizedTagsToCache =
       Tags: LibraryTags }
 
 let createTagLibraryMap (libraryFile: FileInfo) : Result<TagMap, Error> =
-    let parseTagLibrary (json: string) : Result<LibraryTags array, Error> =
-        try Ok (JsonSerializer.Deserialize<LibraryTags array>(json))
-        with e -> Error (ParseError e.Message)
 
     let audioFilePath (fileTags: LibraryTags) : string =
         Path.Combine [| fileTags.DirectoryName; fileTags.FileNameOnly |]
@@ -46,7 +30,7 @@ let createTagLibraryMap (libraryFile: FileInfo) : Result<TagMap, Error> =
     then
         libraryFile.FullName
         |> readfile
-        >>= parseTagLibrary
+        >>= IO.parseJsonToTags
         <!> Array.map (fun tags -> audioFilePath tags, tags)
         <!> Map.ofArray
     else
