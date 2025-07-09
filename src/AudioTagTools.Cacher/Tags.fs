@@ -70,7 +70,7 @@ let private prepareTagsToWrite (tagLibraryMap: TagMap) (fileInfos: FileInfo seq)
                 LastWriteTime = DateTimeOffset fileInfo.LastWriteTime
             }
 
-        let tagsFromFile (fileInfo: FileInfo) (fileTags: TaggedFile) =
+        let tagsFromFile (fileInfo: FileInfo) (fileTags: FileTags) =
             {
                 FileNameOnly = fileInfo.Name
                 DirectoryName = fileInfo.DirectoryName

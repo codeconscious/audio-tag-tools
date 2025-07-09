@@ -5,7 +5,7 @@ open Errors
 open Utilities
 open TagLibrary
 
-type TaggedFile = TagLib.File
+type FileTags = TagLib.File
 
 let readfile filePath : Result<string, Error> =
     match readAllText filePath with
@@ -28,8 +28,8 @@ let parseJsonToTags (json: string) : Result<LibraryTags array, Error> =
     parseJsonToTags json
     |> Result.mapError ParseError
 
-let parseFileTags (filePath: string) : Result<TaggedFile, Error> =
-    try Ok (TaggedFile.Create filePath)
+let parseFileTags (filePath: string) : Result<FileTags, Error> =
+    try Ok (FileTags.Create filePath)
     with e -> Error (ParseError e.Message)
 
 let writeFile (filePath: string) (content: string) : Result<unit, Error> =
