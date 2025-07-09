@@ -85,7 +85,9 @@ let private prepareTagsToWrite (tagLibraryMap: TagMap) (fileInfos: FileInfo seq)
                         then String.Empty
                         else fileTags.Tag.Album.Normalize()
                 TrackNo = fileTags.Tag.Track
-                Title = fileTags.Tag.Title
+                Title = if fileTags.Tag.Title = null
+                        then String.Empty
+                        else fileTags.Tag.Title.Normalize()
                 Year = fileTags.Tag.Year
                 Genres = fileTags.Tag.Genres
                 Duration = fileTags.Properties.Duration
