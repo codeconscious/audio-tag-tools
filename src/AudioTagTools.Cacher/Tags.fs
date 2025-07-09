@@ -74,20 +74,17 @@ let private prepareTagsToWrite (tagLibraryMap: TagMap) (fileInfos: FileInfo seq)
             {
                 FileNameOnly = fileInfo.Name
                 DirectoryName = fileInfo.DirectoryName
-                Artists = if fileTags.Tag.Performers = null
-                          then [| String.Empty |]
-                          else fileTags.Tag.Performers
-                               |> Array.map (fun p -> p.Normalize())
-                AlbumArtists = if fileTags.Tag.AlbumArtists = null
-                               then [| String.Empty |]
-                               else fileTags.Tag.AlbumArtists |> Array.map _.Normalize()
-                Album = if fileTags.Tag.Album = null
-                        then String.Empty
-                        else fileTags.Tag.Album.Normalize()
+                Artists = fileTags.Tag.Performers |> Array.map _.Normalize()
+                AlbumArtists = fileTags.Tag.AlbumArtists |> Array.map _.Normalize()
+                Album = fileTags.Tag.Album
+                        |> Option.ofObj
+                        |> Option.map _.Normalize()
+                        |> Option.defaultValue String.Empty
                 TrackNo = fileTags.Tag.Track
-                Title = if fileTags.Tag.Title = null
-                        then String.Empty
-                        else fileTags.Tag.Title.Normalize()
+                Title = fileTags.Tag.Title
+                        |> Option.ofObj
+                        |> Option.map _.Normalize()
+                        |> Option.defaultValue String.Empty
                 Year = fileTags.Tag.Year
                 Genres = fileTags.Tag.Genres
                 Duration = fileTags.Properties.Duration
