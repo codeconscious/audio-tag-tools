@@ -94,14 +94,9 @@ let private prepareTagsToWrite (tagLibraryMap: TagMap) (fileInfos: FileInfo seq)
                 LastWriteTime = DateTimeOffset fileInfo.LastWriteTime
             }
 
-        let fileTags = parseFileTags fileInfo.FullName
-
-        match fileTags with
-        | Error _ -> blankTags
-        | Ok fileTags ->
-            if fileTags.Tag = null
-            then blankTags
-            else tagsFromFile fileInfo fileTags
+        match parseFileTags fileInfo.FullName with
+        | Ok (Some tags) -> tagsFromFile fileInfo tags
+        | _ -> blankTags
 
     let prepareTagsToCache (tagLibraryMap: TagMap) (audioFile: FileInfo) : CategorizedTagsToCache =
         if Map.containsKey audioFile.FullName tagLibraryMap
