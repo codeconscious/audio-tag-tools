@@ -26,14 +26,14 @@ let getFileInfos (dirPath: DirectoryInfo) : Result<FileInfo seq, Error> =
 
 let parseJsonToTags (json: string) : Result<LibraryTags array, Error> =
     parseJsonToTags json
-    |> Result.mapError ParseError
+    |> Result.mapError LibraryTagParseError
 
 let parseFileTags (filePath: string) : Result<FileTags option, Error> =
     try
         FileTags.Create filePath
         |> Option.ofObj
         |> Ok
-    with e -> Error (ParseError e.Message)
+    with e -> Error (FileTagParseError e.Message)
 
 let writeFile (filePath: string) (content: string) : Result<unit, Error> =
     try Ok (File.WriteAllText(filePath, content))
