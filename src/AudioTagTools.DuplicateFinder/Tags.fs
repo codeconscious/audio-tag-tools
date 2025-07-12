@@ -88,7 +88,7 @@ let printFilteredCount (tags: LibraryTags array) =
     printfn $"Filtered file count: %s{formatNumber tags.Length}"
 
 let printResults (groupedTracks: LibraryTags array array option) =
-    let print index (groupTracks: LibraryTags array) =
+    let printGroup index (groupTracks: LibraryTags array) =
         // Print the joined artists from this group's first file.
         groupTracks
         |> Array.head
@@ -106,4 +106,4 @@ let printResults (groupedTracks: LibraryTags array array option) =
 
     match groupedTracks with
     | None -> printfn "No duplicates found."
-    | Some gt -> gt |> Array.iteri print
+    | Some gt -> gt |> Array.iteri printGroup
