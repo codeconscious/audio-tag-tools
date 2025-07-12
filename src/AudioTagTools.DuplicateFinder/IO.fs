@@ -14,7 +14,7 @@ let readFile (fileInfo: FileInfo) : Result<string, Error> =
     |> readFile
     |> Result.mapError ReadFileError
 
-let savePlaylist (settings: SettingsRoot) (tags: LibraryTags array array) : Result<unit, Error> =
+let savePlaylist (settings: SettingsRoot) (tags: LibraryTags array array option) : Result<unit, Error> =
     let now = DateTime.Now.ToString("yyyyMMdd_HHmmss")
     let filename = $"Duplicates by AudioTagTools - {now}.m3u"
     let fullPath = Path.Combine(settings.Playlist.SaveDirectory, filename)
@@ -36,10 +36,13 @@ let savePlaylist (settings: SettingsRoot) (tags: LibraryTags array array) : Resu
         builder.AppendLine updatedPath |> ignore
         builder
 
-    tags
-    |> Seq.collect id
-    |> Seq.fold appendFileEntry (StringBuilder "#EXTM3U\n")
-    |> _.ToString()
-    |> writeTextToFile fullPath
-    |> Result.tee (fun _ -> printfn $"Created playlist file \"{fullPath}\".")
-    |> Result.mapError WriteFileError
+    match tags with
+    | None -> Ok ()
+    | Some tags ->
+        tags
+        |> Seq.collect id
+        |> Seq.fold appendFileEntry (StringBuilder "#EXTM3U\n")
+        |> _.ToString()
+        |> writeTextToFile fullPath
+        |> Result.tee (fun _ -> printfn $"Created playlist file \"{fullPath}\".")
+        |> Result.mapError WriteFileError

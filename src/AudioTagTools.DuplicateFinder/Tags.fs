@@ -72,13 +72,14 @@ let private groupName (settings: SettingsRoot) (track: LibraryTags) =
         .Normalize(NormalizationForm.FormC)
         .ToLowerInvariant()
 
-let findDuplicates (settings: SettingsRoot) (tags: LibraryTags array) : LibraryTags array array =
+let findDuplicates (settings: SettingsRoot) (tags: LibraryTags array) : LibraryTags array array option =
     tags
     |> Array.filter hasArtistOrTitle
     |> Array.groupBy (groupName settings)
     |> Array.sortBy fst
     |> Array.map snd
     |> Array.filter (fun groupedTracks -> groupedTracks.Length > 1)
+    |> function [||] -> None | tagData -> Some tagData
 
 let printTotalCount (tags: LibraryTags array) =
     printfn $"Total file count:    %s{formatNumber tags.Length}"
@@ -86,7 +87,7 @@ let printTotalCount (tags: LibraryTags array) =
 let printFilteredCount (tags: LibraryTags array) =
     printfn $"Filtered file count: %s{formatNumber tags.Length}"
 
-let printResults (groupedTracks: LibraryTags array array) =
+let printResults (groupedTracks: LibraryTags array array option) =
     let print index (groupTracks: LibraryTags array) =
         // Print the joined artists from this group's first file.
         groupTracks
@@ -103,6 +104,6 @@ let printResults (groupedTracks: LibraryTags array array) =
         groupTracks
         |> Array.iter (fun x -> printfn $"""    • {artistText x}{x.Title}""")
 
-    if Array.isEmpty groupedTracks
-    then printfn "No duplicates found."
-    else groupedTracks |> Array.iteri print
+    match groupedTracks with
+    | None -> printfn "No duplicates found."
+    | Some gt -> gt |> Array.iteri print
