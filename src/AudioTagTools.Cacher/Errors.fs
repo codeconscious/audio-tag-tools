@@ -16,6 +16,6 @@ let message = function
     | ReadFileError msg -> $"Read failure: {msg}"
     | WriteFileError msg -> $"Write failure: {msg}"
     | GeneralIoError msg -> $"I/O failure: {msg}"
-    | LibraryTagParseError msg -> $"Library tag arse error: {msg}"
+    | LibraryTagParseError msg -> $"Library tag parse error: {msg}"
     | FileTagParseError msg -> $"File tag parse error: {msg}"
     | JsonSerializationError msg -> $"JSON serialization error: {msg}"
