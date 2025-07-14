@@ -3,7 +3,7 @@ module Exporting
 open System
 open TagLibrary
 
-let private mainArtist (fileTags: FileTags) =
+let private mainArtist (fileTags: LibraryTags) =
     match fileTags with
     | a when a.Artists.Length > 0 -> a.Artists[0]
     | a when a.AlbumArtists.Length > 0 -> a.AlbumArtists[0]
@@ -20,7 +20,7 @@ let private mostCommon (items: string seq) : string =
     |> Option.map fst
     |> Option.defaultValue String.Empty
 
-let private allGenres (fileTags: FileTags array) : string array =
+let private allGenres (fileTags: LibraryTags array) : string array =
     fileTags
     |> Array.map _.Genres
     |> Array.filter (fun gs -> gs.Length > 0)
@@ -28,10 +28,10 @@ let private allGenres (fileTags: FileTags array) : string array =
 
 let private mostCommonGenres = allGenres >> mostCommon
 
-let getArtistsWithGenres (filesTagCollection: FileTagCollection) =
+let getArtistsWithGenres (allFileTags: LibraryTags array) =
     let separator = "＼" // Should be a character unlikely to appear in files' tags.
 
-    filesTagCollection
+    allFileTags
     |> Array.groupBy mainArtist
     |> Array.filter (fun (a, _) -> a <> String.Empty) // Maybe need tag check too.
     |> Array.map (fun (a, ts) -> a, mostCommonGenres ts)

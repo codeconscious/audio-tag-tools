@@ -6,7 +6,8 @@ type Error =
     | ReadFileError of string
     | WriteFileError of string
     | GeneralIoError of string
-    | ParseError of string
+    | LibraryTagParseError of string
+    | FileTagParseError of string
     | JsonSerializationError of string
 
 let message = function
@@ -15,5 +16,6 @@ let message = function
     | ReadFileError msg -> $"Read failure: {msg}"
     | WriteFileError msg -> $"Write failure: {msg}"
     | GeneralIoError msg -> $"I/O failure: {msg}"
-    | ParseError msg -> $"Parse error: {msg}"
+    | LibraryTagParseError msg -> $"Library tag parse error: {msg}"
+    | FileTagParseError msg -> $"File tag parse error: {msg}"
     | JsonSerializationError msg -> $"JSON serialization error: {msg}"

@@ -3,8 +3,9 @@ module IO
 open System.IO
 open Errors
 open Utilities
+open TagLibrary
 
-type TaggedFile = TagLib.File
+type FileTags = TagLib.File
 
 let readfile filePath : Result<string, Error> =
     match readAllText filePath with
@@ -23,12 +24,17 @@ let getFileInfos (dirPath: DirectoryInfo) : Result<FileInfo seq, Error> =
     with
     | e -> Error (GeneralIoError e.Message)
 
-let readFileTags (filePath: string) : TaggedFile =
-    TaggedFile.Create filePath // TODO: Enclose in try/with.
+let parseJsonToTags (json: string) : Result<LibraryTags array, Error> =
+    parseJsonToTags json
+    |> Result.mapError LibraryTagParseError
+
+let parseFileTags (filePath: string) : Result<FileTags option, Error> =
+    try
+        FileTags.Create filePath
+        |> Option.ofObj
+        |> Ok
+    with e -> Error (FileTagParseError e.Message)
 
 let writeFile (filePath: string) (content: string) : Result<unit, Error> =
-    try
-        File.WriteAllText(filePath, content)
-        |> Ok
-    with
-    | e -> Error (WriteFileError e.Message)
+    try Ok (File.WriteAllText(filePath, content))
+    with e -> Error (WriteFileError e.Message)

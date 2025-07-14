@@ -9,20 +9,20 @@ open System
 open System.Text
 
 let parseToTags json =
-    parseToTags json
+    parseJsonToTags json
     |> Result.mapError TagParseError
 
-let filter (settings: SettingsRoot) (allTags: FileTagCollection) : FileTags array =
-    let excludeFile (settings: SettingsRoot) (fileTags: FileTags) : bool =
+let filter (settings: SettingsRoot) (allTags: LibraryTags array) : LibraryTags array =
+    let excludeFile (settings: SettingsRoot) (tags: LibraryTags) : bool =
         let isExcluded (exclusion: SettingsProvider.Exclusion) : bool =
             match exclusion.Artist, exclusion.Title with
             | Some a, Some t ->
-                anyContains [fileTags.AlbumArtists; fileTags.Artists] a &&
-                fileTags.Title.StartsWith(t, StringComparison.InvariantCultureIgnoreCase)
+                anyContains [tags.AlbumArtists; tags.Artists] a &&
+                tags.Title.StartsWith(t, StringComparison.InvariantCultureIgnoreCase)
             | Some a, None ->
-                anyContains [fileTags.AlbumArtists; fileTags.Artists] a
+                anyContains [tags.AlbumArtists; tags.Artists] a
             | None, Some t ->
-                fileTags.Title.StartsWith(t, StringComparison.InvariantCultureIgnoreCase)
+                tags.Title.StartsWith(t, StringComparison.InvariantCultureIgnoreCase)
             | _ -> false
 
         settings.Exclusions
@@ -32,25 +32,26 @@ let filter (settings: SettingsRoot) (allTags: FileTagCollection) : FileTags arra
     |> Array.filter (not << excludeFile settings)
 
 let private hasArtistOrTitle track =
-    let hasAnyArtist (track: FileTags) =
+    let hasAnyArtist (track: LibraryTags) =
         track.Artists.Length > 0 || track.AlbumArtists.Length > 0
 
-    let hasTitle (track: FileTags) =
+    let hasTitle (track: LibraryTags) =
         not <| String.IsNullOrWhiteSpace track.Title
 
     hasAnyArtist track && hasTitle track
 
-let private mainArtists (separator: string) (track: FileTags) =
+let private mainArtists (separator: string) (track: LibraryTags) =
     match track with
     | t when t.AlbumArtists.Length > 0
+             && t.AlbumArtists[0] <> "Various"
              && t.AlbumArtists[0] <> "Various Artists"
-             && t.AlbumArtists[0] <> "Various" ->
+             && t.AlbumArtists[0] <> "Multiple Artists" ->
         t.AlbumArtists
     | t ->
         t.Artists
     |> String.concat separator
 
-let private groupName (settings: SettingsRoot) (track: FileTags) =
+let private groupName (settings: SettingsRoot) (track: LibraryTags) =
     // It appears JSON type providers do not import whitespace-only values. Whitespace should
     // always be ignored to increase the accuracy of duplicate checks, so they are added here.
     let removeSubstrings arr =
@@ -71,29 +72,30 @@ let private groupName (settings: SettingsRoot) (track: FileTags) =
         .Normalize(NormalizationForm.FormC)
         .ToLowerInvariant()
 
-let findDuplicates (settings: SettingsRoot) (tags: FilteredTagCollection) : FileTags array array =
+let findDuplicates (settings: SettingsRoot) (tags: LibraryTags array) : LibraryTags array array option =
     tags
     |> Array.filter hasArtistOrTitle
     |> Array.groupBy (groupName settings)
     |> Array.sortBy fst
     |> Array.map snd
     |> Array.filter (fun groupedTracks -> groupedTracks.Length > 1)
+    |> function [||] -> None | tagData -> Some tagData
 
-let printTotalCount (tags: FileTagCollection) =
+let printTotalCount (tags: LibraryTags array) =
     printfn $"Total file count:    %s{formatNumber tags.Length}"
 
-let printFilteredCount (tags: FilteredTagCollection) =
+let printFilteredCount (tags: LibraryTags array) =
     printfn $"Filtered file count: %s{formatNumber tags.Length}"
 
-let printResults (groupedTracks: FileTags array array) =
-    let print index (groupTracks: FileTags array) =
+let printResults (groupedTracks: LibraryTags array array option) =
+    let printGroup index (groupTracks: LibraryTags array) =
         // Print the joined artists from this group's first file.
         groupTracks
         |> Array.head
         |> mainArtists ", "
         |> printfn "%d. %s" (index + 1) // Start at 1, not 0.
 
-        let artistText (track: FileTags) =
+        let artistText (track: LibraryTags) =
             if Array.isEmpty track.Artists
             then String.Empty
             else $"""{String.Join(", ", track.Artists)}  /  """
@@ -102,6 +104,6 @@ let printResults (groupedTracks: FileTags array array) =
         groupTracks
         |> Array.iter (fun x -> printfn $"""    • {artistText x}{x.Title}""")
 
-    if Array.isEmpty groupedTracks
-    then printfn "No duplicates found."
-    else groupedTracks |> Array.iteri print
+    match groupedTracks with
+    | None -> printfn "No duplicates found."
+    | Some gt -> gt |> Array.iteri printGroup
