@@ -40,21 +40,9 @@ let private prepareTagsToWrite (tagLibraryMap: TagMap) (fileInfos: FileInfo seq)
     : CategorizedTagsToCache seq
     =
     let copyCachedTags (libraryTags: LibraryTags) =
-        {
-            FileNameOnly = libraryTags.FileNameOnly
-            DirectoryName = libraryTags.DirectoryName
-            Artists = libraryTags.Artists
-            AlbumArtists = libraryTags.AlbumArtists
-            Album = libraryTags.Album
-            TrackNo = uint libraryTags.TrackNo
-            Title = libraryTags.Title
-            Year = uint libraryTags.Year
-            Genres = libraryTags.Genres
-            Duration = libraryTags.Duration
-            LastWriteTime = DateTimeOffset libraryTags.LastWriteTime.DateTime
-        }
+        { libraryTags with LastWriteTime = DateTimeOffset libraryTags.LastWriteTime.DateTime }
 
-    let generateTags (fileInfo: FileInfo) : LibraryTags =
+    let generateNewTags (fileInfo: FileInfo) : LibraryTags =
         let blankTags =
             {
                 FileNameOnly = fileInfo.Name
@@ -67,6 +55,8 @@ let private prepareTagsToWrite (tagLibraryMap: TagMap) (fileInfos: FileInfo seq)
                 Year = 0u
                 Genres = [| String.Empty |]
                 Duration = TimeSpan.Zero
+                BitRate = 0
+                SampleRate = 0
                 LastWriteTime = DateTimeOffset fileInfo.LastWriteTime
             }
 
@@ -88,6 +78,8 @@ let private prepareTagsToWrite (tagLibraryMap: TagMap) (fileInfos: FileInfo seq)
                 Year = fileTags.Tag.Year
                 Genres = fileTags.Tag.Genres
                 Duration = fileTags.Properties.Duration
+                BitRate = fileTags.Properties.AudioBitrate
+                SampleRate = fileTags.Properties.AudioSampleRate
                 LastWriteTime = DateTimeOffset fileInfo.LastWriteTime
             }
 
@@ -100,9 +92,9 @@ let private prepareTagsToWrite (tagLibraryMap: TagMap) (fileInfos: FileInfo seq)
         then
             let libraryTags = Map.find audioFile.FullName tagLibraryMap
             if libraryTags.LastWriteTime.DateTime < audioFile.LastWriteTime
-            then { Type = OutOfDate; Tags = (generateTags audioFile) }
+            then { Type = OutOfDate; Tags = (generateNewTags audioFile) }
             else { Type = Unchanged; Tags = (copyCachedTags libraryTags) }
-        else { Type = NotPresent; Tags = (generateTags audioFile) }
+        else { Type = NotPresent; Tags = (generateNewTags audioFile) }
 
     fileInfos
     |> Seq.map (prepareTagsToCache tagLibraryMap)
