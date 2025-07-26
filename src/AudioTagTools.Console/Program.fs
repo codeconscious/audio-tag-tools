@@ -8,29 +8,32 @@ let commandInstructions =
     commandMap
     |> Map.keys
     |> String.concat "\" or \""
-    |> sprintf "You must pass in a supported command: \"%s\"."
+    |> sprintf "Supply a supported command: \"%s\"."
 
 type ExitCode =
     | Success = 0
-    | Failure = 1
+    | InvalidArgumentCount = 1
+    | InvalidCommand = 2
+    | OperationFailure = 3
 
 [<EntryPoint>]
-let main args : int =
+let main allArgs : int =
     let watch = Startwatch.Library.Watch()
 
-    match args with
+    match allArgs with
     | [| |] ->
         printfn $"{commandInstructions}"
-        ExitCode.Failure
+        ExitCode.InvalidArgumentCount
     | _ ->
-        let command = args[0]
-        let flags = args[1..]
-
         printfn "Starting..."
 
-        match Map.tryFind command commandMap with
+        let command = Array.head allArgs
+        let operationArgs = Array.tail allArgs
+
+        Map.tryFind command commandMap
+        |> function
         | Some requestedOperation ->
-            match requestedOperation flags with
+            match requestedOperation operationArgs with
             | Ok msg ->
                 printfn $"{msg}"
                 printfn $"Done in {watch.ElapsedFriendly}."
@@ -38,8 +41,8 @@ let main args : int =
             | Error msg ->
                 printfn $"{msg}"
                 printfn $"Failed after {watch.ElapsedFriendly}."
-                ExitCode.Failure
+                ExitCode.OperationFailure
         | None ->
             printfn $"Invalid command \"{command}\". {commandInstructions}"
-            ExitCode.Failure
+            ExitCode.InvalidCommand
     |> int
