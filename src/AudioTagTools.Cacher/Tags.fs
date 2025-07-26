@@ -57,6 +57,7 @@ let private prepareTagsToWrite (tagLibraryMap: TagMap) (fileInfos: FileInfo seq)
                 Duration = TimeSpan.Zero
                 BitRate = 0
                 SampleRate = 0
+                FileSize = 0
                 LastWriteTime = DateTimeOffset fileInfo.LastWriteTime
             }
 
@@ -80,6 +81,7 @@ let private prepareTagsToWrite (tagLibraryMap: TagMap) (fileInfos: FileInfo seq)
                 Duration = fileTags.Properties.Duration
                 BitRate = fileTags.Properties.AudioBitrate
                 SampleRate = fileTags.Properties.AudioSampleRate
+                FileSize = fileInfo.Length
                 LastWriteTime = DateTimeOffset fileInfo.LastWriteTime
             }
 

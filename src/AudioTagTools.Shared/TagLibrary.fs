@@ -18,6 +18,7 @@ type LibraryTags =
         LastWriteTime: DateTimeOffset
         BitRate: int
         SampleRate: int
+        FileSize: int64
     }
 
 let parseJsonToTags (json: string) : Result<LibraryTags array, string> =
