@@ -48,15 +48,13 @@ let private prepareTagsToWrite (tagLibraryMap: TagMap) (fileInfos: FileInfo seq)
                 DirectoryName = fileInfo.DirectoryName
                 Artists = fileTags.Tag.Performers |> Array.map _.Normalize()
                 AlbumArtists = fileTags.Tag.AlbumArtists |> Array.map _.Normalize()
-                Album = fileTags.Tag.Album
-                        |> Option.ofObj
-                        |> Option.map _.Normalize()
-                        |> Option.defaultValue String.Empty
+                Album = match fileTags.Tag.Album with
+                        | null  -> String.Empty
+                        | album -> album.Normalize()
                 TrackNo = fileTags.Tag.Track
-                Title = fileTags.Tag.Title
-                        |> Option.ofObj
-                        |> Option.map _.Normalize()
-                        |> Option.defaultValue String.Empty
+                Title = match fileTags.Tag.Title with
+                        | null  -> String.Empty
+                        | title -> title.Normalize()
                 Year = fileTags.Tag.Year
                 Genres = fileTags.Tag.Genres
                 Duration = fileTags.Properties.Duration
