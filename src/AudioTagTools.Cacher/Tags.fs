@@ -9,7 +9,6 @@ open Utilities
 open FsToolkit.ErrorHandling
 open TagLibrary
 
-
 type TagMap = Map<string, LibraryTags>
 
 type LibraryComparisonResult =
@@ -43,25 +42,7 @@ let private prepareTagsToWrite (tagLibraryMap: TagMap) (fileInfos: FileInfo seq)
         { libraryTags with LastWriteTime = DateTimeOffset libraryTags.LastWriteTime.DateTime }
 
     let generateNewTags (fileInfo: FileInfo) : LibraryTags =
-        let blankTags =
-            {
-                FileNameOnly = fileInfo.Name
-                DirectoryName = fileInfo.DirectoryName
-                Artists = [| String.Empty |]
-                AlbumArtists = [| String.Empty |]
-                Album = String.Empty
-                TrackNo = 0u
-                Title = String.Empty
-                Year = 0u
-                Genres = [| String.Empty |]
-                Duration = TimeSpan.Zero
-                BitRate = 0
-                SampleRate = 0
-                FileSize = 0
-                LastWriteTime = DateTimeOffset fileInfo.LastWriteTime
-            }
-
-        let tagsFromFile (fileInfo: FileInfo) (fileTags: FileTags) =
+       let tagsFromFile (fileInfo: FileInfo) (fileTags: FileTags) =
             {
                 FileNameOnly = fileInfo.Name
                 DirectoryName = fileInfo.DirectoryName
@@ -85,9 +66,9 @@ let private prepareTagsToWrite (tagLibraryMap: TagMap) (fileInfos: FileInfo seq)
                 LastWriteTime = DateTimeOffset fileInfo.LastWriteTime
             }
 
-        match parseFileTags fileInfo.FullName with
-        | Ok (Some tags) -> tagsFromFile fileInfo tags
-        | _ -> blankTags
+       match parseFileTags fileInfo.FullName with
+       | Ok (Some tags) -> tagsFromFile fileInfo tags
+       | _ -> blankTags fileInfo
 
     let prepareTagsToCache (tagLibraryMap: TagMap) (audioFile: FileInfo) : CategorizedTagsToCache =
         if Map.containsKey audioFile.FullName tagLibraryMap
