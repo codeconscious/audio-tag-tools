@@ -16,10 +16,10 @@ type LibraryTags =
         Year: uint
         Genres: string array
         Duration: TimeSpan
-        LastWriteTime: DateTimeOffset
         BitRate: int
         SampleRate: int
         FileSize: int64
+        LastWriteTime: DateTimeOffset
     }
 
 let blankTags (fileInfo: FileInfo) : LibraryTags =
