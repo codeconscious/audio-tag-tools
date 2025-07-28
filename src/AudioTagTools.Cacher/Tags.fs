@@ -23,7 +23,7 @@ type CategorizedTagsToCache =
 let createTagLibraryMap (libraryFile: FileInfo) : Result<TagMap, Error> =
 
     let audioFilePath (fileTags: LibraryTags) : string =
-        Path.Combine [| fileTags.DirectoryName; fileTags.FileNameOnly |]
+        Path.Combine [| fileTags.DirectoryName; fileTags.FileName |]
 
     if libraryFile.Exists
     then
@@ -44,13 +44,14 @@ let private prepareTagsToWrite (tagLibraryMap: TagMap) (fileInfos: FileInfo seq)
     let generateNewTags (fileInfo: FileInfo) : LibraryTags =
        let tagsFromFile (fileInfo: FileInfo) (fileTags: FileTags) =
             {
-                FileNameOnly = fileInfo.Name
+                FileName = fileInfo.Name
                 DirectoryName = fileInfo.DirectoryName
                 Artists = fileTags.Tag.Performers |> Array.map _.Normalize()
                 AlbumArtists = fileTags.Tag.AlbumArtists |> Array.map _.Normalize()
                 Album = match fileTags.Tag.Album with
                         | null  -> String.Empty
                         | album -> album.Normalize()
+                DiscNo = fileTags.Tag.Disc
                 TrackNo = fileTags.Tag.Track
                 Title = match fileTags.Tag.Title with
                         | null  -> String.Empty
@@ -61,6 +62,7 @@ let private prepareTagsToWrite (tagLibraryMap: TagMap) (fileInfos: FileInfo seq)
                 BitRate = fileTags.Properties.AudioBitrate
                 SampleRate = fileTags.Properties.AudioSampleRate
                 FileSize = fileInfo.Length
+                ImageCount = fileTags.Tag.Pictures.Length
                 LastWriteTime = DateTimeOffset fileInfo.LastWriteTime
             }
 
