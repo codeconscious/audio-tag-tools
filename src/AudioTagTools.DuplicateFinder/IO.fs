@@ -26,7 +26,7 @@ let savePlaylist (settings: SettingsRoot) (tags: LibraryTags array array option)
         let extInf = $"#EXTINF:{seconds},{artistWithTitle}"
         builder.AppendLine extInf |> ignore
 
-        let fullPath = Path.Combine(m.DirectoryName, m.FileNameOnly)
+        let fullPath = Path.Combine(m.DirectoryName, m.FileName)
 
         let updatedPath =
             match settings.Playlist.SearchPath, settings.Playlist.ReplacePath with
