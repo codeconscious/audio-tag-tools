@@ -14,7 +14,9 @@ let readfile filePath : Result<string, Error> =
 
 let getFileInfos (dirPath: DirectoryInfo) : Result<FileInfo seq, Error> =
     let isSupportedAudioFile (fileInfo: FileInfo) =
-        [".mp3"; ".m4a"; ".mp4"; ".ogg"; ".flac"]
+        // Supported formats from https://github.com/mono/taglib-sharp.
+        ["aa"; "aax"; "aac"; "aiff"; "ape"; "dsf"; "flac"; "m4a"; "m4b"; "m4p"
+         "mp3"; "mpc"; "mpp"; "ogg"; "oga"; "wav"; "wma"; "wv"; "webm"]
         |> List.contains fileInfo.Extension
 
     try
