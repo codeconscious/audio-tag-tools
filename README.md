@@ -44,7 +44,7 @@ The file will be in this JSON format:
 ```json
 [
   {
-    "FileNameOnly": "FILENAME.m4a",
+    "FileName": "FILENAME.m4a",
     "DirectoryName": "FULL_DIRECTORY_NAME",
     "Artists": [
       "SAMPLE ARTIST NAME"
