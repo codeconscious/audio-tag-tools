@@ -41,11 +41,14 @@ let private hasArtistOrTitle track =
     hasAnyArtist track && hasTitle track
 
 let private mainArtists (separator: string) (track: LibraryTags) =
+    let noForbiddenAlbumArtists artist =
+        [| String.Empty; "Various"; "Various Artists"; "Multiple Artists" |]
+        |> Array.exists _.Equals(artist, StringComparison.InvariantCultureIgnoreCase)
+        |> not
+
     match track with
     | t when t.AlbumArtists.Length > 0
-             && t.AlbumArtists[0] <> "Various"
-             && t.AlbumArtists[0] <> "Various Artists"
-             && t.AlbumArtists[0] <> "Multiple Artists" ->
+             && noForbiddenAlbumArtists t.AlbumArtists[0] ->
         t.AlbumArtists
     | t ->
         t.Artists
