@@ -40,7 +40,7 @@ let blankTags (fileInfo: FileInfo) : LibraryTags =
         BitRate = 0
         SampleRate = 0
         FileSize = 0
-        ImageCount = 1
+        ImageCount = 0
         LastWriteTime = DateTimeOffset fileInfo.LastWriteTime
     }
 
