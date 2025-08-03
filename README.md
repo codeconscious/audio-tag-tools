@@ -184,3 +184,14 @@ dotnet run -- export-genres ~/Downloads/Music/tagLibrary.json ~/Downloads/Music/
 ```
 
 If a genres file already exists at that path, a backup will be created automatically.
+
+## Exit codes
+
+The program returns the following exit codes:
+
+| Code | Meaning                                |
+|------|----------------------------------------|
+| 0    | Finished without issue                 |
+| 1    | Invalid argument count                 |
+| 2    | Invalid command                        |
+| 3    | Failure during the requested operation |
