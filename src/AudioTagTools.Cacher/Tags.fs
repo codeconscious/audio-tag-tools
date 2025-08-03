@@ -1,7 +1,6 @@
 module Tags
 
 open System
-open System.Text.Json
 open IO
 open Errors
 open Operators
