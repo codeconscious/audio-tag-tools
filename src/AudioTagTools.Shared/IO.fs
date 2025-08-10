@@ -18,7 +18,7 @@ let writeLinesToFile (filePath: string) (lines: string array) : Result<unit, str
     try Ok (File.WriteAllLines(filePath, lines))
     with ex -> Error ex.Message
 
-let copyToBackupFile (fileInfo: FileInfo) : Result<FileInfo option, string> =
+let copyToBackupFile (fileInfo: FileInfo) : Result<unit, string> =
     let generateBackUpFilePath (tagLibraryFile: FileInfo) : string =
         let baseName = Path.GetFileNameWithoutExtension tagLibraryFile.Name
         let timestamp = DateTimeOffset.Now.ToString "yyyyMMdd_HHmmss"
@@ -37,8 +37,8 @@ let copyToBackupFile (fileInfo: FileInfo) : Result<FileInfo option, string> =
             |> generateBackUpFilePath
             |> fileInfo.CopyTo
             |> printConfirmation
-            |> Some
+            |> ignore
             |> Ok
         with
         | ex -> Error ex.Message
-    else Ok None
+    else Error "Source file does not exist, so it cannot be backed up."

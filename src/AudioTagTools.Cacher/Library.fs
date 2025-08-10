@@ -15,7 +15,7 @@ let private run (args: string array) : Result<unit, Error> =
         let! tagLibraryMap = createTagLibraryMap tagLibraryFile
         let! newJson = generateNewJson tagLibraryMap fileInfos
 
-        let! _ =
+        do!
             copyToBackupFile tagLibraryFile
             |> Result.mapError WriteFileError
 
