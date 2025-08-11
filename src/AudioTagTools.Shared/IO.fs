@@ -18,27 +18,20 @@ let writeLinesToFile (filePath: string) (lines: string array) : Result<unit, str
     try Ok (File.WriteAllLines(filePath, lines))
     with ex -> Error ex.Message
 
-let copyToBackupFile (fileInfo: FileInfo) : Result<unit, string> =
-    let generateBackUpFilePath (tagLibraryFile: FileInfo) : string =
-        let baseName = Path.GetFileNameWithoutExtension tagLibraryFile.Name
-        let timestamp = DateTimeOffset.Now.ToString "yyyyMMdd_HHmmss"
-        let extension = tagLibraryFile.Extension // Includes the initial period.
-        let fileName = $"%s{baseName}.%s{timestamp}_backup%s{extension}"
-        Path.Combine(tagLibraryFile.DirectoryName, fileName)
+let copyToBackupFile (tagLibrary: FileInfo) : Result<FileInfo, string> =
+    if not tagLibrary.Exists then
+        Error "Source tag library file does not exist, so it cannot be backed up."
+    else
+        let generateBackUpFilePath () : string =
+            let baseName = Path.GetFileNameWithoutExtension tagLibrary.Name
+            let nowText = DateTimeOffset.Now.ToString "yyyyMMdd_HHmmss"
+            let extension = tagLibrary.Extension // Includes the initial period.
+            let fileName = $"%s{baseName}.%s{nowText}_backup%s{extension}"
+            Path.Combine(tagLibrary.DirectoryName, fileName)
 
-    let printConfirmation (backupFile: FileInfo) =
-        printfn "Backed up previous file to \"%s\"." backupFile.Name
-        backupFile
-
-    if fileInfo.Exists
-    then
         try
-            fileInfo
-            |> generateBackUpFilePath
-            |> fileInfo.CopyTo
-            |> printConfirmation
-            |> ignore
+            generateBackUpFilePath()
+            |> tagLibrary.CopyTo
             |> Ok
         with
         | ex -> Error ex.Message
-    else Error "Source file does not exist, so it cannot be backed up."
