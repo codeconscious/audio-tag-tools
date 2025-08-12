@@ -10,12 +10,18 @@ let readFile (fileInfo: FileInfo) : Result<string, string> =
         |> Ok
     with ex -> Error ex.Message
 
-let writeTextToFile (filePath: string) (text: string) : Result<unit, string> =
-    try Ok (File.WriteAllText(filePath, text))
+let writeTextToFile (writePath: string) (text: string) : Result<unit, string> =
+    try
+        (writePath, text)
+        |> File.WriteAllText
+        |> Ok
     with ex -> Error ex.Message
 
-let writeLinesToFile (filePath: string) (lines: string array) : Result<unit, string> =
-    try Ok (File.WriteAllLines(filePath, lines))
+let writeLinesToFile (writePath: string) (lines: string array) : Result<unit, string> =
+    try
+        (writePath, lines)
+        |> File.WriteAllLines
+        |> Ok
     with ex -> Error ex.Message
 
 let copyToBackupFile (tagLibrary: FileInfo) : Result<FileInfo, string> =
@@ -33,5 +39,4 @@ let copyToBackupFile (tagLibrary: FileInfo) : Result<FileInfo, string> =
             generateBackUpFilePath()
             |> tagLibrary.CopyTo
             |> Ok
-        with
-        | ex -> Error ex.Message
+        with ex -> Error ex.Message
