@@ -17,7 +17,7 @@ let getFileInfos (dirPath: DirectoryInfo) : Result<FileInfo seq, Error> =
         // Supported file format extensions from https://github.com/mono/taglib-sharp.
         // The initial periods are needed.
         [".aa"; ".aax"; ".aac"; ".aiff"; ".ape"; ".dsf"; ".flac"; ".m4a"; ".m4b"; "m4p"
-         ".mp3"; ".mpc"; ".mpp"; ".ogg"; ".oga"; ".wav"; ".wma"; ".wv"; ".webm"]
+         ".mp3"; ".mp4"; ".mpc"; ".mpp"; ".ogg"; ".oga"; ".wav"; ".wma"; ".wv"; ".webm"]
         |> List.contains (fileInfo.Extension.ToLowerInvariant())
 
     try
