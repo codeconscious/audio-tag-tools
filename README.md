@@ -18,7 +18,10 @@ Ensure you are in the `AudioTagTools.Console` directory in your terminal.
 
 ## Caching tags
 
-Creates a tag library, a JSON file containing the text tag data from the audio files in a specified directory. 
+Creates a tag library, a JSON file containing the text tag data from the audio files in a specified directory.
+
+> [!NOTE]
+> If you have many files, especially on an external device, this process might take a while on its initial run, but will be much faster in subsequent ones. 
 
 Pass `cache-tags` with two arguments:
 
@@ -41,7 +44,7 @@ The file will be in this JSON format:
 ```json
 [
   {
-    "FileNameOnly": "FILENAME.m4a",
+    "FileName": "FILENAME.m4a",
     "DirectoryName": "FULL_DIRECTORY_NAME",
     "Artists": [
       "SAMPLE ARTIST NAME"

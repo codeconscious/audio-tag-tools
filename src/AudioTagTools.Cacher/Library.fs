@@ -15,12 +15,16 @@ let private run (args: string array) : Result<unit, Error> =
         let! tagLibraryMap = createTagLibraryMap tagLibraryFile
         let! newJson = generateNewJson tagLibraryMap fileInfos
 
-        let! _ =
-            copyToBackupFile tagLibraryFile
+        let _ =
+            tagLibraryFile
+            |> copyToBackupFile
+            |> Result.tee (fun backupFile -> printfn "Backed up previous file to \"%s\"." backupFile.Name)
             |> Result.mapError WriteFileError
 
         do!
-            writeTextToFile tagLibraryFile.FullName newJson
+            newJson
+            |> writeTextToFile tagLibraryFile.FullName
+            |> Result.tee (fun _ -> printfn "Wrote file \"%s\"." tagLibraryFile.FullName)
             |> Result.mapError WriteFileError
     }
 

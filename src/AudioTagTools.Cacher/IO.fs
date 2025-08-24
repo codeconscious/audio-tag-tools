@@ -14,13 +14,20 @@ let readfile filePath : Result<string, Error> =
 
 let getFileInfos (dirPath: DirectoryInfo) : Result<FileInfo seq, Error> =
     let isSupportedAudioFile (fileInfo: FileInfo) =
-        [".mp3"; ".m4a"; ".mp4"; ".ogg"; ".flac"]
-        |> List.contains fileInfo.Extension
+        // Supported file format extensions from https://github.com/mono/taglib-sharp,
+        // plus some additional ones. Initial periods are needed.
+        [".aa"; ".aax"; ".aac"; ".aiff"; ".ape"; ".dsf"; ".flac"; ".m4a"; ".m4b"; "m4p"
+         ".mp3"; ".mpc"; ".mpp"; ".ogg"; ".oga"; ".wav"; ".wma"; ".wv"; ".webm"
+         ".mp4"; ".opus"; ] // This line contains additional custom ones.
+        |> List.contains (fileInfo.Extension.ToLowerInvariant())
 
     try
         dirPath.EnumerateFiles("*", SearchOption.AllDirectories)
         |> Seq.filter isSupportedAudioFile
-        |> Ok
+        |> fun files ->
+            if Seq.isEmpty files
+            then Error (NoFilesFound dirPath.FullName)
+            else Ok files
     with
     | e -> Error (GeneralIoError e.Message)
 
