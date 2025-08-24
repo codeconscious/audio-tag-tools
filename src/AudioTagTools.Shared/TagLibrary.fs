@@ -44,7 +44,6 @@ let blankTags (fileInfo: FileInfo) : LibraryTags =
         LastWriteTime = DateTimeOffset fileInfo.LastWriteTime
     }
 
-
 let parseJsonToTags (json: string) : Result<LibraryTags array, string> =
     try Ok (JsonSerializer.Deserialize<LibraryTags array>(json))
     with e -> Error e.Message
