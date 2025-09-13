@@ -12,19 +12,31 @@ let private run (args: string array) : Result<unit, Error> =
     result {
         let! tagLibraryFile, genreFile = validate args
 
-        let! output =
+        let! oldGenres = IO.readLines tagLibraryFile
+        let oldCount = oldGenres.Length
+        printfn $"{oldCount} entries in the old file."
+
+        let! newGenres =
             tagLibraryFile
             |> IO.readFile
             >>= IO.parseJsonToTags
             <.> fun tags -> printfn $"Parsed tags for {formatInt tags.Length} files from the tag library."
             <!> getArtistsWithGenres
-            <.> fun xs -> printfn $"Prepared {formatInt xs.Length} artist-genre pairs."
 
-        let! _ =
-            copyToBackupFile genreFile
+        let newTotalCount = newGenres.Length
+        let newCount = newGenres |> Array.except oldGenres |> _.Length
+        let deletedCount = oldGenres |> Array.except newGenres |> _.Length
+        printfn $"Prepared {newTotalCount} artist-genre pairs."
+        printfn $"{newCount} are new entries."
+        printfn $"{deletedCount} removed entries."
+
+        do!
+            genreFile
+            |> copyToBackupFile
+            |> Result.map ignore
             |> Result.mapError IoWriteError
 
-        return! IO.writeLines genreFile.FullName output
+        return! IO.writeLines genreFile.FullName newGenres
     }
 
 let start args : Result<string, string> =

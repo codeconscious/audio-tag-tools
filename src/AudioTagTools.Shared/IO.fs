@@ -10,6 +10,13 @@ let readFile (fileInfo: FileInfo) : Result<string, string> =
         |> Ok
     with ex -> Error ex.Message
 
+let readLines (fileInfo: FileInfo) : Result<string array, string> =
+    try
+        fileInfo.FullName
+        |> File.ReadAllLines
+        |> Ok
+    with ex -> Error ex.Message
+
 let writeTextToFile (writePath: string) (text: string) : Result<unit, string> =
     try
         (writePath, text)
