@@ -12,7 +12,7 @@ let private run (args: string array) : Result<unit, Error> =
     result {
         let! tagLibraryFile, genreFile = validate args
 
-        let! oldGenres = IO.readLines tagLibraryFile
+        let! oldGenres = IO.readLines genreFile
         let oldCount = oldGenres.Length
         printfn $"{oldCount} entries in the old file."
 
