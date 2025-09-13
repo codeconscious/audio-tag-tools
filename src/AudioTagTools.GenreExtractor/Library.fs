@@ -27,7 +27,7 @@ let private run (args: string array) : Result<unit, Error> =
         let newCount = newGenres |> Array.except oldGenres |> _.Length
         let deletedCount = oldGenres |> Array.except newGenres |> _.Length
         printfn $"Prepared {newTotalCount} artist-genre pairs."
-        printfn $"{newCount} are new entries."
+        printfn $"{newCount} new entries."
         printfn $"{deletedCount} removed entries."
 
         do!
