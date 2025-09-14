@@ -12,9 +12,9 @@ let private run args : Result<unit, Error> =
     result {
         let! tagLibraryFile, genreFile = validate args
 
-        let! oldGenres = IO.readLines tagLibraryFile
-        let oldCount = oldGenres.Length
-        printfn $"{oldCount} entries in the old file."
+        let! oldGenres = IO.readLines genreFile
+        let oldTotalCount = oldGenres.Length
+        printfn "%s entries in the old file." (formatInt oldTotalCount)
 
         let! newGenres =
             tagLibraryFile
@@ -24,11 +24,12 @@ let private run args : Result<unit, Error> =
             <!> groupArtistsWithGenres "＼" // Separator should be text very unlikely to appear in files' tags.
 
         let newTotalCount = newGenres.Length
-        let newCount = newGenres |> Array.except oldGenres |> _.Length
-        let deletedCount = oldGenres |> Array.except newGenres |> _.Length
-        printfn $"Prepared {newTotalCount} artist-genre pairs."
-        printfn $"{newCount} are new entries."
-        printfn $"{deletedCount} removed entries."
+        let newEntryCount = newGenres |> Array.except oldGenres |> _.Length
+        let deletedEntryCount = oldGenres |> Array.except newGenres |> _.Length
+        printfn "Prepared %s artist-genre entries total (%s new, %s deleted)."
+            (formatInt newTotalCount)
+            (formatInt newEntryCount)
+            (formatInt deletedEntryCount)
 
         do!
             genreFile
