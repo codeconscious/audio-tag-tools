@@ -28,9 +28,7 @@ let private allGenres (fileTags: LibraryTags array) : string array =
 
 let private mostCommonGenres = allGenres >> mostCommon
 
-let getArtistsWithGenres (allFileTags: LibraryTags array) =
-    let separator = "＼" // Should be a character unlikely to appear in files' tags.
-
+let groupArtistsWithGenres (separator: string)  (allFileTags: LibraryTags array) =
     allFileTags
     |> Array.groupBy mainArtist
     |> Array.filter (fun (a, _) -> a <> String.Empty) // Maybe need tag check too.

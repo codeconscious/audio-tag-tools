@@ -8,7 +8,7 @@ open Utilities
 open Shared.IO
 open FsToolkit.ErrorHandling
 
-let private run (args: string array) : Result<unit, Error> =
+let private run args : Result<unit, Error> =
     result {
         let! tagLibraryFile, genreFile = validate args
 
@@ -21,7 +21,7 @@ let private run (args: string array) : Result<unit, Error> =
             |> IO.readFile
             >>= IO.parseJsonToTags
             <.> fun tags -> printfn $"Parsed tags for {formatInt tags.Length} files from the tag library."
-            <!> getArtistsWithGenres
+            <!> groupArtistsWithGenres "＼" // Separator should be text very unlikely to appear in files' tags.
 
         let newTotalCount = newGenres.Length
         let newCount = newGenres |> Array.except oldGenres |> _.Length
