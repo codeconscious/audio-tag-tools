@@ -13,42 +13,42 @@ let parseToTags json =
     |> Result.mapError TagParseError
 
 let filter (settings: SettingsRoot) (allTags: LibraryTags array) : LibraryTags array =
-    let excludeFile (settings: SettingsRoot) (tags: LibraryTags) : bool =
-        let isExcluded (exclusion: SettingsProvider.Exclusion) : bool =
-            match exclusion.Artist, exclusion.Title with
-            | Some a, Some t ->
-                anyContains [tags.AlbumArtists; tags.Artists] a &&
-                tags.Title.StartsWith(t, StringComparison.InvariantCultureIgnoreCase)
-            | Some a, None ->
-                anyContains [tags.AlbumArtists; tags.Artists] a
-            | None, Some t ->
-                tags.Title.StartsWith(t, StringComparison.InvariantCultureIgnoreCase)
-            | _ -> false
-
+    let isExcluded (tags: LibraryTags) =
         settings.Exclusions
-        |> Array.exists isExcluded
+        |> Array.exists (fun excl ->
+            match excl.Artist, excl.Title with
+            | Some artist, Some title ->
+                Array.contains artist tags.AlbumArtists ||
+                Array.contains artist tags.Artists ||
+                tags.Title.StartsWith(title, StringComparison.InvariantCultureIgnoreCase)
+            | Some artist, None ->
+                Array.contains artist tags.AlbumArtists ||
+                Array.contains artist tags.Artists
+            | None, Some title ->
+                tags.Title.StartsWith(title, StringComparison.InvariantCultureIgnoreCase)
+            | _ -> false)
 
     allTags
-    |> Array.filter (not << excludeFile settings)
+    |> Array.filter (not << isExcluded)
 
 let private hasArtistOrTitle track =
     let hasAnyArtist (track: LibraryTags) =
-        track.Artists.Length > 0 || track.AlbumArtists.Length > 0
+        track.Artists.Length > 0 ||
+        track.AlbumArtists.Length > 0
 
     let hasTitle (track: LibraryTags) =
-        not <| String.IsNullOrWhiteSpace track.Title
+        not (String.IsNullOrWhiteSpace track.Title)
 
     hasAnyArtist track && hasTitle track
 
 let private mainArtists (separator: string) (track: LibraryTags) =
     let noForbiddenAlbumArtists artist =
-        [| String.Empty; "Various"; "Various Artists"; "Multiple Artists" |]
-        |> Array.exists _.Equals(artist, StringComparison.InvariantCultureIgnoreCase)
+        [ String.Empty; "Various"; "Various Artists"; "Multiple Artists" ]
+        |> List.exists _.Equals(artist, StringComparison.InvariantCultureIgnoreCase)
         |> not
 
     match track with
-    | t when t.AlbumArtists.Length > 0
-             && noForbiddenAlbumArtists t.AlbumArtists[0] ->
+    | t when t.AlbumArtists.Length > 0 && noForbiddenAlbumArtists t.AlbumArtists[0] ->
         t.AlbumArtists
     | t ->
         t.Artists
@@ -79,10 +79,11 @@ let findDuplicates (settings: SettingsRoot) (tags: LibraryTags array) : LibraryT
     tags
     |> Array.filter hasArtistOrTitle
     |> Array.groupBy (groupName settings)
-    |> Array.sortBy fst
-    |> Array.map snd
-    |> Array.filter (fun groupedTracks -> groupedTracks.Length > 1)
-    |> function [||] -> None | tagData -> Some tagData
+    |> Array.choose (fun (_, group) ->
+        match group with
+        | [| _ |] -> None // Filter out items with no potential duplicates.
+        | duplicates -> Some duplicates)
+    |> function [||] -> None | duplicates -> Some duplicates
 
 let printTotalCount (tags: LibraryTags array) =
     printfn $"Total file count:    %s{formatNumber tags.Length}"
