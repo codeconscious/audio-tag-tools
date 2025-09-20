@@ -8,23 +8,35 @@ open Utilities
 open Shared.IO
 open FsToolkit.ErrorHandling
 
-let private run (args: string array) : Result<unit, Error> =
+let private run args : Result<unit, Error> =
     result {
         let! tagLibraryFile, genreFile = validate args
 
-        let! output =
+        let! oldGenres = IO.readLines genreFile
+        printfn "%s entries in the old file." (formatInt oldGenres.Length)
+
+        let! newGenres =
             tagLibraryFile
             |> IO.readFile
             >>= IO.parseJsonToTags
             <.> fun tags -> printfn $"Parsed tags for {formatInt tags.Length} files from the tag library."
-            <!> getArtistsWithGenres
-            <.> fun xs -> printfn $"Prepared {formatInt xs.Length} artist-genre pairs."
+            <!> groupArtistsWithGenres "＼" // Separator should be text very unlikely to appear in files' tags.
 
-        let! _ =
-            copyToBackupFile genreFile
+        let newTotalCount = newGenres.Length
+        let addedCount = newGenres |> Array.except oldGenres |> _.Length
+        let deletedCount = oldGenres |> Array.except newGenres |> _.Length
+        printfn "Prepared %s artist-genre entries total (%s new, %s deleted)."
+            (formatInt newTotalCount)
+            (formatInt addedCount)
+            (formatInt deletedCount)
+
+        do!
+            genreFile
+            |> copyToBackupFile
+            |> Result.map ignore
             |> Result.mapError IoWriteError
 
-        return! IO.writeLines genreFile.FullName output
+        return! newGenres |> IO.writeLines genreFile.FullName
     }
 
 let start args : Result<string, string> =
