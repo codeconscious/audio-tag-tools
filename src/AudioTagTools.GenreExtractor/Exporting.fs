@@ -9,7 +9,13 @@ let private mainArtist (fileTags: LibraryTags) =
     | a when a.AlbumArtists.Length > 0 -> a.AlbumArtists[0]
     | _ -> String.Empty
 
-let private mostCommon (items: string seq) : string =
+let private allGenres (fileTags: LibraryTags array) : string array =
+    fileTags
+    |> Array.map _.Genres
+    |> Array.filter (fun gs -> gs.Length > 0)
+    |> Array.collect id
+
+let private mostCommon (items: string array) : string =
     items
     |> Seq.countBy id
     |> Seq.fold (fun acc (item, count) ->
@@ -19,12 +25,6 @@ let private mostCommon (items: string seq) : string =
         | Some _ -> acc) None
     |> Option.map fst
     |> Option.defaultValue String.Empty
-
-let private allGenres (fileTags: LibraryTags array) : string array =
-    fileTags
-    |> Array.map _.Genres
-    |> Array.filter (fun gs -> gs.Length > 0)
-    |> Array.collect id
 
 let private mostCommonGenres = allGenres >> mostCommon
 
