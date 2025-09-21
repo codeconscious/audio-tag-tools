@@ -100,7 +100,7 @@ let private reportResults (results: CategorizedTagsToCache seq) : CategorizedTag
 
     results
 
-let generateNewJson
+let generateJson
     (tagLibraryMap: TagMap)
     (fileInfos: FileInfo seq)
     : Result<string, Error>
