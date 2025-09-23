@@ -9,7 +9,13 @@ let private mainArtist (fileTags: LibraryTags) =
     | a when a.AlbumArtists.Length > 0 -> a.AlbumArtists[0]
     | _ -> String.Empty
 
-let private mostCommon (items: string seq) : string =
+let private allGenres (fileTags: LibraryTags array) : string array =
+    fileTags
+    |> Array.map _.Genres
+    |> Array.filter (fun gs -> gs.Length > 0)
+    |> Array.collect id
+
+let private mostCommon (items: string array) : string =
     items
     |> Seq.countBy id
     |> Seq.fold (fun acc (item, count) ->
@@ -20,17 +26,9 @@ let private mostCommon (items: string seq) : string =
     |> Option.map fst
     |> Option.defaultValue String.Empty
 
-let private allGenres (fileTags: LibraryTags array) : string array =
-    fileTags
-    |> Array.map _.Genres
-    |> Array.filter (fun gs -> gs.Length > 0)
-    |> Array.collect id
-
 let private mostCommonGenres = allGenres >> mostCommon
 
-let getArtistsWithGenres (allFileTags: LibraryTags array) =
-    let separator = "＼" // Should be a character unlikely to appear in files' tags.
-
+let groupArtistsWithGenres (separator: string)  (allFileTags: LibraryTags array) =
     allFileTags
     |> Array.groupBy mainArtist
     |> Array.filter (fun (a, _) -> a <> String.Empty) // Maybe need tag check too.
