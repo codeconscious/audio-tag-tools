@@ -8,19 +8,19 @@ open System.Globalization
 
 /// Helper for try/with -> Result.
 let private ofTry (f: unit -> 'T) : Result<'T, string> =
-    try    Ok (f())
-    with e -> Error e.Message
+    try Ok (f())
+    with exn -> Error exn.Message
 
 /// Serialize items to formatted JSON, returning a Result.
 /// If an exception is thrown during the underlying operation,
 /// the Error only includes its message.
 let serializeToJson items : Result<string, string> =
-    let serializerOptions =
+    let options =
         JsonSerializerOptions(
             WriteIndented = true,
-            Encoder = JavaScriptEncoder.Create(UnicodeRanges.All))
+            Encoder = JavaScriptEncoder.Create UnicodeRanges.All)
 
-    ofTry (fun _ -> JsonSerializer.Serialize(items, serializerOptions))
+    ofTry (fun _ -> JsonSerializer.Serialize(items, options))
 
 /// Reads all text from the specified file, returning a Result.
 /// If an exception is thrown during the underlying operation,
