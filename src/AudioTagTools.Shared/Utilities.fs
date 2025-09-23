@@ -15,9 +15,11 @@ let formatInt (i: int) : string =
 /// the Error only includes its message.
 let serializeToJson items : Result<string, string> =
     try
-        let serializerOptions = JsonSerializerOptions()
-        serializerOptions.WriteIndented <- true
-        serializerOptions.Encoder <- JavaScriptEncoder.Create UnicodeRanges.All
+        let serializerOptions =
+            JsonSerializerOptions(
+                WriteIndented = true,
+                Encoder = JavaScriptEncoder.Create(UnicodeRanges.All))
+
         JsonSerializer.Serialize(items, serializerOptions)
         |> Ok
     with
