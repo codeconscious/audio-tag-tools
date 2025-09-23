@@ -36,8 +36,7 @@ let savePlaylist (settings: SettingsRoot) (tags: LibraryTags array array option)
             | s, _ when String.IsNullOrEmpty s -> fullPath
             | s, r -> fullPath.Replace(s, r)
 
-        builder.AppendLine updatedPath |> ignore
-        builder
+        builder.AppendLine updatedPath
 
     match tags with
     | None -> Ok ()
