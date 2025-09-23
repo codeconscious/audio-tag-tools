@@ -93,10 +93,10 @@ let private reportResults (results: CategorizedTagsToCache seq) : CategorizedTag
             | Unchanged -> {| acc with Unchanged = acc.Unchanged + 1 |})
 
     printfn "Results:"
-    printfn "• New:       %s" (formatNumber totals.NotPresent)
-    printfn "• Updated:   %s" (formatNumber totals.OutOfDate)
-    printfn "• Unchanged: %s" (formatNumber totals.Unchanged)
-    printfn "• Total:     %s" (formatNumber (Seq.length results))
+    printfn "• New:       %s" (formatInt totals.NotPresent)
+    printfn "• Updated:   %s" (formatInt totals.OutOfDate)
+    printfn "• Unchanged: %s" (formatInt totals.Unchanged)
+    printfn "• Total:     %s" (formatInt (Seq.length results))
 
     results
 

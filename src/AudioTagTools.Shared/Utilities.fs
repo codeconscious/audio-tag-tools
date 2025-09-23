@@ -28,13 +28,9 @@ let serializeToJson items : Result<string, string> =
 let readAllText (filePath: string) : Result<string, string> =
     ofTry (fun _ -> System.IO.File.ReadAllText filePath)
 
-/// Format an int to a comma-separated numeric string. Example: 1000 -> "1,000".
+/// Format an integer to a comma-separated numeric string. Example: 1000 -> "1,000".
 let formatInt (i: int) : string =
     i.ToString("#,##0", CultureInfo.InvariantCulture)
-
-/// Converts an int to friendly string format. Sample: 1000 -> "1,000".
-let formatNumber (i: int) : string =
-    i.ToString("N0", CultureInfo.InvariantCulture)
 
 /// Removes all instances of multiple substrings from a given string.
 let removeSubstrings (substrings: string array) (text: string) : string =

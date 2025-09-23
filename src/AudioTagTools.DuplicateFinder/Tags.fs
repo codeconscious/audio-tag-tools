@@ -86,10 +86,10 @@ let findDuplicates (settings: SettingsRoot) (tags: LibraryTags array) : LibraryT
     |> function [||] -> None | duplicates -> Some duplicates
 
 let printTotalCount (tags: LibraryTags array) =
-    printfn $"Total file count:    %s{formatNumber tags.Length}"
+    printfn $"Total file count:    %s{formatInt tags.Length}"
 
 let printFilteredCount (tags: LibraryTags array) =
-    printfn $"Filtered file count: %s{formatNumber tags.Length}"
+    printfn $"Filtered file count: %s{formatInt tags.Length}"
 
 let printResults (groupedTracks: LibraryTags array array option) =
     let printGroup index (groupTracks: LibraryTags array) =
