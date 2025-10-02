@@ -10,7 +10,7 @@ type FileTags = TagLib.File
 let readfile filePath : Result<string, Error> =
     match readAllText filePath with
     | Ok x -> Ok x
-    | Error msg -> Error (ReadFileError msg.Message)
+    | Error msg -> Error (ReadFileError msg)
 
 let getFileInfos (dirPath: DirectoryInfo) : Result<FileInfo seq, Error> =
     let isSupportedAudioFile (fileInfo: FileInfo) =

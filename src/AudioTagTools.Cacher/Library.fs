@@ -13,7 +13,7 @@ let private run (args: string array) : Result<unit, Error> =
         let! mediaDir, tagLibraryFile = validate args
         let! fileInfos = getFileInfos mediaDir
         let! tagLibraryMap = createTagLibraryMap tagLibraryFile
-        let! newJson = generateNewJson tagLibraryMap fileInfos
+        let! newJson = fileInfos |> generateJson tagLibraryMap
 
         let _ =
             tagLibraryFile

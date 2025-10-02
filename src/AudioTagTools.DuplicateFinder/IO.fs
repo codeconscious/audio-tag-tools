@@ -21,7 +21,10 @@ let savePlaylist (settings: SettingsRoot) (tags: LibraryTags array array option)
 
     let appendFileEntry (builder: StringBuilder) (m: LibraryTags) : StringBuilder =
         let seconds = m.Duration.TotalSeconds
-        let artist = Array.append m.AlbumArtists m.Artists |> String.concat "; "
+        let artist =
+            m.Artists
+            |> Array.append m.AlbumArtists
+            |> String.concat "; "
         let artistWithTitle = $"{artist} - {m.Title}"
         let extInf = $"#EXTINF:{seconds},{artistWithTitle}"
         builder.AppendLine extInf |> ignore
@@ -33,8 +36,7 @@ let savePlaylist (settings: SettingsRoot) (tags: LibraryTags array array option)
             | s, _ when String.IsNullOrEmpty s -> fullPath
             | s, r -> fullPath.Replace(s, r)
 
-        builder.AppendLine updatedPath |> ignore
-        builder
+        builder.AppendLine updatedPath
 
     match tags with
     | None -> Ok ()
