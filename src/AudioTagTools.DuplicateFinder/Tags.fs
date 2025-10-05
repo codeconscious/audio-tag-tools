@@ -75,6 +75,16 @@ let private groupName (settings: SettingsRoot) (track: LibraryTags) =
         .Normalize(NormalizationForm.FormC)
         .ToLowerInvariant()
 
+let private sortByArtist (groupedTags: LibraryTags array array) =
+    let groupArtistName (group: LibraryTags array) =
+        let first = group[0]
+        if first.AlbumArtists.Length > 1
+        then first.AlbumArtists[0]
+        else first.Artists[0]
+
+    groupedTags
+    |> Array.sortBy groupArtistName
+
 let findDuplicates (settings: SettingsRoot) (tags: LibraryTags array) : LibraryTags array array option =
     tags
     |> Array.filter hasArtistOrTitle
@@ -84,6 +94,7 @@ let findDuplicates (settings: SettingsRoot) (tags: LibraryTags array) : LibraryT
         | [| _ |] -> None // Filter out items with no potential duplicates.
         | duplicates -> Some duplicates)
     |> function [||] -> None | duplicates -> Some duplicates
+    |> Option.map sortByArtist
 
 let printTotalCount (tags: LibraryTags array) =
     printfn $"Total file count:    %s{formatInt tags.Length}"
