@@ -85,14 +85,16 @@ let private groupName (settings: SettingsRoot) (track: LibraryTags) =
         .ToLowerInvariant()
 
 let private sortByArtist (groupedTags: LibraryTags array array) =
-    let groupArtistName (group: LibraryTags array) =
+    let artistAndTrackName (group: LibraryTags array) =
         let firstFile = group[0]
-        if firstFile.AlbumArtists.Length > 1
-        then firstFile.AlbumArtists[0]
-        else firstFile.Artists[0]
+        let artist =
+            if firstFile.AlbumArtists.Length > 1
+            then firstFile.AlbumArtists[0]
+            else firstFile.Artists[0]
+        $"{artist}{firstFile.Title}"
 
     groupedTags
-    |> Array.sortBy groupArtistName
+    |> Array.sortBy artistAndTrackName
 
 let findDuplicates (settings: SettingsRoot) (tags: LibraryTags array) : LibraryTags array array option =
     tags
