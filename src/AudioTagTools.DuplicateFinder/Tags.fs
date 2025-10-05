@@ -42,8 +42,17 @@ let private hasArtistOrTitle track =
     hasAnyArtist track && hasTitle track
 
 let private mainArtists (separator: string) (track: LibraryTags) =
+    let forbiddenArtistNames =
+        [
+            String.Empty
+            "Various"
+            "Various Artists"
+            "Multiple Artists"
+            "\u003Cunknown\u003E"
+        ]
+
     let noForbiddenAlbumArtists artist =
-        [ String.Empty; "Various"; "Various Artists"; "Multiple Artists" ]
+        forbiddenArtistNames
         |> List.exists _.Equals(artist, StringComparison.InvariantCultureIgnoreCase)
         |> not
 
@@ -64,7 +73,7 @@ let private groupName (settings: SettingsRoot) (track: LibraryTags) =
 
     let artists =
         track
-        |> mainArtists String.Empty
+        |> mainArtists String.Empty // Separator unneeded since this text is for grouping only.
         |> removeSubstrings settings.ArtistReplacements
 
     let title =
@@ -75,6 +84,18 @@ let private groupName (settings: SettingsRoot) (track: LibraryTags) =
         .Normalize(NormalizationForm.FormC)
         .ToLowerInvariant()
 
+let private sortByArtist (groupedTags: LibraryTags array array) =
+    let artistAndTrackName (group: LibraryTags array) =
+        let firstFile = group[0]
+        let artist =
+            if firstFile.AlbumArtists.Length > 1
+            then firstFile.AlbumArtists[0]
+            else firstFile.Artists[0]
+        $"{artist}{firstFile.Title}"
+
+    groupedTags
+    |> Array.sortBy artistAndTrackName
+
 let findDuplicates (settings: SettingsRoot) (tags: LibraryTags array) : LibraryTags array array option =
     tags
     |> Array.filter hasArtistOrTitle
@@ -84,6 +105,7 @@ let findDuplicates (settings: SettingsRoot) (tags: LibraryTags array) : LibraryT
         | [| _ |] -> None // Filter out items with no potential duplicates.
         | duplicates -> Some duplicates)
     |> function [||] -> None | duplicates -> Some duplicates
+    |> Option.map sortByArtist
 
 let printTotalCount (tags: LibraryTags array) =
     printfn $"Total file count:    %s{formatInt tags.Length}"
