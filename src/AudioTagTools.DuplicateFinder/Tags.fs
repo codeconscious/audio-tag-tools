@@ -1,5 +1,6 @@
 module Tags
 
+open System.IO
 open Errors
 open Utilities
 open Settings
@@ -128,7 +129,9 @@ let printResults (groupedTracks: LibraryTags array array option) =
 
         // Print each suspected duplicate track in the group.
         groupTracks
-        |> Array.iter (fun x -> printfn $"""    • {artistText x}{x.Title}""")
+        |> Array.iter (fun x ->
+            let extension = (Path.GetExtension x.FileName)[1..] |> _.ToUpperInvariant()
+            printfn $"""    • {artistText x}{x.Title}  [{extension}; {x.BitRate}kbps; {x.FileSize} bytes]""")
 
     match groupedTracks with
     | None -> printfn "No duplicates found."
