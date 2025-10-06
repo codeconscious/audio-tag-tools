@@ -45,4 +45,9 @@ let anyContains (collections: string seq seq) (target: string) : bool =
     |> Seq.concat
     |> Seq.exists (fun text -> StringComparer.InvariantCultureIgnoreCase.Equals(text, target))
 
+/// Formats a TimeSpan to "h:mm:ss" format, where the hours ('h') are optional.
+let formatTimeSpan (timeSpan: TimeSpan) : string =
+    match timeSpan.Hours with
+    | 0 -> sprintf "%dm%ds" timeSpan.Minutes timeSpan.Seconds
+    | _ -> sprintf "%dh%dm%ds" timeSpan.Hours timeSpan.Minutes timeSpan.Seconds
 
