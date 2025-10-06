@@ -129,10 +129,15 @@ let printResults (groupedTracks: LibraryTags array array option) =
 
         // Print each suspected duplicate track in the group.
         groupTracks
-        |> Array.iter (fun x ->
-            let extension = (Path.GetExtension x.FileName)[1..] |> _.ToUpperInvariant()
-            let duration = formatTimeSpan x.Duration
-            printfn $"""    • {artistText x}{x.Title}  [{duration}; {extension}; {x.BitRate}kbps; {x.FileSize} bytes]""")
+        |> Array.iter (fun fileTags ->
+            let artist = artistText fileTags
+            let title = fileTags.Title
+            let duration = formatTimeSpan fileTags.Duration
+            let extension = (Path.GetExtension fileTags.FileName)[1..] |> _.ToUpperInvariant()
+            let bitrate = $"{fileTags.BitRate}kbps"
+            let fileSize = formatBytes fileTags.FileSize
+            // TODO: Add color?
+            printfn $"""    • {artist}{title}  [{duration}; {extension}; {bitrate}; {fileSize}]""")
 
     match groupedTracks with
     | None -> printfn "No duplicates found."

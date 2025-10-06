@@ -6,6 +6,18 @@ open System.Text.Encodings.Web
 open System.Text.Unicode
 open System.Globalization
 
+/// Format an integer to a comma-separated numeric string. Example: 1000 -> "1,000".
+let formatInt (i: int) : string =
+    i.ToString("#,##0", CultureInfo.InvariantCulture)
+
+/// Format a 64-bit integer to a comma-separated numeric string. Example: 1000 -> "1,000".
+let formatInt64 (i: int64) : string =
+    i.ToString("#,##0", CultureInfo.InvariantCulture)
+
+/// Format a float to a comma-separated numeric string. Example: 1000.00 -> "1,000.00".
+let formatFloat (f: float) : string =
+    f.ToString("#,##0.00", CultureInfo.InvariantCulture)
+
 /// Helper for try/with -> Result.
 let private ofTry (f: unit -> 'T) : Result<'T, string> =
     try Ok (f())
@@ -28,10 +40,6 @@ let serializeToJson items : Result<string, string> =
 let readAllText (filePath: string) : Result<string, string> =
     ofTry (fun _ -> System.IO.File.ReadAllText filePath)
 
-/// Format an integer to a comma-separated numeric string. Example: 1000 -> "1,000".
-let formatInt (i: int) : string =
-    i.ToString("#,##0", CultureInfo.InvariantCulture)
-
 /// Removes all instances of multiple substrings from a given string.
 let removeSubstrings (substrings: string array) (text: string) : string =
     Array.fold
@@ -51,3 +59,15 @@ let formatTimeSpan (timeSpan: TimeSpan) : string =
     | 0 -> sprintf "%dm%ds" timeSpan.Minutes timeSpan.Seconds
     | _ -> sprintf "%dh%dm%ds" timeSpan.Hours timeSpan.Minutes timeSpan.Seconds
 
+let formatBytes (bytes: int64) =
+    let kilobyte = 1024L
+    let megabyte = kilobyte * 1024L
+    let gigabyte = megabyte * 1024L
+    let terabyte = gigabyte * 1024L
+
+    match bytes with
+    | _ when bytes >= terabyte -> sprintf "%s TB" ((float bytes / float terabyte) |> formatFloat)
+    | _ when bytes >= gigabyte -> sprintf "%s GB" ((float bytes / float gigabyte) |> formatFloat)
+    | _ when bytes >= megabyte -> sprintf "%s MB" ((float bytes / float megabyte) |> formatFloat)
+    | _ when bytes >= kilobyte -> sprintf "%s KB" ((float bytes / float kilobyte) |> formatFloat)
+    | _ -> sprintf "%s bytes" (bytes |> formatInt64)
