@@ -125,7 +125,7 @@ let printResults (groupedTracks: LibraryTags array array option) =
         let artistText (track: LibraryTags) =
             if Array.isEmpty track.Artists
             then String.Empty
-            else $"""{String.Join(", ", track.Artists)}  /  """
+            else $"""{String.Join(", ", track.Artists)}"""
 
         // Print each suspected duplicate track in the group.
         groupTracks
@@ -136,8 +136,14 @@ let printResults (groupedTracks: LibraryTags array array option) =
             let extension = (Path.GetExtension fileTags.FileName)[1..] |> _.ToUpperInvariant()
             let bitrate = $"{fileTags.BitRate}kbps"
             let fileSize = formatBytes fileTags.FileSize
-            // TODO: Add color?
-            printfn $"""    • {artist}{title}  [{duration}; {extension}; {bitrate}; {fileSize}]""")
+            printf $"""    • {artist}"""
+            Console.ForegroundColor <- ConsoleColor.DarkGray
+            printf " — "
+            Console.ResetColor()
+            printf $"{title}"
+            Console.ForegroundColor <- ConsoleColor.DarkGray
+            printfn $"""  [{duration}; {extension}; {bitrate}; {fileSize}]"""
+            Console.ResetColor())
 
     match groupedTracks with
     | None -> printfn "No duplicates found."
