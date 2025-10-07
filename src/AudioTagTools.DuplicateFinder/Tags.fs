@@ -142,7 +142,7 @@ let printResults (groupedTracks: LibraryTags array array option) =
             Console.ResetColor()
             printf $"{title}"
             Console.ForegroundColor <- ConsoleColor.DarkGray
-            printfn $"""  [{duration}; {extension}; {bitrate}; {fileSize}]"""
+            printfn $"""  [{duration} {extension} {bitrate} {fileSize}]"""
             Console.ResetColor())
 
     match groupedTracks with

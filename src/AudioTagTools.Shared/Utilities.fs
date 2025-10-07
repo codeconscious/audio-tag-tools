@@ -66,8 +66,8 @@ let formatBytes (bytes: int64) =
     let terabyte = gigabyte * 1024L
 
     match bytes with
-    | _ when bytes >= terabyte -> sprintf "%s TB" ((float bytes / float terabyte) |> formatFloat)
-    | _ when bytes >= gigabyte -> sprintf "%s GB" ((float bytes / float gigabyte) |> formatFloat)
-    | _ when bytes >= megabyte -> sprintf "%s MB" ((float bytes / float megabyte) |> formatFloat)
-    | _ when bytes >= kilobyte -> sprintf "%s KB" ((float bytes / float kilobyte) |> formatFloat)
+    | _ when bytes >= terabyte -> sprintf "%sT" ((float bytes / float terabyte) |> formatFloat)
+    | _ when bytes >= gigabyte -> sprintf "%sG" ((float bytes / float gigabyte) |> formatFloat)
+    | _ when bytes >= megabyte -> sprintf "%sM" ((float bytes / float megabyte) |> formatFloat)
+    | _ when bytes >= kilobyte -> sprintf "%sK" ((float bytes / float kilobyte) |> formatFloat)
     | _ -> sprintf "%s bytes" (bytes |> formatInt64)
