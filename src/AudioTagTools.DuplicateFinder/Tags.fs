@@ -111,27 +111,25 @@ let findDuplicates (settings: SettingsRoot) (tags: LibraryTags array) : LibraryT
 let printCount description (tags: LibraryTags array) =
     printfn $"%s{description}%s{formatInt tags.Length}"
 
-let printResults (groupedTracks: LibraryTags array array option) =
+let printResults (groupedTracks: LibraryTags array array option) : unit =
     let printfGray text =
         Console.ForegroundColor <- ConsoleColor.DarkGray
         printf text
         Console.ResetColor()
 
-    let printGroup index (groupTracks: LibraryTags array) =
+    let printGroup index (groupTracks: LibraryTags array) : unit =
         // Print the joined artists from this group's first file.
         groupTracks
         |> Array.head
         |> mainArtists ", "
-        |> printfn "%d. %s" (index + 1) // Start at 1, not 0.
+        |> printfn "%d. %s" (index + 1) // Start numbering at 1, not 0.
 
-        let artistText (track: LibraryTags) =
+        let artistText (track: LibraryTags) : string =
             if Array.isEmpty track.Artists
             then String.Empty
             else $"""{String.Join(", ", track.Artists)}"""
 
-        // Print each suspected duplicate track in the group.
-        groupTracks
-        |> Array.iter (fun fileTags ->
+        let printTrackTags fileTags : unit =
             let artist = artistText fileTags
             let title = fileTags.Title
             let duration = formatTimeSpan fileTags.Duration
@@ -141,7 +139,10 @@ let printResults (groupedTracks: LibraryTags array array option) =
             printf $"""    • {artist}"""
             printfGray " — "
             printf $"{title}"
-            printfGray $"""  [{duration} {extension} {bitrate} {fileSize}]{Environment.NewLine}""")
+            printfGray $"""  [{duration} {extension} {bitrate} {fileSize}]{Environment.NewLine}"""
+
+        // Print each suspected duplicate in the group.
+        groupTracks |> Array.iter printTrackTags
 
     match groupedTracks with
     | None -> printfn "No duplicates found."
