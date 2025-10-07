@@ -112,6 +112,11 @@ let printCount description (tags: LibraryTags array) =
     printfn $"%s{description}%s{formatInt tags.Length}"
 
 let printResults (groupedTracks: LibraryTags array array option) =
+    let printfGray text =
+        Console.ForegroundColor <- ConsoleColor.DarkGray
+        printf text
+        Console.ResetColor()
+
     let printGroup index (groupTracks: LibraryTags array) =
         // Print the joined artists from this group's first file.
         groupTracks
@@ -134,13 +139,9 @@ let printResults (groupedTracks: LibraryTags array array option) =
             let bitrate = $"{fileTags.BitRate}kbps"
             let fileSize = formatBytes fileTags.FileSize
             printf $"""    • {artist}"""
-            Console.ForegroundColor <- ConsoleColor.DarkGray
-            printf " — "
-            Console.ResetColor()
+            printfGray " — "
             printf $"{title}"
-            Console.ForegroundColor <- ConsoleColor.DarkGray
-            printfn $"""  [{duration} {extension} {bitrate} {fileSize}]"""
-            Console.ResetColor())
+            printfGray $"""  [{duration} {extension} {bitrate} {fileSize}]{Environment.NewLine}""")
 
     match groupedTracks with
     | None -> printfn "No duplicates found."
