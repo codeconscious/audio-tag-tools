@@ -118,16 +118,10 @@ let printResults (groupedTracks: LibraryTags array array option) : unit =
         Console.ResetColor()
 
     let printGroup index (groupTracks: LibraryTags array) : unit =
-        // Print the joined artists from this group's first file.
-        groupTracks
-        |> Array.head
-        |> mainArtists ", "
-        |> printfn "%d. %s" (index + 1) // Start numbering at 1, not 0.
-
         let artistText (track: LibraryTags) : string =
             if Array.isEmpty track.Artists
             then String.Empty
-            else $"""{String.Join(", ", track.Artists)}"""
+            else String.Join(", ", track.Artists)
 
         let printTrackTags fileTags : unit =
             let artist = artistText fileTags
@@ -141,7 +135,13 @@ let printResults (groupedTracks: LibraryTags array array option) : unit =
             printf $"{title}"
             printfGray $"  [{duration} {extension} {bitrate} {fileSize}]{Environment.NewLine}"
 
-        // Print each suspected duplicate in the group.
+        // Print group header using the artists from the first file.
+        groupTracks
+        |> Array.head
+        |> mainArtists ", "
+        |> printfn "%d. %s" (index + 1) // Start numbering at 1, not 0.
+
+        // Print each suspected duplicate.
         groupTracks |> Array.iter printTrackTags
 
     match groupedTracks with
