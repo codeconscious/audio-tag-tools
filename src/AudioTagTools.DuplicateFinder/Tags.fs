@@ -136,10 +136,10 @@ let printResults (groupedTracks: LibraryTags array array option) : unit =
             let extension = (Path.GetExtension fileTags.FileName)[1..] |> _.ToUpperInvariant()
             let bitrate = $"{fileTags.BitRate}kbps"
             let fileSize = formatBytes fileTags.FileSize
-            printf $"""    • {artist}"""
+            printf $"    • {artist}"
             printfGray " — "
             printf $"{title}"
-            printfGray $"""  [{duration} {extension} {bitrate} {fileSize}]{Environment.NewLine}"""
+            printfGray $"  [{duration} {extension} {bitrate} {fileSize}]{Environment.NewLine}"
 
         // Print each suspected duplicate in the group.
         groupTracks |> Array.iter printTrackTags
