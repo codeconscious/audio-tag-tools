@@ -92,7 +92,7 @@ let private sortByArtist (groupedTags: LibraryTags array array) =
             if firstFile.AlbumArtists.Length > 1
             then firstFile.AlbumArtists[0]
             else firstFile.Artists[0]
-        $"{artist}{firstFile.Title}"
+        $"{artist}{firstFile.Title}" // Only used for sorting, so spaces, etc., aren't needed.
 
     groupedTags
     |> Array.sortBy artistAndTrackName
@@ -111,16 +111,16 @@ let findDuplicates (settings: SettingsRoot) (tags: LibraryTags array) : LibraryT
 let printCount description (tags: LibraryTags array) =
     printfn $"%s{description}%s{formatInt tags.Length}"
 
-let printResults (groupedTracks: LibraryTags array array option) : unit =
+let printDuplicates (groupedTracks: LibraryTags array array option) =
     let printfGray = Printing.printfColor ConsoleColor.DarkGray
 
-    let printGroup index (groupTracks: LibraryTags array) : unit =
+    let printGroup index (groupTracks: LibraryTags array) =
         let artistSummary (track: LibraryTags) : string =
             if Array.isEmpty track.Artists
             then String.Empty
             else String.Join(", ", track.Artists)
 
-        let printFileSummary fileTags : unit =
+        let printFileSummary fileTags =
             let artist = artistSummary fileTags
             let title = fileTags.Title
             let duration = formatTimeSpan fileTags.Duration
@@ -132,14 +132,18 @@ let printResults (groupedTracks: LibraryTags array array option) : unit =
             printf $"{title}"
             printfGray $"  [{duration} {extension} {bitrate} {fileSize}]{Environment.NewLine}"
 
-        // Group header
-        groupTracks
-        |> Array.head
-        |> mainArtists ", "
-        |> printfn "%d. %s" (index + 1) // Start numbering at 1, not 0.
+        let printHeader () =
+            groupTracks
+            |> Array.head
+            |> mainArtists ", "
+            |> printfn "%d. %s" (index + 1) // Start numbering at 1, not 0.
 
-        // Suspected duplicates
-        groupTracks |> Array.iter printFileSummary
+        let printDuplicates () =
+            groupTracks
+            |> Array.iter printFileSummary
+
+        printHeader ()
+        printDuplicates ()
 
     match groupedTracks with
     | None -> printfn "No duplicates found."

@@ -26,7 +26,7 @@ let private run (args: string array) : Result<unit, Error> =
             <!> filter settings
             <.> printCount "Filtered file count: "
             <!> findDuplicates settings
-            <.> printResults
+            <.> printDuplicates
             >>= savePlaylist settings
     }
 
