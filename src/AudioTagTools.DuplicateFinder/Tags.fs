@@ -42,7 +42,7 @@ let private hasArtistOrTitle track =
 
     hasAnyArtist track && hasTitle track
 
-let private mainArtists (separator: string) (track: LibraryTags) =
+let private mainArtists (separator: string) (track: LibraryTags) : string =
     let forbiddenArtistNames =
         [
             String.Empty
@@ -112,19 +112,16 @@ let printCount description (tags: LibraryTags array) =
     printfn $"%s{description}%s{formatInt tags.Length}"
 
 let printResults (groupedTracks: LibraryTags array array option) : unit =
-    let printfGray text =
-        Console.ForegroundColor <- ConsoleColor.DarkGray
-        printf text
-        Console.ResetColor()
+    let printfGray = Printing.printfColor ConsoleColor.DarkGray
 
     let printGroup index (groupTracks: LibraryTags array) : unit =
-        let artistText (track: LibraryTags) : string =
+        let artistSummary (track: LibraryTags) : string =
             if Array.isEmpty track.Artists
             then String.Empty
             else String.Join(", ", track.Artists)
 
-        let printTrackTags fileTags : unit =
-            let artist = artistText fileTags
+        let printFileSummary fileTags : unit =
+            let artist = artistSummary fileTags
             let title = fileTags.Title
             let duration = formatTimeSpan fileTags.Duration
             let extension = (Path.GetExtension fileTags.FileName)[1..] |> _.ToUpperInvariant()
@@ -135,14 +132,14 @@ let printResults (groupedTracks: LibraryTags array array option) : unit =
             printf $"{title}"
             printfGray $"  [{duration} {extension} {bitrate} {fileSize}]{Environment.NewLine}"
 
-        // Print group header using the artists from the first file.
+        // Group header
         groupTracks
         |> Array.head
         |> mainArtists ", "
         |> printfn "%d. %s" (index + 1) // Start numbering at 1, not 0.
 
-        // Print each suspected duplicate.
-        groupTracks |> Array.iter printTrackTags
+        // Suspected duplicates
+        groupTracks |> Array.iter printFileSummary
 
     match groupedTracks with
     | None -> printfn "No duplicates found."

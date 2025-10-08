@@ -10,6 +10,7 @@
         <Compile Include="Utilities.fs"/>
         <Compile Include="IO.fs" />
         <Compile Include="TagLibrary.fs" />
+        <Compile Include="Printing.fs" />
     </ItemGroup>
 
     <ItemGroup>
