@@ -44,7 +44,7 @@ let parseToSettings (json: string) : Result<SettingsRoot, Error> =
     | e -> Error (SettingsParseError e.Message)
 
 let printSummary (settings: SettingsRoot) =
-    printfn "Settings summary:"
+    printfn "Settings:"
     printfn $"  Exclusions:          %d{settings.Exclusions.Length}"
     printfn $"  Artist Replacements: %d{settings.ArtistReplacements.Length}"
     printfn $"  Title Replacements:  %d{settings.TitleReplacements.Length}"

@@ -22,11 +22,11 @@ let private run (args: string array) : Result<unit, Error> =
             tagLibraryFile
             |> readFile
             >>= parseToTags
-            <.> printTotalCount
+            <.> printCount "Total file count:    "
             <!> filter settings
-            <.> printFilteredCount
+            <.> printCount "Filtered file count: "
             <!> findDuplicates settings
-            <.> printResults
+            <.> printDuplicates
             >>= savePlaylist settings
     }
 

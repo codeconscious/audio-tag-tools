@@ -1,5 +1,6 @@
 module Tags
 
+open System.IO
 open Errors
 open Utilities
 open Settings
@@ -41,7 +42,7 @@ let private hasArtistOrTitle track =
 
     hasAnyArtist track && hasTitle track
 
-let private mainArtists (separator: string) (track: LibraryTags) =
+let private mainArtists (separator: string) (track: LibraryTags) : string =
     let forbiddenArtistNames =
         [
             String.Empty
@@ -91,7 +92,7 @@ let private sortByArtist (groupedTags: LibraryTags array array) =
             if firstFile.AlbumArtists.Length > 1
             then firstFile.AlbumArtists[0]
             else firstFile.Artists[0]
-        $"{artist}{firstFile.Title}"
+        $"{artist}{firstFile.Title}" // Only used for sorting, so spaces, etc., aren't needed.
 
     groupedTags
     |> Array.sortBy artistAndTrackName
@@ -107,28 +108,42 @@ let findDuplicates (settings: SettingsRoot) (tags: LibraryTags array) : LibraryT
     |> function [||] -> None | duplicates -> Some duplicates
     |> Option.map sortByArtist
 
-let printTotalCount (tags: LibraryTags array) =
-    printfn $"Total file count:    %s{formatInt tags.Length}"
+let printCount description (tags: LibraryTags array) =
+    printfn $"%s{description}%s{formatInt tags.Length}"
 
-let printFilteredCount (tags: LibraryTags array) =
-    printfn $"Filtered file count: %s{formatInt tags.Length}"
+let printDuplicates (groupedTracks: LibraryTags array array option) =
+    let printfGray = Printing.printfColor ConsoleColor.DarkGray
 
-let printResults (groupedTracks: LibraryTags array array option) =
     let printGroup index (groupTracks: LibraryTags array) =
-        // Print the joined artists from this group's first file.
-        groupTracks
-        |> Array.head
-        |> mainArtists ", "
-        |> printfn "%d. %s" (index + 1) // Start at 1, not 0.
-
-        let artistText (track: LibraryTags) =
+        let artistSummary (track: LibraryTags) : string =
             if Array.isEmpty track.Artists
             then String.Empty
-            else $"""{String.Join(", ", track.Artists)}  /  """
+            else String.Join(", ", track.Artists)
 
-        // Print each suspected duplicate track in the group.
-        groupTracks
-        |> Array.iter (fun x -> printfn $"""    • {artistText x}{x.Title}""")
+        let printFileSummary fileTags =
+            let artist = artistSummary fileTags
+            let title = fileTags.Title
+            let duration = formatTimeSpan fileTags.Duration
+            let extension = (Path.GetExtension fileTags.FileName)[1..] |> _.ToUpperInvariant()
+            let bitrate = $"{fileTags.BitRate}kbps"
+            let fileSize = formatBytes fileTags.FileSize
+            printf $"    • {artist}"
+            printfGray " — "
+            printf $"{title}"
+            printfGray $"  [{duration} {extension} {bitrate} {fileSize}]{Environment.NewLine}"
+
+        let printHeader () =
+            groupTracks
+            |> Array.head
+            |> mainArtists ", "
+            |> printfn "%d. %s" (index + 1) // Start numbering at 1, not 0.
+
+        let printDuplicates () =
+            groupTracks
+            |> Array.iter printFileSummary
+
+        printHeader ()
+        printDuplicates ()
 
     match groupedTracks with
     | None -> printfn "No duplicates found."
