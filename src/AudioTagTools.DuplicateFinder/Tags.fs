@@ -92,7 +92,7 @@ let private sortByArtist (groupedTags: LibraryTags array array) =
             if firstFile.AlbumArtists.Length > 1
             then firstFile.AlbumArtists[0]
             else firstFile.Artists[0]
-        $"{artist}{firstFile.Title}" // Only used for sorting, so spaces, etc., aren't needed.
+        $"{artist}{firstFile.Title}" // Only used for sorting, so spaces aren't needed.
 
     groupedTags
     |> Array.sortBy artistAndTrackName
@@ -103,7 +103,7 @@ let findDuplicates (settings: SettingsRoot) (tags: LibraryTags array) : LibraryT
     |> Array.groupBy (groupName settings)
     |> Array.choose (fun (_, group) ->
         match group with
-        | [| _ |] -> None // Filter out items with no potential duplicates.
+        | [| _ |] -> None // Remove items with no potential duplicates.
         | duplicates -> Some duplicates)
     |> function [||] -> None | duplicates -> Some duplicates
     |> Option.map sortByArtist
@@ -124,13 +124,13 @@ let printDuplicates (groupedTracks: LibraryTags array array option) =
             let artist = artistSummary fileTags
             let title = fileTags.Title
             let duration = formatTimeSpan fileTags.Duration
-            let extension = (Path.GetExtension fileTags.FileName)[1..] |> _.ToUpperInvariant()
+            let periodlessExtension = (Path.GetExtension fileTags.FileName)[1..] |> _.ToUpperInvariant()
             let bitrate = $"{fileTags.BitRate}kbps"
             let fileSize = formatBytes fileTags.FileSize
             printf $"    • {artist}"
             printfGray " — "
             printf $"{title}"
-            printfGray $"  [{duration} {extension} {bitrate} {fileSize}]{Environment.NewLine}"
+            printfGray $"  [{duration} {periodlessExtension} {bitrate} {fileSize}]{Environment.NewLine}"
 
         let printHeader () =
             groupTracks
