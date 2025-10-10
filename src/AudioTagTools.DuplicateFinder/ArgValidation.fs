@@ -5,5 +5,7 @@ open System.IO
 
 let validate (args: string array) : Result<FileInfo * FileInfo, Error> =
     match args with
-    | [| x; y |] -> Ok (FileInfo x, FileInfo y)
-    | _ -> Error InvalidArgCount
+    | [| settingsFilePath; tagLibraryPath |] ->
+        Ok (FileInfo settingsFilePath, FileInfo tagLibraryPath)
+    | _ ->
+        Error InvalidArgCount
