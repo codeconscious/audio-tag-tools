@@ -95,7 +95,7 @@ let private reportResults (results: CategorizedTagsToCache seq) : CategorizedTag
     let total =
         totals
         |> Map.values
-        |> Seq.fold (+) 0
+        |> Seq.sum
         |> formatInt
 
     printfn "Results:"
