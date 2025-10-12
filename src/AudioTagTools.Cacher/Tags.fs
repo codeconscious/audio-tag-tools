@@ -20,7 +20,6 @@ type CategorizedTagsToCache =
       Tags: LibraryTags }
 
 let createTagLibraryMap (libraryFile: FileInfo) : Result<TagMap, Error> =
-
     let audioFilePath (fileTags: LibraryTags) : string =
         Path.Combine [| fileTags.DirectoryName; fileTags.FileName |]
 
@@ -82,21 +81,28 @@ let private prepareTagsToWrite (tagLibraryMap: TagMap) (fileInfos: FileInfo seq)
     |> Seq.map (prepareTagsToCache tagLibraryMap)
 
 let private reportResults (results: CategorizedTagsToCache seq) : CategorizedTagsToCache seq =
-    let initialCounts = {| NotPresent = 0; OutOfDate = 0; Unchanged = 0 |}
-
     let totals =
-        (initialCounts, Seq.map _.Type results)
-        ||> Seq.fold (fun acc result ->
-            match result with
-            | NotPresent -> {| acc with NotPresent = acc.NotPresent + 1 |}
-            | OutOfDate -> {| acc with OutOfDate = acc.OutOfDate + 1 |}
-            | Unchanged -> {| acc with Unchanged = acc.Unchanged + 1 |})
+        results
+        |> Seq.countBy _.Type
+        |> Map.ofSeq
+
+    let countOf comparisonResult =
+        totals
+        |> Map.tryFind comparisonResult
+        |> Option.defaultValue 0
+        |> formatInt
+
+    let total =
+        totals
+        |> Map.values
+        |> Seq.fold (+) 0
+        |> formatInt
 
     printfn "Results:"
-    printfn "• New:       %s" (formatInt totals.NotPresent)
-    printfn "• Updated:   %s" (formatInt totals.OutOfDate)
-    printfn "• Unchanged: %s" (formatInt totals.Unchanged)
-    printfn "• Total:     %s" (formatInt (Seq.length results))
+    printfn "• New:       %s" (countOf NotPresent)
+    printfn "• Updated:   %s" (countOf OutOfDate)
+    printfn "• Unchanged: %s" (countOf Unchanged)
+    printfn "• Total:     %s" total
 
     results
 
