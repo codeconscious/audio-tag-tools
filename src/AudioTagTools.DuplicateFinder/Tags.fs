@@ -12,20 +12,27 @@ let parseToTags json =
     |> Result.mapError TagParseError
 
 let filter (settings: SettingsRoot) (allTags: LibraryTags array) : LibraryTags array =
+    let(|ArtistAndTitle|ArtistOnly|TitleOnly|Invalid|) (exclusion: Exclusion) =
+        match exclusion.Artist, exclusion.Title with
+        | Some a, Some t -> ArtistAndTitle (a, t)
+        | Some a, None -> ArtistOnly a
+        | None, Some t -> TitleOnly t
+        | _ -> Invalid
+
     let isExcluded (tags: LibraryTags) =
         settings.Exclusions
-        |> Array.exists (fun excl ->
-            match excl.Artist, excl.Title with
-            | Some artist, Some title ->
+        |> Array.exists (fun exclusion ->
+            match exclusion with
+            | ArtistAndTitle (artist, title) ->
                 Array.contains artist tags.AlbumArtists ||
                 Array.contains artist tags.Artists ||
                 tags.Title.StartsWith(title, StringComparison.InvariantCultureIgnoreCase)
-            | Some artist, None ->
+            | ArtistOnly artist ->
                 Array.contains artist tags.AlbumArtists ||
                 Array.contains artist tags.Artists
-            | None, Some title ->
+            | TitleOnly title ->
                 tags.Title.StartsWith(title, StringComparison.InvariantCultureIgnoreCase)
-            | _ -> false)
+            | Invalid -> false)
 
     allTags
     |> Array.filter (not << isExcluded)
