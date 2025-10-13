@@ -80,20 +80,20 @@ let private prepareTagsToWrite (tagLibraryMap: TagMap) (fileInfos: FileInfo seq)
     fileInfos
     |> Seq.map (prepareTagsToCache tagLibraryMap)
 
-let private reportResults (results: CategorizedTagsToCache seq) : CategorizedTagsToCache seq =
-    let totals =
-        results
+let private reportResults (categorizedTags: CategorizedTagsToCache seq) : CategorizedTagsToCache seq =
+    let categoryTotals =
+        categorizedTags
         |> Seq.countBy _.Type
         |> Map.ofSeq
 
-    let countOf comparisonResult =
-        totals
-        |> Map.tryFind comparisonResult
+    let countOf comparisonResultType =
+        categoryTotals
+        |> Map.tryFind comparisonResultType
         |> Option.defaultValue 0
         |> formatInt
 
-    let total =
-        totals
+    let grandTotal =
+        categoryTotals
         |> Map.values
         |> Seq.sum
         |> formatInt
@@ -102,9 +102,9 @@ let private reportResults (results: CategorizedTagsToCache seq) : CategorizedTag
     printfn "• New:       %s" (countOf NotPresent)
     printfn "• Updated:   %s" (countOf OutOfDate)
     printfn "• Unchanged: %s" (countOf Unchanged)
-    printfn "• Total:     %s" total
+    printfn "• Total:     %s" grandTotal
 
-    results
+    categorizedTags
 
 let generateJson
     (tagLibraryMap: TagMap)
