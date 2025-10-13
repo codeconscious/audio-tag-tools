@@ -6,9 +6,12 @@ let commandMap =
       "export-genres", AudioTagTools.GenreExtractor.start ]
     |> Map.ofList
 
-let (|ValidCommand|_|) requestedCommand =
+let (|ValidCommand|InvalidCommand|) requestedCommand =
     commandMap
     |> Map.tryFind requestedCommand
+    |> function
+    | Some command -> ValidCommand command
+    | None -> InvalidCommand
 
 let instructions =
     commandMap
