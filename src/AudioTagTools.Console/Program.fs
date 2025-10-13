@@ -28,12 +28,12 @@ let main allArgs : int =
         printfn "Starting..."
 
         let command = Array.head allArgs
-        let operationArgs = Array.tail allArgs
+        let args = Array.tail allArgs
 
         Map.tryFind command commandMap
         |> function
-        | Some requestedOperation ->
-            match requestedOperation operationArgs with
+        | Some command' ->
+            match command' args with
             | Ok msg ->
                 printfn $"{msg}"
                 printfn $"Done in {watch.ElapsedFriendly}."
