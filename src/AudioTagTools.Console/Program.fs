@@ -1,14 +1,4 @@
-﻿let commandMap =
-    [ "cache-tags", AudioTagTools.Cacher.start
-      "find-duplicates", AudioTagTools.DuplicateFinder.start
-      "export-genres", AudioTagTools.GenreExtractor.start ]
-    |> Map.ofList
-
-let commandInstructions =
-    commandMap
-    |> Map.keys
-    |> String.concat "\" or \""
-    |> sprintf "Supply a supported command: \"%s\"."
+﻿open Commands
 
 type ExitCode =
     | Success = 0
@@ -22,18 +12,17 @@ let main allArgs : int =
 
     match allArgs with
     | [| |] ->
-        printfn $"{commandInstructions}"
+        printfn $"{instructions}"
         ExitCode.InvalidArgumentCount
     | _ ->
         printfn "Starting..."
 
-        let command = Array.head allArgs
+        let requestedCommand = Array.head allArgs
         let args = Array.tail allArgs
 
-        Map.tryFind command commandMap
-        |> function
-        | Some command' ->
-            match command' args with
+        match requestedCommand with
+        | ValidCommand command ->
+            match command args with
             | Ok msg ->
                 printfn $"{msg}"
                 printfn $"Done in {watch.ElapsedFriendly}."
@@ -42,7 +31,7 @@ let main allArgs : int =
                 printfn $"{msg}"
                 printfn $"Failed after {watch.ElapsedFriendly}."
                 ExitCode.OperationFailure
-        | None ->
-            printfn $"Invalid command \"{command}\". {commandInstructions}"
+        | _ ->
+            printfn $"Invalid command \"{requestedCommand}\". {instructions}"
             ExitCode.InvalidCommand
     |> int
