@@ -13,4 +13,3 @@ let printfColor color msg =
 
 let printfnColor color msg =
     printfColor color $"{msg}{newLine}"
-
