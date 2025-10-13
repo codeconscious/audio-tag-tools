@@ -19,23 +19,25 @@ let filter (settings: SettingsRoot) (allTags: LibraryTags array) : LibraryTags a
         | None, Some t -> TitleOnly t
         | _ -> Invalid
 
-    let isExcluded (tags: LibraryTags) =
-        settings.Exclusions
-        |> Array.exists (fun exclusion ->
-            match exclusion with
+    let isIncluded (fileTags: LibraryTags) =
+        let isExcluded fileTags = function
             | ArtistAndTitle (artist, title) ->
-                Array.contains artist tags.AlbumArtists ||
-                Array.contains artist tags.Artists ||
-                tags.Title.StartsWith(title, StringComparison.InvariantCultureIgnoreCase)
+                Array.contains artist fileTags.AlbumArtists ||
+                Array.contains artist fileTags.Artists ||
+                fileTags.Title.StartsWith(title, StringComparison.InvariantCultureIgnoreCase)
             | ArtistOnly artist ->
-                Array.contains artist tags.AlbumArtists ||
-                Array.contains artist tags.Artists
+                Array.contains artist fileTags.AlbumArtists ||
+                Array.contains artist fileTags.Artists
             | TitleOnly title ->
-                tags.Title.StartsWith(title, StringComparison.InvariantCultureIgnoreCase)
-            | Invalid -> false)
+                fileTags.Title.StartsWith(title, StringComparison.InvariantCultureIgnoreCase)
+            | Invalid -> false
+
+        settings.Exclusions
+        |> Array.exists (isExcluded fileTags)
+        |> not
 
     allTags
-    |> Array.filter (not << isExcluded)
+    |> Array.filter isIncluded
 
 let private hasArtistOrTitle track =
     let hasAnyArtist (track: LibraryTags) =
