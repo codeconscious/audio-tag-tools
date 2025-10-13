@@ -62,7 +62,7 @@ let private mainArtists (separator: string) (track: LibraryTags) : string =
         t.Artists
     |> String.concat separator
 
-let private groupName (settings: SettingsRoot) (track: LibraryTags) =
+let private groupingName (settings: SettingsRoot) (track: LibraryTags) =
     // It appears JSON type providers do not import whitespace-only values. Whitespace should
     // always be ignored to increase the accuracy of duplicate checks, so they are added here.
     let removeSubstrings arr =
@@ -98,9 +98,9 @@ let private sortByArtist (groupedTags: LibraryTags array array) =
 let findDuplicates (settings: SettingsRoot) (tags: LibraryTags array) : LibraryTags array array option =
     tags
     |> Array.filter hasArtistOrTitle
-    |> Array.groupBy (groupName settings)
-    |> Array.choose (fun (_, group) ->
-        match group with
+    |> Array.groupBy (groupingName settings)
+    |> Array.choose (fun (_, groupedItems) ->
+        match groupedItems with
         | [| _ |] -> None // Remove items with no potential duplicates.
         | duplicates -> Some duplicates)
     |> function [||] -> None | duplicates -> Some duplicates
