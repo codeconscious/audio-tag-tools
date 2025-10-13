@@ -2,7 +2,6 @@ module IO
 
 open System.IO
 open Errors
-open Utilities
 open TagLibrary
 
 type FileTags = TagLib.File

@@ -1,3 +1,4 @@
+[<AutoOpen>]
 module Operators
 
 open FsToolkit.ErrorHandling

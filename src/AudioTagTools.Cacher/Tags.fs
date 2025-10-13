@@ -3,8 +3,6 @@ module Tags
 open System
 open IO
 open Errors
-open Operators
-open Utilities
 open FsToolkit.ErrorHandling
 open TagLibrary
 

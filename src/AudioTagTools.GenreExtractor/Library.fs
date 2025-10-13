@@ -1,10 +1,8 @@
 ﻿module AudioTagTools.GenreExtractor
 
-open Operators
 open Errors
 open Exporting
 open ArgValidation
-open Utilities
 open Shared.IO
 open FsToolkit.ErrorHandling
 

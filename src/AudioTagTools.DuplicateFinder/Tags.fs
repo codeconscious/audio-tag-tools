@@ -2,9 +2,7 @@ module Tags
 
 open System.IO
 open Errors
-open Utilities
 open Settings
-open Operators
 open TagLibrary
 open System
 open System.Text

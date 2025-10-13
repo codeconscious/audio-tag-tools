@@ -1,6 +1,5 @@
 ﻿module AudioTagTools.Cacher
 
-open System
 open Errors
 open IO
 open Tags

@@ -1,6 +1,5 @@
 ﻿module AudioTagTools.DuplicateFinder
 
-open Operators
 open Errors
 open ArgValidation
 open IO
