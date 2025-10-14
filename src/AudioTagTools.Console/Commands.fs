@@ -1,5 +1,7 @@
 module Commands
 
+type Command = string array -> Result<string, string>
+
 let commandMap =
     [ "cache-tags", AudioTagTools.Cacher.start
       "find-duplicates", AudioTagTools.DuplicateFinder.start

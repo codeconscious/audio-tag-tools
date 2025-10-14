@@ -6,8 +6,8 @@ type ExitCode =
     | InvalidCommand = 2
     | OperationFailure = 3
 
-let execute (watch: Startwatch.Library.Watch) validCommandFn args =
-    match validCommandFn args with
+let execute (watch: Startwatch.Library.Watch) (commandFn: Command) args =
+    match commandFn args with
     | Ok msg ->
         printfn $"%s{msg}"
         printfn $"Done in %s{watch.ElapsedFriendly}."
