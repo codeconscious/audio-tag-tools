@@ -6,31 +6,32 @@ type ExitCode =
     | InvalidCommand = 2
     | OperationFailure = 3
 
-let execute (watch: Startwatch.Library.Watch) (commandFn: Command) args =
-    match commandFn args with
-    | Ok msg ->
-        printfn $"%s{msg}"
-        printfn $"Done in %s{watch.ElapsedFriendly}."
-        ExitCode.Success
-    | Error msg ->
-        printfn $"%s{msg}"
-        printfn $"Failed after %s{watch.ElapsedFriendly}."
-        ExitCode.OperationFailure
-
-let invalidArgCountExit () =
-    printfn $"%s{instructions}"
-    ExitCode.InvalidArgumentCount
-
-let invalidCommandExit command =
-    printfn $"Invalid command \"%s{command}\". %s{instructions}"
-    ExitCode.InvalidCommand
-
 [<EntryPoint>]
 let main allArgs =
     let watch = Startwatch.Library.Watch()
 
+    let execute (commandFn: Command) args =
+        match commandFn args with
+        | Ok msg ->
+            printfn $"%s{msg}"
+            printfn $"Done in %s{watch.ElapsedFriendly}."
+            ExitCode.Success
+        | Error msg ->
+            printfn $"%s{msg}"
+            printfn $"Failed after %s{watch.ElapsedFriendly}."
+            ExitCode.OperationFailure
+
+    let invalidArgCountExit () =
+        printfn $"%s{instructions}"
+        ExitCode.InvalidArgumentCount
+
+    let invalidCommandExit command =
+        printfn $"Invalid command \"%s{command}\". %s{instructions}"
+        ExitCode.InvalidCommand
+
     match allArgs with
-    | [| |] -> invalidArgCountExit ()
+    | [| |] ->
+        invalidArgCountExit ()
     | _ ->
         printfn "Starting..."
 
@@ -39,6 +40,6 @@ let main allArgs =
 
         match requestedCommand with
         | InvalidCommand -> invalidCommandExit requestedCommand
-        | ValidCommand commandFn -> execute watch commandFn args
+        | ValidCommand commandFn -> execute commandFn args
     |> int
 
