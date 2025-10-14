@@ -6,27 +6,27 @@ type ExitCode =
     | InvalidCommand = 2
     | OperationFailure = 3
 
-let runCommand (watch: Startwatch.Library.Watch) validCommandFn args =
+let execute (watch: Startwatch.Library.Watch) validCommandFn args =
     match validCommandFn args with
     | Ok msg ->
-        printfn $"{msg}"
-        printfn $"Done in {watch.ElapsedFriendly}."
-        ExitCode.Success |> int
+        printfn $"%s{msg}"
+        printfn $"Done in %s{watch.ElapsedFriendly}."
+        ExitCode.Success
     | Error msg ->
-        printfn $"{msg}"
-        printfn $"Failed after {watch.ElapsedFriendly}."
-        ExitCode.OperationFailure |> int
+        printfn $"%s{msg}"
+        printfn $"Failed after %s{watch.ElapsedFriendly}."
+        ExitCode.OperationFailure
 
 let invalidArgCountExit () =
-    printfn $"{instructions}"
-    ExitCode.InvalidArgumentCount |> int
+    printfn $"%s{instructions}"
+    ExitCode.InvalidArgumentCount
 
 let invalidCommandExit command =
-    printfn $"Invalid command \"{command}\". {instructions}"
-    ExitCode.InvalidCommand |> int
+    printfn $"Invalid command \"%s{command}\". %s{instructions}"
+    ExitCode.InvalidCommand
 
 [<EntryPoint>]
-let main allArgs : int =
+let main allArgs =
     let watch = Startwatch.Library.Watch()
 
     match allArgs with
@@ -34,10 +34,11 @@ let main allArgs : int =
     | _ ->
         printfn "Starting..."
 
-        let requestedCommand = Array.head allArgs
-        let args = Array.tail allArgs
+        let requestedCommand = allArgs[0]
+        let args = allArgs[1..]
 
         match requestedCommand with
         | InvalidCommand -> invalidCommandExit requestedCommand
-        | ValidCommand validCommandFn -> runCommand watch validCommandFn args
+        | ValidCommand commandFn -> execute watch commandFn args
+    |> int
 
