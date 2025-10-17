@@ -1,11 +1,11 @@
-module Commands
+module Console.Commands
 
 type Command = string array -> Result<string, string>
 
 let commandMap =
-    [ "cache-tags", AudioTagTools.Cacher.start
-      "find-duplicates", AudioTagTools.DuplicateFinder.start
-      "export-genres", AudioTagTools.GenreExtractor.start ]
+    [ "cache-tags", Cacher.Library.start
+      "find-duplicates", DuplicateFinder.Library.start
+      "export-genres", GenreExtractor.Library.start ]
     |> Map.ofList
 
 let (|ValidCommand|InvalidCommand|) requestedCommand =

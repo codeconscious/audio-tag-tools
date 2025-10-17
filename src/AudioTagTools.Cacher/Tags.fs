@@ -1,10 +1,11 @@
-module Tags
+module Cacher.Tags
 
 open System
 open IO
 open Errors
+open Shared
+open Shared.TagLibrary
 open FsToolkit.ErrorHandling
-open TagLibrary
 
 type TagMap = Map<string, LibraryTags>
 

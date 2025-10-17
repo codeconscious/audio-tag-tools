@@ -1,4 +1,4 @@
-module ArgValidation
+module Cacher.ArgValidation
 
 open Errors
 open System.IO
@@ -6,6 +6,7 @@ open System.IO
 let validate (args: string array) : Result<DirectoryInfo * FileInfo, Error> =
     match args with
     | [| mediaDirPath; tagLibraryPath |] ->
-        Ok (DirectoryInfo mediaDirPath, FileInfo tagLibraryPath)
+        Ok (DirectoryInfo mediaDirPath,
+            FileInfo tagLibraryPath)
     | _ ->
         Error InvalidArgCount

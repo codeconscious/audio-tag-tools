@@ -1,10 +1,11 @@
-﻿module AudioTagTools.DuplicateFinder
+﻿module DuplicateFinder.Library
 
 open Errors
 open ArgValidation
 open IO
 open Tags
 open Settings
+open Shared
 open FsToolkit.ErrorHandling
 
 let private run (args: string array) : Result<unit, Error> =

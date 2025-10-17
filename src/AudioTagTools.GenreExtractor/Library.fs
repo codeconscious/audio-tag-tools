@@ -1,24 +1,25 @@
-﻿module AudioTagTools.GenreExtractor
+﻿module GenreExtractor.Library
 
+open ArgValidation
 open Errors
 open Exporting
-open ArgValidation
-open Shared.IO
+open IO
+open Shared
 open FsToolkit.ErrorHandling
 
 let private run args : Result<unit, Error> =
     result {
         let! tagLibraryFile, genreFile = validate args
 
-        let! oldGenres = IO.readLines genreFile
+        let! oldGenres = readLines genreFile
         printfn "%s entries in the old file." (formatInt oldGenres.Length)
 
         let! newGenres =
             tagLibraryFile
-            |> IO.readFile
-            >>= IO.parseJsonToTags
+            |> readFile
+            >>= parseJsonToTags
             <.> fun tags -> printfn $"Parsed tags for {formatInt tags.Length} files from the tag library."
-            <!> groupArtistsWithGenres "＼" // Separator should be text very unlikely to appear in files' tags.
+            <!> groupArtistsWithGenres "＼" // Separator should be text highly unlikely to appear in files' tags.
 
         let newTotalCount = newGenres.Length
         let addedCount = newGenres |> Array.except oldGenres |> _.Length
@@ -32,9 +33,10 @@ let private run args : Result<unit, Error> =
             genreFile
             |> copyToBackupFile
             |> Result.map ignore
-            |> Result.mapError IoWriteError
 
-        return! newGenres |> IO.writeLines genreFile.FullName
+        return!
+            newGenres
+            |> writeLines genreFile.FullName
     }
 
 let start args : Result<string, string> =

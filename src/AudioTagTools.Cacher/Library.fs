@@ -1,11 +1,11 @@
-﻿module AudioTagTools.Cacher
+﻿module Cacher.Library
 
+open ArgValidation
 open Errors
 open IO
 open Tags
-open ArgValidation
+open Shared.IO
 open FsToolkit.ErrorHandling
-open AudioTagTools.Shared.IO
 
 let private run (args: string array) : Result<unit, Error> =
     result {

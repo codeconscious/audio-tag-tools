@@ -1,5 +1,5 @@
 [<AutoOpen>]
-module Operators
+module Shared.Operators
 
 open FsToolkit.ErrorHandling
 

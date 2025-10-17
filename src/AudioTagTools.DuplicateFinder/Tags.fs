@@ -1,14 +1,16 @@
-module Tags
+module DuplicateFinder.Tags
 
-open System.IO
 open Errors
 open Settings
-open TagLibrary
+open Shared
+open Shared.TagLibrary
 open System
+open System.IO
 open System.Text
 
 let parseToTags json =
-    parseJsonToTags json
+    json
+    |> parseJsonToTags
     |> Result.mapError TagParseError
 
 let filter (settings: SettingsRoot) (allTags: LibraryTags array) : LibraryTags array =
@@ -119,7 +121,7 @@ let printCount description (tags: LibraryTags array) =
     printfn $"%s{description}%s{formatInt tags.Length}"
 
 let printDuplicates (groupedTracks: LibraryTags array array option) =
-    let printfGray = Printing.printfColor ConsoleColor.DarkGray
+    let printfGray = printfColor ConsoleColor.DarkGray
 
     let printGroup index (groupTracks: LibraryTags array) =
         let artistSummary (track: LibraryTags) : string =

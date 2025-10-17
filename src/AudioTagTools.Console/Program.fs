@@ -1,4 +1,4 @@
-﻿open Commands
+﻿open Console.Commands
 
 type ExitCode =
     | Success = 0

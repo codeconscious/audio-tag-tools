@@ -1,9 +1,9 @@
-module IO
+module DuplicateFinder.IO
 
 open Errors
 open Settings
-open TagLibrary
-open AudioTagTools.Shared.IO
+open Shared.TagLibrary
+open Shared.IO
 open System
 open System.Text
 open System.IO
@@ -42,8 +42,8 @@ let savePlaylist (settings: SettingsRoot) (tags: LibraryTags array array option)
     | None -> Ok ()
     | Some tags ->
         tags
-        |> Seq.collect id
-        |> Seq.fold appendFileEntry (StringBuilder "#EXTM3U\n")
+        |> Array.collect id
+        |> Array.fold appendFileEntry (StringBuilder "#EXTM3U\n")
         |> _.ToString()
         |> writeTextToFile fullPath
         |> Result.tee (fun _ -> printfn $"Created playlist file \"{fullPath}\".")

@@ -1,4 +1,4 @@
-module Settings
+module DuplicateFinder.Settings
 
 open Errors
 open FSharp.Data

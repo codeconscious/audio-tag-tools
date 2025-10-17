@@ -1,5 +1,5 @@
 [<AutoOpen>]
-module Utilities
+module Shared.Utilities
 
 open System
 open System.Text.Json
