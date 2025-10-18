@@ -1,9 +1,12 @@
-module ArgValidation
+module GenreExtractor.ArgValidation
 
-open System.IO
 open Errors
+open System.IO
 
 let validate (args: string array) : Result<FileInfo * FileInfo, Error> =
     match args with
-    | [| x; y |] -> Ok (FileInfo x, FileInfo y)
-    | _ -> Error InvalidArgCount
+    | [| tagLibraryPath; genreFilePath |] ->
+        Ok (FileInfo tagLibraryPath,
+            FileInfo genreFilePath)
+    | _ ->
+        Error InvalidArgCount

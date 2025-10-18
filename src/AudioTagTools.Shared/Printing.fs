@@ -1,6 +1,7 @@
 // Be careful with color because we don't know the user's terminal color scheme,
 // so it's easy to unintentionally output invisible or hard-to-read text.
-module Printing
+[<AutoOpen>]
+module Shared.Printing
 
 open System
 
@@ -13,4 +14,3 @@ let printfColor color msg =
 
 let printfnColor color msg =
     printfColor color $"{msg}{newLine}"
-

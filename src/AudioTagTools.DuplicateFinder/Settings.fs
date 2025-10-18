@@ -1,4 +1,4 @@
-module Settings
+module DuplicateFinder.Settings
 
 open Errors
 open FSharp.Data
@@ -34,6 +34,7 @@ let settingsSample = """
 
 type SettingsProvider = JsonProvider<settingsSample>
 type SettingsRoot = SettingsProvider.Root
+type Exclusion = SettingsProvider.Exclusion
 
 let parseToSettings (json: string) : Result<SettingsRoot, Error> =
     try

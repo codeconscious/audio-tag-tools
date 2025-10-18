@@ -1,4 +1,4 @@
-module Errors
+module DuplicateFinder.Errors
 
 type Error =
     | InvalidArgCount

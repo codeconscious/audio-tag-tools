@@ -1,4 +1,4 @@
-module Errors
+module Cacher.Errors
 
 type Error =
     | InvalidArgCount

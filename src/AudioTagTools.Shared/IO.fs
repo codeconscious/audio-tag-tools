@@ -1,4 +1,4 @@
-module AudioTagTools.Shared.IO
+module Shared.IO
 
 open System
 open System.IO
