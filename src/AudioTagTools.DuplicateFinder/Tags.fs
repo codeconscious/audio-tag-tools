@@ -110,9 +110,9 @@ let findDuplicates (settings: SettingsRoot) (tags: LibraryTags array) : LibraryT
     tags
     |> Array.filter hasArtistOrTitle
     |> Array.groupBy (groupingName settings)
-    |> Array.choose (fun (_, groupedItems) ->
-        match groupedItems with
-        | [| _ |] -> None // Remove items with no potential duplicates.
+    |> Array.choose (fun (_, groupedTracks) ->
+        match groupedTracks with
+        | [| _ |] -> None // Sole track with no potential duplicates.
         | duplicates -> Some duplicates)
     |> function [||] -> None | duplicates -> Some duplicates
     |> Option.map sortByArtist
