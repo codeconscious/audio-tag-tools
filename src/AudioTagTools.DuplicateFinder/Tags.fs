@@ -1,36 +1,45 @@
-module Tags
+module DuplicateFinder.Tags
 
-open System.IO
 open Errors
-open Utilities
 open Settings
-open Operators
-open TagLibrary
+open Shared
+open Shared.TagLibrary
 open System
+open System.IO
 open System.Text
 
 let parseToTags json =
-    parseJsonToTags json
+    json
+    |> parseJsonToTags
     |> Result.mapError TagParseError
 
 let filter (settings: SettingsRoot) (allTags: LibraryTags array) : LibraryTags array =
-    let isExcluded (tags: LibraryTags) =
+    let(|ArtistAndTitle|ArtistOnly|TitleOnly|Invalid|) (exclusion: Exclusion) =
+        match exclusion.Artist, exclusion.Title with
+        | Some a, Some t -> ArtistAndTitle (a, t)
+        | Some a, None -> ArtistOnly a
+        | None, Some t -> TitleOnly t
+        | _ -> Invalid
+
+    let isIncluded (fileTags: LibraryTags) =
+        let isExcluded fileTags = function
+            | ArtistAndTitle (artist, title) ->
+                Array.contains artist fileTags.AlbumArtists ||
+                Array.contains artist fileTags.Artists ||
+                fileTags.Title.StartsWith(title, StringComparison.InvariantCultureIgnoreCase)
+            | ArtistOnly artist ->
+                Array.contains artist fileTags.AlbumArtists ||
+                Array.contains artist fileTags.Artists
+            | TitleOnly title ->
+                fileTags.Title.StartsWith(title, StringComparison.InvariantCultureIgnoreCase)
+            | Invalid -> false
+
         settings.Exclusions
-        |> Array.exists (fun excl ->
-            match excl.Artist, excl.Title with
-            | Some artist, Some title ->
-                Array.contains artist tags.AlbumArtists ||
-                Array.contains artist tags.Artists ||
-                tags.Title.StartsWith(title, StringComparison.InvariantCultureIgnoreCase)
-            | Some artist, None ->
-                Array.contains artist tags.AlbumArtists ||
-                Array.contains artist tags.Artists
-            | None, Some title ->
-                tags.Title.StartsWith(title, StringComparison.InvariantCultureIgnoreCase)
-            | _ -> false)
+        |> Array.exists (isExcluded fileTags)
+        |> not
 
     allTags
-    |> Array.filter (not << isExcluded)
+    |> Array.filter isIncluded
 
 let private hasArtistOrTitle track =
     let hasAnyArtist (track: LibraryTags) =
@@ -64,7 +73,7 @@ let private mainArtists (separator: string) (track: LibraryTags) : string =
         t.Artists
     |> String.concat separator
 
-let private groupName (settings: SettingsRoot) (track: LibraryTags) =
+let private groupingName (settings: SettingsRoot) (track: LibraryTags) =
     // It appears JSON type providers do not import whitespace-only values. Whitespace should
     // always be ignored to increase the accuracy of duplicate checks, so they are added here.
     let removeSubstrings arr =
@@ -92,7 +101,7 @@ let private sortByArtist (groupedTags: LibraryTags array array) =
             if firstFile.AlbumArtists.Length > 1
             then firstFile.AlbumArtists[0]
             else firstFile.Artists[0]
-        $"{artist}{firstFile.Title}" // Only used for sorting, so spaces, etc., aren't needed.
+        $"{artist}{firstFile.Title}" // Only used for sorting, so spaces aren't needed.
 
     groupedTags
     |> Array.sortBy artistAndTrackName
@@ -100,10 +109,10 @@ let private sortByArtist (groupedTags: LibraryTags array array) =
 let findDuplicates (settings: SettingsRoot) (tags: LibraryTags array) : LibraryTags array array option =
     tags
     |> Array.filter hasArtistOrTitle
-    |> Array.groupBy (groupName settings)
-    |> Array.choose (fun (_, group) ->
-        match group with
-        | [| _ |] -> None // Filter out items with no potential duplicates.
+    |> Array.groupBy (groupingName settings)
+    |> Array.choose (fun (_, groupedTracks) ->
+        match groupedTracks with
+        | [| _ |] -> None // Sole track with no potential duplicates.
         | duplicates -> Some duplicates)
     |> function [||] -> None | duplicates -> Some duplicates
     |> Option.map sortByArtist
@@ -112,7 +121,7 @@ let printCount description (tags: LibraryTags array) =
     printfn $"%s{description}%s{formatInt tags.Length}"
 
 let printDuplicates (groupedTracks: LibraryTags array array option) =
-    let printfGray = Printing.printfColor ConsoleColor.DarkGray
+    let printfGray = printfColor ConsoleColor.DarkGray
 
     let printGroup index (groupTracks: LibraryTags array) =
         let artistSummary (track: LibraryTags) : string =
@@ -124,13 +133,13 @@ let printDuplicates (groupedTracks: LibraryTags array array option) =
             let artist = artistSummary fileTags
             let title = fileTags.Title
             let duration = formatTimeSpan fileTags.Duration
-            let extension = (Path.GetExtension fileTags.FileName)[1..] |> _.ToUpperInvariant()
+            let periodlessExtension = (Path.GetExtension fileTags.FileName)[1..] |> _.ToUpperInvariant()
             let bitrate = $"{fileTags.BitRate}kbps"
             let fileSize = formatBytes fileTags.FileSize
             printf $"    • {artist}"
             printfGray " — "
             printf $"{title}"
-            printfGray $"  [{duration} {extension} {bitrate} {fileSize}]{Environment.NewLine}"
+            printfGray $"  [{duration} {periodlessExtension} {bitrate} {fileSize}]{Environment.NewLine}"
 
         let printHeader () =
             groupTracks

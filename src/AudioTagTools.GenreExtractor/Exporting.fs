@@ -1,7 +1,7 @@
-module Exporting
+module GenreExtractor.Exporting
 
+open Shared.TagLibrary
 open System
-open TagLibrary
 
 let private mainArtist (fileTags: LibraryTags) =
     match fileTags with

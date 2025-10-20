@@ -1,4 +1,4 @@
-module TagLibrary
+module Shared.TagLibrary
 
 open System
 open System.IO

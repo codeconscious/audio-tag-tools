@@ -1,9 +1,9 @@
-module IO
+module Cacher.IO
 
-open System.IO
 open Errors
-open Utilities
-open TagLibrary
+open Shared
+open Shared.TagLibrary
+open System.IO
 
 type FileTags = TagLib.File
 

@@ -1,22 +1,31 @@
-module IO
+module GenreExtractor.IO
 
-open System.IO
 open Errors
-open TagLibrary
-open AudioTagTools.Shared.IO
+open Shared.TagLibrary
+open Shared.IO
+open System.IO
 
 let readFile (fileInfo: FileInfo) : Result<string, Error> =
-    readFile fileInfo
+    fileInfo
+    |> readFile
     |> Result.mapError IoReadError
 
 let readLines (fileInfo: FileInfo) : Result<string array, Error> =
-    readLines fileInfo
+    fileInfo
+    |> readLines
     |> Result.mapError IoReadError
 
 let parseJsonToTags (json: string) : Result<LibraryTags array, Error> =
-    parseJsonToTags json
+    json
+    |> parseJsonToTags
     |> Result.mapError TagParseError
 
 let writeLines (filePath: string) (lines: string array) : Result<unit, Error> =
-    writeLinesToFile filePath lines
+    lines
+    |> writeLinesToFile filePath
+    |> Result.mapError IoWriteError
+
+let copyToBackupFile fileInfo : Result<FileInfo, Error> =
+    fileInfo
+    |> copyToBackupFile
     |> Result.mapError IoWriteError

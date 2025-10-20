@@ -1,12 +1,11 @@
-module Tags
+module Cacher.Tags
 
 open System
 open IO
 open Errors
-open Operators
-open Utilities
+open Shared
+open Shared.TagLibrary
 open FsToolkit.ErrorHandling
-open TagLibrary
 
 type TagMap = Map<string, LibraryTags>
 
@@ -20,7 +19,6 @@ type CategorizedTagsToCache =
       Tags: LibraryTags }
 
 let createTagLibraryMap (libraryFile: FileInfo) : Result<TagMap, Error> =
-
     let audioFilePath (fileTags: LibraryTags) : string =
         Path.Combine [| fileTags.DirectoryName; fileTags.FileName |]
 
@@ -81,24 +79,31 @@ let private prepareTagsToWrite (tagLibraryMap: TagMap) (fileInfos: FileInfo seq)
     fileInfos
     |> Seq.map (prepareTagsToCache tagLibraryMap)
 
-let private reportResults (results: CategorizedTagsToCache seq) : CategorizedTagsToCache seq =
-    let initialCounts = {| NotPresent = 0; OutOfDate = 0; Unchanged = 0 |}
+let private reportResults (categorizedTags: CategorizedTagsToCache seq) : CategorizedTagsToCache seq =
+    let categoryTotals =
+        categorizedTags
+        |> Seq.countBy _.Type
+        |> Map.ofSeq
 
-    let totals =
-        (initialCounts, Seq.map _.Type results)
-        ||> Seq.fold (fun acc result ->
-            match result with
-            | NotPresent -> {| acc with NotPresent = acc.NotPresent + 1 |}
-            | OutOfDate -> {| acc with OutOfDate = acc.OutOfDate + 1 |}
-            | Unchanged -> {| acc with Unchanged = acc.Unchanged + 1 |})
+    let countOf comparisonResultType =
+        categoryTotals
+        |> Map.tryFind comparisonResultType
+        |> Option.defaultValue 0
+        |> formatInt
+
+    let grandTotal =
+        categoryTotals
+        |> Map.values
+        |> Seq.sum
+        |> formatInt
 
     printfn "Results:"
-    printfn "• New:       %s" (formatInt totals.NotPresent)
-    printfn "• Updated:   %s" (formatInt totals.OutOfDate)
-    printfn "• Unchanged: %s" (formatInt totals.Unchanged)
-    printfn "• Total:     %s" (formatInt (Seq.length results))
+    printfn "• New:       %s" (countOf NotPresent)
+    printfn "• Updated:   %s" (countOf OutOfDate)
+    printfn "• Unchanged: %s" (countOf Unchanged)
+    printfn "• Total:     %s" grandTotal
 
-    results
+    categorizedTags
 
 let generateJson
     (tagLibraryMap: TagMap)

@@ -1,4 +1,4 @@
-module Errors
+module GenreExtractor.Errors
 
 type Error =
     | InvalidArgCount

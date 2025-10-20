@@ -1,14 +1,4 @@
-﻿let commandMap =
-    [ "cache-tags", AudioTagTools.Cacher.start
-      "find-duplicates", AudioTagTools.DuplicateFinder.start
-      "export-genres", AudioTagTools.GenreExtractor.start ]
-    |> Map.ofList
-
-let commandInstructions =
-    commandMap
-    |> Map.keys
-    |> String.concat "\" or \""
-    |> sprintf "Supply a supported command: \"%s\"."
+﻿open Console.Commands
 
 type ExitCode =
     | Success = 0
@@ -17,32 +7,39 @@ type ExitCode =
     | OperationFailure = 3
 
 [<EntryPoint>]
-let main allArgs : int =
+let main allArgs =
     let watch = Startwatch.Library.Watch()
+
+    let execute (commandFn: Command) args =
+        match commandFn args with
+        | Ok msg ->
+            printfn $"%s{msg}"
+            printfn $"Done in %s{watch.ElapsedFriendly}."
+            ExitCode.Success
+        | Error msg ->
+            printfn $"%s{msg}"
+            printfn $"Failed after %s{watch.ElapsedFriendly}."
+            ExitCode.OperationFailure
+
+    let invalidArgCountExit () =
+        printfn $"%s{instructions}"
+        ExitCode.InvalidArgumentCount
+
+    let invalidCommandExit command =
+        printfn $"Invalid command \"%s{command}\". %s{instructions}"
+        ExitCode.InvalidCommand
 
     match allArgs with
     | [| |] ->
-        printfn $"{commandInstructions}"
-        ExitCode.InvalidArgumentCount
+        invalidArgCountExit ()
     | _ ->
         printfn "Starting..."
 
-        let command = Array.head allArgs
-        let operationArgs = Array.tail allArgs
+        let requestedCommand = allArgs[0]
+        let args = allArgs[1..]
 
-        Map.tryFind command commandMap
-        |> function
-        | Some requestedOperation ->
-            match requestedOperation operationArgs with
-            | Ok msg ->
-                printfn $"{msg}"
-                printfn $"Done in {watch.ElapsedFriendly}."
-                ExitCode.Success
-            | Error msg ->
-                printfn $"{msg}"
-                printfn $"Failed after {watch.ElapsedFriendly}."
-                ExitCode.OperationFailure
-        | None ->
-            printfn $"Invalid command \"{command}\". {commandInstructions}"
-            ExitCode.InvalidCommand
+        match requestedCommand with
+        | InvalidCommand -> invalidCommandExit requestedCommand
+        | ValidCommand commandFn -> execute commandFn args
     |> int
+
