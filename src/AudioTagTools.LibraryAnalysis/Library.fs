@@ -19,15 +19,16 @@ let private run (args: string array) : Result<unit, Error> =
             |> Array.distinct
             |> _.Length
 
-        let topGenres =
-            tags
-            |> Array.map _.Genres
-            |> Array.collect id
-            |> Array.filter (fun a -> not <| String.IsNullOrEmpty a)
+        let mostPopulous count items =
+            items
+            |> Array.filter (not << String.IsNullOrEmpty)
             |> Array.groupBy _.ToLowerInvariant()
             |> Array.map (fun (_, group) -> (group[0], group.Length))
             |> Array.sortByDescending snd
-            |> Array.take 10
+            |> Array.take count
+
+        let topTitles = mostPopulous 10 (tags |> Array.map _.Title)
+        let topGenres = mostPopulous 10 (tags |> Array.map _.Genres |> Array.collect id)
 
         let largestFiles =
             tags
@@ -40,6 +41,9 @@ let private run (args: string array) : Result<unit, Error> =
 
         printfn "Top 10 genres:"
         topGenres |> Array.iter (fun (genre, count) -> printfn $"   • {genre}  {formatInt count}")
+
+        printfn "Top 10 title:"
+        topTitles |> Array.iter (fun (title, count) -> printfn $"   • {title}  {formatInt count}")
 
         printfn "Top 10 largest files:"
         largestFiles |> Array.iter (fun f ->
