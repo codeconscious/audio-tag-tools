@@ -12,43 +12,95 @@ let private run (args: string array) : Result<unit, Error> =
         let! tagLibraryFile = validate args
         let! tags = tagLibraryFile |> readFile >>= parseJsonToTags
 
-        let uniqueArtists =
-            tags
-            |> Array.map (fun t -> Array.concat [| t.Artists; t.AlbumArtists |])
-            |> Array.concat
-            |> Array.distinct
-            |> _.Length
+        printfn "Tag library analysis results:"
+        printfn $"Tracks: {formatInt tags.Length}"
 
-        let mostPopulous count items =
+        let artists =
+            tags
+            |> Array.map (fun t ->
+                Array.concat [| t.Artists; t.AlbumArtists |]
+                |> Array.distinct
+                |> Array.except [| String.Empty; " "; "Various Artists"; "<unknown>" |])
+            |> Array.concat
+
+        let uniqueArtists = artists |> Array.distinct
+        printfn $"Unique artists: {formatInt uniqueArtists.Length}"
+
+        let averageFileSize =
+            let sizeTotal = tags |> Array.map _.FileSize |> Array.sum
+            let fileCount = tags.Length
+            sizeTotal / (int64 fileCount)
+        printfn $"Average file size: %d{averageFileSize} bytes"
+
+        let inline mostPopulous count (grouper: 'a -> 'a) (items: 'a array) =
             items
-            |> Array.filter (not << String.IsNullOrEmpty)
-            |> Array.groupBy _.ToLowerInvariant()
+            |> Array.groupBy grouper
             |> Array.map (fun (_, group) -> (group[0], group.Length))
             |> Array.sortByDescending snd
-            |> Array.take count
+            |> Array.truncate count
 
-        let topTitles = mostPopulous 10 (tags |> Array.map _.Title)
-        let topGenres = mostPopulous 10 (tags |> Array.map _.Genres |> Array.collect id)
+        let asLower (x: string) = x.ToLowerInvariant()
+        let topTitles = mostPopulous 10 asLower (tags |> Array.map _.Title)
+        let topGenres = mostPopulous 10 asLower (tags |> Array.map _.Genres |> Array.collect id)
+
+        let mostCommonArtists =
+            tags
+            |> Array.map (fun t ->
+                Array.concat [| t.Artists; t.AlbumArtists |]
+                |> Array.distinct
+                |> Array.except [| String.Empty; " "; "Various Artists"; "<unknown>" |])
+            |> Array.concat
+            |> mostPopulous 15 id
+        printfn "Top 15 artists:"
+        mostCommonArtists |> Array.iteri (fun i (artist, count) -> printfn $"   • {i + 1} {artist}  {formatInt count}")
 
         let largestFiles =
             tags
             |> Array.sortByDescending _.FileSize
-            |> Array.take 10
-
-        printfn "Tag library analysis results:"
-        printfn $"Tracks: {formatInt tags.Length}"
-        printfn $"Unique artists: {formatInt uniqueArtists}"
+            |> Array.truncate 10
 
         printfn "Top 10 genres:"
         topGenres |> Array.iter (fun (genre, count) -> printfn $"   • {genre}  {formatInt count}")
 
-        printfn "Top 10 title:"
+        printfn "Top 10 titles:"
         topTitles |> Array.iter (fun (title, count) -> printfn $"   • {title}  {formatInt count}")
 
         printfn "Top 10 largest files:"
         largestFiles |> Array.iter (fun f ->
             let artist = String.concat ", " f.Artists
             printfn $"   • {artist} / {f.Title}  {formatBytes f.FileSize}")
+
+        let qualityData =
+            tags
+            |> Array.map (fun t -> {| BitRate = t.BitRate
+                                      SampleRate = t.SampleRate
+                                      Extension = Path.GetExtension t.FileName |> _.ToUpperInvariant() |} )
+
+        let topBitRates = qualityData |> Array.map _.BitRate |> mostPopulous 10 id
+        printfn "Top 10 bitrates:"
+        topBitRates |> Array.iter (fun (bitrate, count) -> printfn $"   • {bitrate}  {formatInt count}")
+
+        let topSampleRates = qualityData |> Array.map _.SampleRate |> mostPopulous 10 id
+        printfn "Top 10 sample rates:"
+        topSampleRates |> Array.iter (fun (sampleRate, count) -> printfn $"   • {sampleRate}  {formatInt count}")
+
+        let topFormats = qualityData |> Array.map _.Extension |> mostPopulous 10 id
+        printfn "Top 10 extensions:"
+        topFormats |> Array.iter (fun (ext, count) -> printfn $"   • {ext}  {formatInt count}")
+
+        let topCombo = qualityData |> mostPopulous 10 id
+        printfn "Top 10 combos:"
+        topCombo |> Array.iter (fun (x, count) -> printfn $"   • {x.Extension}, {x.BitRate}, {x.SampleRate} -> {formatInt count}")
+
+        let haveAlbumArt =
+            tags
+            |> Array.map _.ImageCount
+            |> Array.filter (fun x -> x > 0)
+            |> Array.length
+            |> float
+            |> fun count -> count / float tags.Length
+        printfn $"With album art: %A{haveAlbumArt}%%"
+
     }
 
 let start (args: string array) : Result<string, string> =
