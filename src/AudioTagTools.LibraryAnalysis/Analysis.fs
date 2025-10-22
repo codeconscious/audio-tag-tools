@@ -5,10 +5,11 @@ open Shared.Utilities
 
 let inline mostPopulous count (grouper: 'a -> 'a) (items: 'a array) =
     items
-    |> Array.groupBy grouper
-    |> Array.map (fun (_, group) -> (group[0], group.Length))
-    |> Array.sortByDescending snd
-    |> Array.truncate count
+    |> List.ofArray // TODO: Remove after refactoring library tags to a list.
+    |> List.groupBy grouper
+    |> List.map (fun (_, group) -> (group[0], group.Length))
+    |> List.sortByDescending snd
+    |> List.truncate count
 
 let albumArtPercentage (tags: LibraryTags array) =
     tags
@@ -21,7 +22,7 @@ let topBitRates tags =
     tags
     |> Array.map _.BitRate
     |> mostPopulous 10 id
-    |> Array.map (fun (bitrate, count) -> $"   • {bitrate}  {formatInt count}")
+    |> List.map (fun (bitrate, count) -> [|$"{bitrate} kbps"; formatInt count|])
 
 (*
 

@@ -79,8 +79,11 @@ let private run (args: string array) : Result<unit, Error> =
         //                              SampleRate = t.SampleRate
         //                              Extension = (Path.GetExtension t.FileName)[1..] |> _.ToUpperInvariant() } )
 
-        printfn "Top bitrates:"
-        topBitRates tags |> Array.iter (printfn "%s")
+        printTable {
+            Title = Some "Top bitrates"
+            Headers = Some ["Bitrate"; "Count"]
+            Rows = Some (topBitRates tags)
+        }
 
         albumArtPercentage tags |> printfn "%s"
     }
