@@ -8,6 +8,8 @@ open IO
 open Shared
 open FsToolkit.ErrorHandling
 
+type QualityData = { BitRate: int; Extension: string; SampleRate: int }
+
 let private run (args: string array) : Result<unit, Error> =
     result {
         let! tagLibraryFile = validate args
@@ -71,27 +73,14 @@ let private run (args: string array) : Result<unit, Error> =
             let artist = String.concat ", " f.Artists
             printfn $"   • {artist} / {f.Title}  {formatBytes f.FileSize}")
 
-        let qualityData =
-            tags
-            |> Array.map (fun t -> {| BitRate = t.BitRate
-                                      SampleRate = t.SampleRate
-                                      Extension = (Path.GetExtension t.FileName)[1..] |> _.ToUpperInvariant() |} )
+        // let qualityData =
+        //     tags
+        //     |> Array.map (fun t -> { BitRate = t.BitRate
+        //                              SampleRate = t.SampleRate
+        //                              Extension = (Path.GetExtension t.FileName)[1..] |> _.ToUpperInvariant() } )
 
-        let topBitRates = qualityData |> Array.map _.BitRate |> mostPopulous 10 id
-        printfn "Top 10 bitrates:"
-        topBitRates |> Array.iter (fun (bitrate, count) -> printfn $"   • {bitrate}  {formatInt count}")
-
-        let topSampleRates = qualityData |> Array.map _.SampleRate |> mostPopulous 10 id
-        printfn "Top 10 sample rates:"
-        topSampleRates |> Array.iter (fun (sampleRate, count) -> printfn $"   • {formatInt sampleRate}  {formatInt count}")
-
-        let topFormats = qualityData |> Array.map _.Extension |> mostPopulous 10 id
-        printfn "Top 10 extensions:"
-        topFormats |> Array.iter (fun (ext, count) -> printfn $"   • {ext}  {formatInt count}")
-
-        let topCombo = qualityData |> mostPopulous 10 id
-        printfn "Top 10 combos:"
-        topCombo |> Array.iter (fun (x, count) -> printfn $"   • {x.Extension}, {x.BitRate}, {x.SampleRate} -> {formatInt count}")
+        printfn "Top bitrates:"
+        topBitRates tags |> Array.iter (printfn "%s")
 
         albumArtPercentage tags |> printfn "%s"
     }
