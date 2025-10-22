@@ -1,5 +1,6 @@
 ﻿module LibraryAnalysis.Library
 
+open Analysis
 open System
 open ArgValidation
 open Errors
@@ -92,12 +93,7 @@ let private run (args: string array) : Result<unit, Error> =
         printfn "Top 10 combos:"
         topCombo |> Array.iter (fun (x, count) -> printfn $"   • {x.Extension}, {x.BitRate}, {x.SampleRate} -> {formatInt count}")
 
-        let haveAlbumArtCount =
-            tags
-            |> Array.choose (fun t -> if t.ImageCount > 0 then Some t.ImageCount else None)
-            |> Array.length
-            |> fun count -> float count / float tags.Length * 100.
-        printfn $"With album art: %s{formatFloat haveAlbumArtCount}%%"
+        albumArtPercentage tags |> printfn "%s"
     }
 
 let start (args: string array) : Result<string, string> =

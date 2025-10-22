@@ -9,6 +9,7 @@
         <Compile Include="Errors.fs" />
         <Compile Include="IO.fs" />
         <Compile Include="ArgValidation.fs" />
+        <Compile Include="Analysis.fs" />
         <Compile Include="Library.fs"/>
     </ItemGroup>
 
