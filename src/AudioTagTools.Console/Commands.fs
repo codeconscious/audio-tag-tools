@@ -4,6 +4,7 @@ type Command = string array -> Result<string, string>
 
 let commandMap =
     [ "cache-tags", Cacher.Library.start
+      "analysis", LibraryAnalysis.Library.start
       "find-duplicates", DuplicateFinder.Library.start
       "export-genres", GenreExtractor.Library.start ]
     |> Map.ofList
