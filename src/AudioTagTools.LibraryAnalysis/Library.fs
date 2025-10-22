@@ -92,15 +92,12 @@ let private run (args: string array) : Result<unit, Error> =
         printfn "Top 10 combos:"
         topCombo |> Array.iter (fun (x, count) -> printfn $"   • {x.Extension}, {x.BitRate}, {x.SampleRate} -> {formatInt count}")
 
-        let haveAlbumArt =
+        let haveAlbumArtCount =
             tags
-            |> Array.map _.ImageCount
-            |> Array.filter (fun x -> x > 0)
+            |> Array.choose (fun t -> if t.ImageCount > 0 then Some t.ImageCount else None)
             |> Array.length
-            |> float
-            |> fun count -> count / float tags.Length
-        printfn $"With album art: %A{haveAlbumArt}%%"
-
+            |> fun count -> float count / float tags.Length * 100.
+        printfn $"With album art: %s{formatFloat haveAlbumArtCount}%%"
     }
 
 let start (args: string array) : Result<string, string> =
