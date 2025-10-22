@@ -74,7 +74,7 @@ let private run (args: string array) : Result<unit, Error> =
             tags
             |> Array.map (fun t -> {| BitRate = t.BitRate
                                       SampleRate = t.SampleRate
-                                      Extension = Path.GetExtension t.FileName |> _.ToUpperInvariant() |} )
+                                      Extension = (Path.GetExtension t.FileName)[1..] |> _.ToUpperInvariant() |} )
 
         let topBitRates = qualityData |> Array.map _.BitRate |> mostPopulous 10 id
         printfn "Top 10 bitrates:"
