@@ -74,17 +74,32 @@ let private run (args: string array) : Result<unit, Error> =
             let artist = String.concat ", " f.Artists
             printfn $"   • {artist} / {f.Title}  {formatBytes f.FileSize}")
 
-        // let qualityData =
-        //     tags
-        //     |> Array.map (fun t -> { BitRate = t.BitRate
-        //                              SampleRate = t.SampleRate
-        //                              Extension = (Path.GetExtension t.FileName)[1..] |> _.ToUpperInvariant() } )
+        printTable {
+            Title = Some "Top Formats"
+            Headers = Some ["Extension"; "Count"]
+            Rows = Some (topFormats 10 tags)
+            ColumnAlignments = [Justify.Left; Justify.Right]
+        }
 
         printTable {
-            Title = Some "Top bitrates"
+            Title = Some "Top Bitrates"
             Headers = Some ["Bitrate"; "Count"]
-            Rows = Some (topBitRates tags)
+            Rows = Some (topBitRates 10 tags)
             ColumnAlignments = [Justify.Right; Justify.Right]
+        }
+
+        printTable {
+            Title = Some "Top Sample Rates"
+            Headers = Some ["Sample Rate"; "Count"]
+            Rows = Some (topSampleRates 10 tags)
+            ColumnAlignments = [Justify.Right; Justify.Right]
+        }
+
+        printTable {
+            Title = Some "Most Common Quality Cominbations"
+            Headers = Some ["Format"; "Bit Rate"; "Sample Rate"; "Count"]
+            Rows = Some (topQualityData 10 tags)
+            ColumnAlignments = [Justify.Left; Justify.Right; Justify.Right; Justify.Right]
         }
 
         albumArtPercentage tags |> printfn "%s"

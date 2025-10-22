@@ -1,5 +1,6 @@
 module LibraryAnalysis.Analysis
 
+open System.IO
 open Shared.TagLibrary
 open Shared.Utilities
 
@@ -18,11 +19,37 @@ let albumArtPercentage (tags: LibraryTags array) =
     |> fun count -> float count / float tags.Length * 100.
     |> fun x -> $"With album art: %s{formatFloat x}%%"
 
-let topBitRates tags =
+let topBitRates count tags =
     tags
     |> Array.map _.BitRate
-    |> mostPopulous 10 id
+    |> mostPopulous count id
     |> List.map (fun (bitrate, count) -> [|$"{bitrate} kbps"; formatInt count|])
+
+let topSampleRates count tags =
+    tags
+    |> Array.map _.SampleRate
+    |> mostPopulous count id
+    |> List.map (fun (sampleRate, count) -> [|$"{formatInt sampleRate}"; formatInt count|])
+
+let topFormats count tags =
+    tags
+    |> Array.map (fun t -> (Path.GetExtension t.FileName)[1..] |> _.ToUpperInvariant())
+    |> mostPopulous count id
+    |> List.map (fun (ext, count) -> [|$"{ext}"; formatInt count|])
+
+let topQualityData count tags =
+    tags
+    |> Array.map (fun t -> {| BitRate = t.BitRate
+                              SampleRate = t.SampleRate
+                              Extension = (Path.GetExtension t.FileName)[1..] |> _.ToUpperInvariant() |} )
+    |> mostPopulous count id
+    |> List.map (fun (data, count) ->
+        [|
+           data.Extension
+           $"{data.BitRate} kbps"
+           formatInt data.SampleRate
+           formatInt count
+        |])
 
 (*
 
