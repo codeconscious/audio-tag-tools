@@ -7,6 +7,7 @@ open Errors
 open IO
 open Shared
 open FsToolkit.ErrorHandling
+open Spectre.Console
 
 type QualityData = { BitRate: int; Extension: string; SampleRate: int }
 
@@ -83,6 +84,7 @@ let private run (args: string array) : Result<unit, Error> =
             Title = Some "Top bitrates"
             Headers = Some ["Bitrate"; "Count"]
             Rows = Some (topBitRates tags)
+            ColumnAlignments = [Justify.Right; Justify.Right]
         }
 
         albumArtPercentage tags |> printfn "%s"
