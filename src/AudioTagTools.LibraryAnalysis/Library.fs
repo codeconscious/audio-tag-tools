@@ -82,7 +82,7 @@ let private run (args: string array) : Result<unit, Error> =
 
         let topSampleRates = qualityData |> Array.map _.SampleRate |> mostPopulous 10 id
         printfn "Top 10 sample rates:"
-        topSampleRates |> Array.iter (fun (sampleRate, count) -> printfn $"   • {sampleRate}  {formatInt count}")
+        topSampleRates |> Array.iter (fun (sampleRate, count) -> printfn $"   • {formatInt sampleRate}  {formatInt count}")
 
         let topFormats = qualityData |> Array.map _.Extension |> mostPopulous 10 id
         printfn "Top 10 extensions:"
