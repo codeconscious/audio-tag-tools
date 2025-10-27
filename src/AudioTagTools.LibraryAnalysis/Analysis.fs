@@ -15,13 +15,17 @@ let inline private mostPopulous count (grouper: 'a -> 'a) (items: 'a array) =
 
 let private asLower (x: string) = x.ToLowerInvariant()
 
-let topArtists count (tags: LibraryTags array) =
+let filteredArtists (tags: LibraryTags array) =
     tags
     |> Array.map (fun t ->
         Array.concat [| t.Artists; t.AlbumArtists |]
         |> Array.distinct
         |> Array.except [| String.Empty; " "; "Various Artists"; "<unknown>" |])
     |> Array.concat
+
+let topArtists count (tags: LibraryTags array) =
+    tags
+    |> filteredArtists
     |> mostPopulous count id
     |> List.map (fun (artist, count) -> [| artist; formatInt count |])
 
