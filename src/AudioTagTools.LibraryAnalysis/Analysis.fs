@@ -51,22 +51,3 @@ let topQualityData count tags =
            formatInt count
         |])
 
-(*
-
-        let topBitRates = qualityData |> Array.map _.BitRate |> mostPopulous 10 id
-        printfn "Top 10 bitrates:"
-        topBitRates |> Array.iter (fun (bitrate, count) -> printfn $"   • {bitrate}  {formatInt count}")
-
-        let topSampleRates = qualityData |> Array.map _.SampleRate |> mostPopulous 10 id
-        printfn "Top 10 sample rates:"
-        topSampleRates |> Array.iter (fun (sampleRate, count) -> printfn $"   • {formatInt sampleRate}  {formatInt count}")
-
-        let topFormats = qualityData |> Array.map _.Extension |> mostPopulous 10 id
-        printfn "Top 10 extensions:"
-        topFormats |> Array.iter (fun (ext, count) -> printfn $"   • {ext}  {formatInt count}")
-
-        let topCombo = qualityData |> mostPopulous 10 id
-        printfn "Top 10 combos:"
-        topCombo |> Array.iter (fun (x, count) -> printfn $"   • {x.Extension}, {x.BitRate}, {x.SampleRate} -> {formatInt count}")
-
-*)
