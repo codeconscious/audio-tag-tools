@@ -9,7 +9,13 @@ open Shared
 open FsToolkit.ErrorHandling
 open Spectre.Console
 
-type QualityData = { BitRate: int; Extension: string; SampleRate: int }
+// type Justify = Spectre.Console.Justify
+
+type QualityData = {
+    BitRate: int
+    Extension: string
+    SampleRate: int
+}
 
 let private run (args: string array) : Result<unit, Error> =
     result {
@@ -36,43 +42,33 @@ let private run (args: string array) : Result<unit, Error> =
             sizeTotal / (int64 fileCount)
         printfn $"Average file size: %d{averageFileSize} bytes"
 
-        let inline mostPopulous count (grouper: 'a -> 'a) (items: 'a array) =
-            items
-            |> Array.groupBy grouper
-            |> Array.map (fun (_, group) -> (group[0], group.Length))
-            |> Array.sortByDescending snd
-            |> Array.truncate count
+        printTable {
+            Title = Some "Top Artists"
+            Headers = Some ["Artist"; "Count"]
+            Rows = Some (topArtists 20 tags)
+            ColumnAlignments = [Justify.Left; Justify.Right]
+        }
 
-        let asLower (x: string) = x.ToLowerInvariant()
-        let topTitles = mostPopulous 10 asLower (tags |> Array.map _.Title)
-        let topGenres = mostPopulous 10 asLower (tags |> Array.map _.Genres |> Array.collect id)
+        printTable {
+            Title = Some "Top Genres"
+            Headers = Some ["Genre"; "Count"]
+            Rows = Some (topGenres 10 tags)
+            ColumnAlignments = [Justify.Left; Justify.Right]
+        }
 
-        let mostCommonArtists =
-            tags
-            |> Array.map (fun t ->
-                Array.concat [| t.Artists; t.AlbumArtists |]
-                |> Array.distinct
-                |> Array.except [| String.Empty; " "; "Various Artists"; "<unknown>" |])
-            |> Array.concat
-            |> mostPopulous 15 id
-        printfn "Top 15 artists:"
-        mostCommonArtists |> Array.iteri (fun i (artist, count) -> printfn $"   • {i + 1} {artist}  {formatInt count}")
+        printTable {
+            Title = Some "Top Titles"
+            Headers = Some ["Title"; "Count"]
+            Rows = Some (topTitles 20 tags)
+            ColumnAlignments = [Justify.Left; Justify.Right]
+        }
 
-        let largestFiles =
-            tags
-            |> Array.sortByDescending _.FileSize
-            |> Array.truncate 10
-
-        printfn "Top 10 genres:"
-        topGenres |> Array.iter (fun (genre, count) -> printfn $"   • {genre}  {formatInt count}")
-
-        printfn "Top 10 titles:"
-        topTitles |> Array.iter (fun (title, count) -> printfn $"   • {title}  {formatInt count}")
-
-        printfn "Top 10 largest files:"
-        largestFiles |> Array.iter (fun f ->
-            let artist = String.concat ", " f.Artists
-            printfn $"   • {artist} / {f.Title}  {formatBytes f.FileSize}")
+        printTable {
+            Title = Some "Largest files"
+            Headers = Some ["Artist & Title"; "File Size"]
+            Rows = Some (largestFiles 10 tags)
+            ColumnAlignments = [Justify.Left; Justify.Right]
+        }
 
         printTable {
             Title = Some "Top Formats"

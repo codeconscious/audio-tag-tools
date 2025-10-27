@@ -1,16 +1,50 @@
 module LibraryAnalysis.Analysis
 
+open System
 open System.IO
 open Shared.TagLibrary
 open Shared.Utilities
 
-let inline mostPopulous count (grouper: 'a -> 'a) (items: 'a array) =
+let inline private mostPopulous count (grouper: 'a -> 'a) (items: 'a array) =
     items
     |> List.ofArray // TODO: Remove after refactoring library tags to a list.
     |> List.groupBy grouper
     |> List.map (fun (_, group) -> (group[0], group.Length))
     |> List.sortByDescending snd
     |> List.truncate count
+
+let private asLower (x: string) = x.ToLowerInvariant()
+
+let topArtists count (tags: LibraryTags array) =
+    tags
+    |> Array.map (fun t ->
+        Array.concat [| t.Artists; t.AlbumArtists |]
+        |> Array.distinct
+        |> Array.except [| String.Empty; " "; "Various Artists"; "<unknown>" |])
+    |> Array.concat
+    |> mostPopulous count id
+    |> List.map (fun (artist, count) -> [| artist; formatInt count |])
+
+let topGenres count (tags: LibraryTags array) =
+    tags
+    |> Array.map _.Genres |> Array.collect id
+    |> mostPopulous count asLower
+    |> List.map (fun (genre, count) -> [| genre; formatInt count |])
+
+let topTitles count (tags: LibraryTags array) =
+    tags
+    |> Array.map _.Title
+    |> mostPopulous count asLower
+    |> List.map (fun (title, count) -> [| title; formatInt count |])
+
+let largestFiles count (tags: LibraryTags array) =
+    tags
+    |> Array.sortByDescending _.FileSize
+    |> Array.truncate count
+    |> Array.map (fun file ->
+        let artist = String.concat ", " file.Artists
+        [| $"{artist} / {file.Title}"; formatBytes file.FileSize |])
+    |> List.ofArray
 
 let albumArtPercentage (tags: LibraryTags array) =
     tags
