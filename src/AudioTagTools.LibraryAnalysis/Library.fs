@@ -63,9 +63,9 @@ let private run (args: string array) : Result<unit, Error> =
 
         printTable {
             Title = Some "Largest files"
-            Headers = Some ["Artist & Title"; "File Size"]
-            Rows = (largestFiles 10 tags)
-            ColumnAlignments = [Justify.Left; Justify.Right]
+            Headers = Some ["File Size"; "Artist & Title"]
+            Rows = (largestFiles 10 tags) |> List.map Array.rev
+            ColumnAlignments = [Justify.Right; Justify.Left]
         }
 
         printTable {
