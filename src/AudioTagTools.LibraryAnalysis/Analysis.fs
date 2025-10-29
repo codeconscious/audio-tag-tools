@@ -4,20 +4,21 @@ open System
 open System.IO
 open Shared.TagLibrary
 open Shared.Utilities
+open FSharpPlus
 
 let inline private mostPopulous count (grouper: 'a -> 'a) (items: 'a array) =
     items
     |> List.ofArray // TODO: Remove after refactoring library tags to a list.
     |> List.groupBy grouper
     |> List.map (fun (_, group) -> (group[0], group.Length))
-    |> List.sortByDescending snd
+    |> sortByDescending snd
     |> List.truncate count
 
 let private asLower (x: string) = x.ToLowerInvariant()
 
 let filteredArtists (tags: LibraryTags array) =
     tags
-    |> Array.map (fun t ->
+    |> map (fun t ->
         Array.concat [| t.Artists; t.AlbumArtists |]
         |> Array.distinct
         |> Array.except [| String.Empty; " "; "Various Artists"; "<unknown>" |])
