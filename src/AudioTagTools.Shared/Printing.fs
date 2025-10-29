@@ -43,7 +43,6 @@ let printTable (tableData: TableData) =
     tableData.Rows
     |> List.iter (fun row -> table.AddRow row |> ignore)
 
-
     match tableData.Title with
     | Some title ->
         let panel = Panel(table)

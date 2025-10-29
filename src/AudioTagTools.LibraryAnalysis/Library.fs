@@ -48,9 +48,9 @@ let private run (args: string array) : Result<unit, Error> =
         }
 
         printTable {
-            Title = Some "Top Genres"
-            Headers = Some ["Genre"; "Count"]
-            Rows = (topGenres 10 tags)
+            Title = Some "Top Album Names"
+            Headers = Some ["Album"; "Count"]
+            Rows = (topAlbums 20 tags)
             ColumnAlignments = [Justify.Left; Justify.Right]
         }
 
@@ -58,6 +58,13 @@ let private run (args: string array) : Result<unit, Error> =
             Title = Some "Top Titles"
             Headers = Some ["Title"; "Count"]
             Rows = (topTitles 20 tags)
+            ColumnAlignments = [Justify.Left; Justify.Right]
+        }
+
+        printTable {
+            Title = Some "Top Genres"
+            Headers = Some ["Genre"; "Count"]
+            Rows = (topGenres 10 tags)
             ColumnAlignments = [Justify.Left; Justify.Right]
         }
 

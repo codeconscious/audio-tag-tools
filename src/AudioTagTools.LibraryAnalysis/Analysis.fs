@@ -29,17 +29,23 @@ let topArtists count (tags: LibraryTags array) =
     |> mostPopulous count id
     |> List.map (fun (artist, count) -> [| artist; formatInt count |])
 
-let topGenres count (tags: LibraryTags array) =
+let topAlbums count (tags: LibraryTags array) =
     tags
-    |> Array.map _.Genres |> Array.collect id
-    |> mostPopulous count asLower
-    |> List.map (fun (genre, count) -> [| genre; formatInt count |])
+    |> Array.map _.Album
+    |> mostPopulous count id
+    |> List.map (fun (album, count) -> [| album; formatInt count |])
 
 let topTitles count (tags: LibraryTags array) =
     tags
     |> Array.map _.Title
     |> mostPopulous count asLower
     |> List.map (fun (title, count) -> [| title; formatInt count |])
+
+let topGenres count (tags: LibraryTags array) =
+    tags
+    |> Array.map _.Genres |> Array.collect id
+    |> mostPopulous count asLower
+    |> List.map (fun (genre, count) -> [| genre; formatInt count |])
 
 let largestFiles count (tags: LibraryTags array) =
     tags
