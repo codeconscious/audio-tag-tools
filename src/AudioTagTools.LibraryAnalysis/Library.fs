@@ -36,6 +36,18 @@ let private run (args: string array) : Result<unit, Error> =
                 [| "Track count"; formatInt tags.Length |]
                 [| "Unique artists"; formatInt uniqueArtistCount |]
                 [| "Average file size"; formatBytes averageFileSize  |]
+                [| "Album art percentage"; $"%s{formatFloat <| albumArtPercentage tags}%%" |]
+            ]
+            ColumnAlignments = [Justify.Left; Justify.Right]
+        }
+
+        printTable {
+            Title = Some "General Stats"
+            Headers = None
+            Rows = [
+                [| "Track count"; formatInt tags.Length |]
+                [| "Unique artists"; formatInt uniqueArtistCount |]
+                [| "Average file size"; formatBytes averageFileSize  |]
             ]
             ColumnAlignments = [Justify.Left; Justify.Right]
         }
@@ -102,8 +114,6 @@ let private run (args: string array) : Result<unit, Error> =
             Rows = (topQualityData 10 tags)
             ColumnAlignments = [Justify.Left; Justify.Right; Justify.Right; Justify.Right]
         }
-
-        albumArtPercentage tags |> printfn "%s"
     }
 
 let start (args: string array) : Result<string, string> =
