@@ -49,7 +49,8 @@ let topTitles count (tags: LibraryTags array) =
 
 let topGenres count (tags: LibraryTags array) =
     tags
-    |> Array.map _.Genres |> Array.collect id
+    |> Array.map _.Genres
+    |> Array.collect id
     |> mostPopulous count asLower
     |> List.map (fun (genre, count) -> [| genre; formatInt count |])
 
