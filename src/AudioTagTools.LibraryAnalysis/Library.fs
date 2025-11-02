@@ -20,8 +20,6 @@ let private run (args: string array) : Result<unit, Error> =
         let! tagLibraryFile = validate args
         let! tags = tagLibraryFile |> readFile >>= parseJsonToTags
 
-        printfn "Tag library analysis results:"
-
         let uniqueArtistCount = tags |> filteredArtists |> Array.distinct |> _.Length
 
         let averageFileSize =
@@ -32,23 +30,12 @@ let private run (args: string array) : Result<unit, Error> =
         printTable {
             Title = Some "General Stats"
             Headers = None
-            Rows = [
+            Rows = [|
                 [| "Track count"; formatInt tags.Length |]
                 [| "Unique artists"; formatInt uniqueArtistCount |]
                 [| "Average file size"; formatBytes averageFileSize  |]
                 [| "Album art percentage"; $"%s{formatFloat <| albumArtPercentage tags}%%" |]
-            ]
-            ColumnAlignments = [Justify.Left; Justify.Right]
-        }
-
-        printTable {
-            Title = Some "General Stats"
-            Headers = None
-            Rows = [
-                [| "Track count"; formatInt tags.Length |]
-                [| "Unique artists"; formatInt uniqueArtistCount |]
-                [| "Average file size"; formatBytes averageFileSize  |]
-            ]
+            |]
             ColumnAlignments = [Justify.Left; Justify.Right]
         }
 
@@ -83,7 +70,7 @@ let private run (args: string array) : Result<unit, Error> =
         printTable {
             Title = Some "Largest files"
             Headers = Some ["File Size"; "Artist & Title"]
-            Rows = (largestFiles 10 tags) |> List.map Array.rev
+            Rows = (largestFiles 10 tags) |> Array.map Array.rev
             ColumnAlignments = [Justify.Right; Justify.Left]
         }
 
