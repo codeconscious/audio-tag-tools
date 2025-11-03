@@ -21,7 +21,7 @@ let private run (args: string array) : Result<unit, Error> =
         let! tags = tagLibraryFile |> readFile >>= parseJsonToTags
 
         printTable {
-            Title = Some "General Stats"
+            Title = Some "General Data"
             Headers = None
             Rows = [|
                 [| "Track count"; formatInt tags.Length |]
@@ -89,7 +89,7 @@ let private run (args: string array) : Result<unit, Error> =
         }
 
         printTable {
-            Title = Some "Most Common Quality Cominbations"
+            Title = Some "Top Quality Combinations"
             Headers = Some ["Format"; "Bit Rate"; "Sample Rate"; "Count"]
             Rows = (topQualityData 10 tags)
             ColumnAlignments = [Justify.Left; Justify.Right; Justify.Right; Justify.Right]
