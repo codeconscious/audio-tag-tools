@@ -56,7 +56,7 @@ let private run (args: string array) : Result<unit, Error> =
         printTable {
             Title = Some "Top Genres"
             Headers = Some ["Genre"; "Count"]
-            Rows = topGenres 15 tags
+            Rows = topGenres 30 tags
             ColumnAlignments = [Justify.Left; Justify.Right]
         }
 

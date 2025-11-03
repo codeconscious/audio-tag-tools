@@ -46,7 +46,7 @@ let printTable (tableData: TableData) =
     match tableData.Title with
     | Some title ->
         let panel = Panel(table)
-        panel.Header <- PanelHeader title
+        panel.Header <- PanelHeader $"|  {title}  |"
         // panel.Border <- BoxBorder.None
         AnsiConsole.Write panel
     | None ->

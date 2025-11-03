@@ -28,8 +28,8 @@ let albumArtPercentage (tags: LibraryTags array) =
 let filteredArtists (tags: LibraryTags array) =
     tags
     |> Array.map (fun t ->
-        Array.concat [| t.Artists; t.AlbumArtists |]
-        |> Array.distinct
+        t
+        |> allDistinctArtists
         |> Array.except [| String.Empty; " "; "Various Artists"; "<unknown>" |])
     |> Array.concat
 
@@ -65,31 +65,32 @@ let topGenres count (tags: LibraryTags array) =
     |> Array.map (fun (genre, count) -> [| genre; formatInt count |])
 
 let artistsWithMostGenres count (tags: LibraryTags array) =
-    let countEachGenre (gs: string array) =
-        gs
+    let genreCounts (genres: string array) =
+        genres
         |> Array.countBy id
         |> Array.sortBy fst
         |> Array.map (fun (g, count) -> $"{g} ({count})")
         |> String.concat "; "
 
-    tags
-    |> Array.filter hasAnyArtist
-    |> Array.groupBy (fun t -> t |> allDistinctArtists |> Array.head)
-    |> Array.map (fun (a, ts) ->
-        a,
-        ts
-        |> Array.map _.Genres
-        |> Array.concat
-        |> Array.map _.Trim())
-    |> Array.sortByDescending (fun (_, genres) ->
+    let artistsWithAllGenres (a, tags) =
+        (a, tags
+            |> Array.map _.Genres
+            |> Array.concat
+            |> Array.map _.Trim())
+
+    let uniqueGenreCount (genres : string array) =
         genres
         |> Array.distinctBy _.ToLowerInvariant()
-        |> _.Length)
+        |> _.Length
+
+    tags
+    |> Array.filter hasAnyArtist
+    |> Array.groupBy firstDistinctArtist
+    |> Array.map artistsWithAllGenres
+    |> Array.map (fun (a, gs) -> a, uniqueGenreCount gs, gs)
+    |> Array.sortByDescending (fun (_, uniqueCount, _) -> uniqueCount)
     |> Array.take count
-    |> Array.map (fun (artist, genres) ->
-        [| artist
-           genres |> Array.distinctBy _.ToLowerInvariant() |> _.Length |> formatInt
-           genres |> countEachGenre |])
+    |> Array.map (fun (a, uniqueCount, gs) -> [| a; formatInt uniqueCount; genreCounts gs |])
 
 let largestFiles count (tags: LibraryTags array) =
     tags

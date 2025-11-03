@@ -52,6 +52,9 @@ let allDistinctArtists (t: LibraryTags) =
     Array.concat [| t.Artists; t.AlbumArtists |]
     |> Array.distinct
 
+let firstDistinctArtist (t: LibraryTags) =
+    t |> allDistinctArtists |> Array.head
+
 let hasAnyArtist (track: LibraryTags) =
     track.Artists.Length > 0 ||
     track.AlbumArtists.Length > 0
