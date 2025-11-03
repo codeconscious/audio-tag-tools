@@ -35,63 +35,63 @@ let private run (args: string array) : Result<unit, Error> =
         printTable {
             Title = Some "Top Artists"
             Headers = Some ["Artist"; "Count"]
-            Rows = (topArtists 20 tags)
+            Rows = topArtists 20 tags
             ColumnAlignments = [Justify.Left; Justify.Right]
         }
 
         printTable {
             Title = Some "Top Album Names"
             Headers = Some ["Album"; "Count"]
-            Rows = (topAlbums 20 tags)
+            Rows = topAlbums 20 tags
             ColumnAlignments = [Justify.Left; Justify.Right]
         }
 
         printTable {
             Title = Some "Top Titles"
             Headers = Some ["Title"; "Count"]
-            Rows = (topTitles 20 tags)
+            Rows = topTitles 20 tags
             ColumnAlignments = [Justify.Left; Justify.Right]
         }
 
         printTable {
             Title = Some "Top Genres"
             Headers = Some ["Genre"; "Count"]
-            Rows = (topGenres 10 tags)
+            Rows = topGenres 10 tags
             ColumnAlignments = [Justify.Left; Justify.Right]
         }
 
         printTable {
             Title = Some "Largest files"
             Headers = Some ["File Size"; "Artist & Title"]
-            Rows = (largestFiles 10 tags) |> Array.map Array.rev
+            Rows = largestFiles 10 tags |> Array.map Array.rev
             ColumnAlignments = [Justify.Right; Justify.Left]
         }
 
         printTable {
             Title = Some "Top Formats"
             Headers = Some ["Extension"; "Count"]
-            Rows = (topFormats 10 tags)
+            Rows = topFormats 10 tags
             ColumnAlignments = [Justify.Left; Justify.Right]
         }
 
         printTable {
             Title = Some "Top Bitrates"
             Headers = Some ["Bitrate"; "Count"]
-            Rows = (topBitRates 10 tags)
+            Rows = topBitRates 10 tags
             ColumnAlignments = [Justify.Right; Justify.Right]
         }
 
         printTable {
             Title = Some "Top Sample Rates"
             Headers = Some ["Sample Rate"; "Count"]
-            Rows = (topSampleRates 10 tags)
+            Rows = topSampleRates 10 tags
             ColumnAlignments = [Justify.Right; Justify.Right]
         }
 
         printTable {
             Title = Some "Top Quality Combinations"
             Headers = Some ["Format"; "Bit Rate"; "Sample Rate"; "Count"]
-            Rows = (topQualityData 10 tags)
+            Rows = topQualityData 10 tags
             ColumnAlignments = [Justify.Left; Justify.Right; Justify.Right; Justify.Right]
         }
     }
