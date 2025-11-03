@@ -19,6 +19,25 @@ let formatInt64 (i: int64) : string =
 let formatFloat (f: float) : string =
     f.ToString("#,##0.00", CultureInfo.InvariantCulture)
 
+/// Formats a float to a percentage string with a custom number of decimal places.
+let formatPercent (decimalPlaces: int) (n: float) : string =
+    let decimalPlaces' = if decimalPlaces < 0 then 0 else decimalPlaces
+    let pct = n * 100.0
+    pct.ToString("F" + decimalPlaces'.ToString(), CultureInfo.InvariantCulture) + "%"
+
+let formatBytes (bytes: int64) =
+    let kilobyte = 1024L
+    let megabyte = kilobyte * 1024L
+    let gigabyte = megabyte * 1024L
+    let terabyte = gigabyte * 1024L
+
+    match bytes with
+    | _ when bytes >= terabyte -> sprintf "%sT" ((float bytes / float terabyte) |> formatFloat)
+    | _ when bytes >= gigabyte -> sprintf "%sG" ((float bytes / float gigabyte) |> formatFloat)
+    | _ when bytes >= megabyte -> sprintf "%sM" ((float bytes / float megabyte) |> formatFloat)
+    | _ when bytes >= kilobyte -> sprintf "%sK" ((float bytes / float kilobyte) |> formatFloat)
+    | _ -> sprintf "%s bytes" (bytes |> formatInt64)
+
 /// Helper for try/with -> Result.
 let private ofTry (f: unit -> 'T) : Result<'T, string> =
     try Ok (f())
@@ -59,16 +78,3 @@ let formatTimeSpan (timeSpan: TimeSpan) : string =
     match timeSpan.Hours with
     | 0 -> sprintf "%dm%ds" timeSpan.Minutes timeSpan.Seconds
     | _ -> sprintf "%dh%dm%ds" timeSpan.Hours timeSpan.Minutes timeSpan.Seconds
-
-let formatBytes (bytes: int64) =
-    let kilobyte = 1024L
-    let megabyte = kilobyte * 1024L
-    let gigabyte = megabyte * 1024L
-    let terabyte = gigabyte * 1024L
-
-    match bytes with
-    | _ when bytes >= terabyte -> sprintf "%sT" ((float bytes / float terabyte) |> formatFloat)
-    | _ when bytes >= gigabyte -> sprintf "%sG" ((float bytes / float gigabyte) |> formatFloat)
-    | _ when bytes >= megabyte -> sprintf "%sM" ((float bytes / float megabyte) |> formatFloat)
-    | _ when bytes >= kilobyte -> sprintf "%sK" ((float bytes / float kilobyte) |> formatFloat)
-    | _ -> sprintf "%s bytes" (bytes |> formatInt64)

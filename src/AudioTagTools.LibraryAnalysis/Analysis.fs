@@ -40,10 +40,15 @@ let uniqueArtistCount tags =
     |> _.Length
 
 let topArtists count (tags: LibraryTags array) =
-    tags
-    |> filteredArtists
+    let artists = tags |> filteredArtists
+    let artistCount = float artists.Length
+
+    artists
     |> mostPopulous count id
-    |> Array.map (fun (artist, count) -> [| artist; formatInt count |])
+    |> Array.map (fun (artist, count) ->
+        [| artist
+           formatInt count
+           float count / artistCount |> formatPercent 3 |])
 
 let topAlbums count (tags: LibraryTags array) =
     tags
@@ -58,11 +63,16 @@ let topTitles count (tags: LibraryTags array) =
     |> Array.map (fun (title, count) -> [| title; formatInt count |])
 
 let topGenres count (tags: LibraryTags array) =
-    tags
-    |> Array.map _.Genres
+    let genres = tags |> Array.map _.Genres
+    let totalCount = float genres.Length
+
+    genres
     |> Array.collect id
     |> mostPopulous count asLower
-    |> Array.map (fun (genre, count) -> [| genre; formatInt count |])
+    |> Array.map (fun (genre, count) ->
+        [| genre
+           formatInt count
+           float count / totalCount |> formatPercent 2 |])
 
 let artistsWithMostGenres count (tags: LibraryTags array) =
     let genreCounts (genres: string array) : string =

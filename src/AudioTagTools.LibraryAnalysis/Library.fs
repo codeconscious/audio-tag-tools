@@ -34,9 +34,9 @@ let private run (args: string array) : Result<unit, Error> =
 
         printTable {
             Title = Some "Top Artists"
-            Headers = Some ["Artist"; "Count"]
+            Headers = Some ["Artist"; "Count"; "Ratio"]
             Rows = topArtists 30 tags
-            ColumnAlignments = [Justify.Left; Justify.Right]
+            ColumnAlignments = [Justify.Left; Justify.Right; Justify.Right]
         }
 
         printTable {
@@ -55,9 +55,9 @@ let private run (args: string array) : Result<unit, Error> =
 
         printTable {
             Title = Some "Top Genres"
-            Headers = Some ["Genre"; "Count"]
+            Headers = Some ["Genre"; "Count"; "Ratio"]
             Rows = topGenres 30 tags
-            ColumnAlignments = [Justify.Left; Justify.Right]
+            ColumnAlignments = [Justify.Left; Justify.Right; Justify.Right]
         }
 
         printTable {
