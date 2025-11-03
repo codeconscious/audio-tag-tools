@@ -48,3 +48,16 @@ let parseJsonToTags (json: string) : Result<LibraryTags array, string> =
     try Ok (JsonSerializer.Deserialize<LibraryTags array>(json))
     with e -> Error e.Message
 
+let allDistinctArtists (t: LibraryTags) =
+    Array.concat [| t.Artists; t.AlbumArtists |]
+    |> Array.distinct
+
+let hasAnyArtist (track: LibraryTags) =
+    track.Artists.Length > 0 ||
+    track.AlbumArtists.Length > 0
+
+let hasTitle (track: LibraryTags) =
+    not (String.IsNullOrWhiteSpace track.Title)
+
+let hasArtistOrTitle track =
+    hasAnyArtist track && hasTitle track

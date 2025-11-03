@@ -73,13 +73,11 @@ let artistsWithMostGenres count (tags: LibraryTags array) =
         |> String.concat "; "
 
     tags
-    |> Array.filter (fun t -> t.Artists.Length > 0 || t.AlbumArtists.Length > 0)
-    |> Array.groupBy (fun t ->
-        Array.concat [| t.Artists; t.AlbumArtists |]
-        |> Array.distinct
-        |> Array.head)
-    |> Array.map (fun (k, v) ->
-        k, v
+    |> Array.filter hasAnyArtist
+    |> Array.groupBy (fun t -> t |> allDistinctArtists |> Array.head)
+    |> Array.map (fun (a, ts) ->
+        a,
+        ts
         |> Array.map _.Genres
         |> Array.concat
         |> Array.map _.Trim())

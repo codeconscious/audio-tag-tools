@@ -41,16 +41,6 @@ let filter (settings: SettingsRoot) (allTags: LibraryTags array) : LibraryTags a
     allTags
     |> Array.filter isIncluded
 
-let private hasArtistOrTitle track =
-    let hasAnyArtist (track: LibraryTags) =
-        track.Artists.Length > 0 ||
-        track.AlbumArtists.Length > 0
-
-    let hasTitle (track: LibraryTags) =
-        not (String.IsNullOrWhiteSpace track.Title)
-
-    hasAnyArtist track && hasTitle track
-
 let private mainArtists (separator: string) (track: LibraryTags) : string =
     let forbiddenArtistNames =
         [
