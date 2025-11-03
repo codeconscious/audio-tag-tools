@@ -65,20 +65,20 @@ let topGenres count (tags: LibraryTags array) =
     |> Array.map (fun (genre, count) -> [| genre; formatInt count |])
 
 let artistsWithMostGenres count (tags: LibraryTags array) =
-    let genreCounts (genres: string array) =
+    let genreCounts (genres: string array) : string =
         genres
         |> Array.countBy id
         |> Array.sortBy fst
         |> Array.map (fun (g, count) -> $"{g} ({count})")
         |> String.concat "; "
 
-    let artistsWithAllGenres (a, tags) =
+    let artistsWithAllGenres (a, tags) : 'a * string array =
         (a, tags
             |> Array.map _.Genres
             |> Array.concat
             |> Array.map _.Trim())
 
-    let uniqueGenreCount (genres : string array) =
+    let uniqueGenreCount (genres : string array) : int =
         genres
         |> Array.distinctBy _.ToLowerInvariant()
         |> _.Length
