@@ -35,35 +35,42 @@ let private run (args: string array) : Result<unit, Error> =
         printTable {
             Title = Some "Top Artists"
             Headers = Some ["Artist"; "Count"]
-            Rows = topArtists 20 tags
+            Rows = topArtists 30 tags
             ColumnAlignments = [Justify.Left; Justify.Right]
         }
 
         printTable {
             Title = Some "Top Album Names"
             Headers = Some ["Album"; "Count"]
-            Rows = topAlbums 20 tags
+            Rows = topAlbums 30 tags
             ColumnAlignments = [Justify.Left; Justify.Right]
         }
 
         printTable {
             Title = Some "Top Titles"
             Headers = Some ["Title"; "Count"]
-            Rows = topTitles 20 tags
+            Rows = topTitles 30 tags
             ColumnAlignments = [Justify.Left; Justify.Right]
         }
 
         printTable {
             Title = Some "Top Genres"
             Headers = Some ["Genre"; "Count"]
-            Rows = topGenres 10 tags
+            Rows = topGenres 15 tags
             ColumnAlignments = [Justify.Left; Justify.Right]
+        }
+
+        printTable {
+            Title = Some "Artists With The Most Genres"
+            Headers = Some ["Artist"; "Count"; "Genres"]
+            Rows = artistsWithMostGenres 20 tags
+            ColumnAlignments = [Justify.Left; Justify.Right; Justify.Left]
         }
 
         printTable {
             Title = Some "Largest files"
             Headers = Some ["File Size"; "Artist & Title"]
-            Rows = largestFiles 10 tags |> Array.map Array.rev
+            Rows = largestFiles 20 tags |> Array.map Array.rev
             ColumnAlignments = [Justify.Right; Justify.Left]
         }
 

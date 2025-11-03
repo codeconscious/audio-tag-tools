@@ -64,6 +64,35 @@ let topGenres count (tags: LibraryTags array) =
     |> mostPopulous count asLower
     |> Array.map (fun (genre, count) -> [| genre; formatInt count |])
 
+let artistsWithMostGenres count (tags: LibraryTags array) =
+    let countEachGenre (gs: string array) =
+        gs
+        |> Array.countBy id
+        |> Array.sortBy fst
+        |> Array.map (fun (g, count) -> $"{g} ({count})")
+        |> String.concat "; "
+
+    tags
+    |> Array.filter (fun t -> t.Artists.Length > 0 || t.AlbumArtists.Length > 0)
+    |> Array.groupBy (fun t ->
+        Array.concat [| t.Artists; t.AlbumArtists |]
+        |> Array.distinct
+        |> Array.head)
+    |> Array.map (fun (k, v) ->
+        k, v
+        |> Array.map _.Genres
+        |> Array.concat
+        |> Array.map _.Trim())
+    |> Array.sortByDescending (fun (_, genres) ->
+        genres
+        |> Array.distinctBy _.ToLowerInvariant()
+        |> _.Length)
+    |> Array.take count
+    |> Array.map (fun (artist, genres) ->
+        [| artist
+           genres |> Array.distinctBy _.ToLowerInvariant() |> _.Length |> formatInt
+           genres |> countEachGenre |])
+
 let largestFiles count (tags: LibraryTags array) =
     tags
     |> Array.sortByDescending _.FileSize
