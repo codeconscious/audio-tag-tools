@@ -14,6 +14,10 @@ let inline private mostPopulous count (grouper: 'a -> 'a) (items: 'a array) =
 
 let private asLower (x: string) = x.ToLowerInvariant()
 
+let private ratio count totalCount decimalPlaces =
+    float count / float totalCount
+    |> formatPercent decimalPlaces
+
 let averageFileSize tags =
     let sizeTotal = tags |> Array.map _.FileSize |> Array.sum
     let fileCount = tags.Length
@@ -41,14 +45,14 @@ let uniqueArtistCount tags =
 
 let topArtists count (tags: LibraryTags array) =
     let artists = tags |> filteredArtists
-    let artistCount = float artists.Length
+    let artistCount = artists.Length
 
     artists
     |> mostPopulous count id
     |> Array.map (fun (artist, count) ->
         [| artist
            formatInt count
-           float count / artistCount |> formatPercent 3 |])
+           ratio count artistCount 3 |])
 
 let topAlbums count (tags: LibraryTags array) =
     tags
@@ -64,7 +68,7 @@ let topTitles count (tags: LibraryTags array) =
 
 let topGenres count (tags: LibraryTags array) =
     let genres = tags |> Array.map _.Genres
-    let totalCount = float genres.Length
+    let genreCount = genres.Length
 
     genres
     |> Array.collect id
@@ -72,7 +76,7 @@ let topGenres count (tags: LibraryTags array) =
     |> Array.map (fun (genre, count) ->
         [| genre
            formatInt count
-           float count / totalCount |> formatPercent 2 |])
+           ratio count genreCount 2 |])
 
 let artistsWithMostGenres count (tags: LibraryTags array) =
     let genreCounts (genres: string array) : string =
