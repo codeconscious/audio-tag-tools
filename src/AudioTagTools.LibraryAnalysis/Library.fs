@@ -20,20 +20,13 @@ let private run (args: string array) : Result<unit, Error> =
         let! tagLibraryFile = validate args
         let! tags = tagLibraryFile |> readFile >>= parseJsonToTags
 
-        let uniqueArtistCount = tags |> filteredArtists |> Array.distinct |> _.Length
-
-        let averageFileSize =
-            let sizeTotal = tags |> Array.map _.FileSize |> Array.sum
-            let fileCount = tags.Length
-            sizeTotal / (int64 fileCount)
-
         printTable {
             Title = Some "General Stats"
             Headers = None
             Rows = [|
                 [| "Track count"; formatInt tags.Length |]
-                [| "Unique artists"; formatInt uniqueArtistCount |]
-                [| "Average file size"; formatBytes averageFileSize  |]
+                [| "Unique artists"; formatInt <| uniqueArtistCount tags |]
+                [| "Average file size"; formatBytes <| averageFileSize tags  |]
                 [| "Album art percentage"; $"%s{formatFloat <| albumArtPercentage tags}%%" |]
             |]
             ColumnAlignments = [Justify.Left; Justify.Right]

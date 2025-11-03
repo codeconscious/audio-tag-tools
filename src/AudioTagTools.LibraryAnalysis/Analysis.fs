@@ -14,6 +14,11 @@ let inline private mostPopulous count (grouper: 'a -> 'a) (items: 'a array) =
 
 let private asLower (x: string) = x.ToLowerInvariant()
 
+let averageFileSize tags =
+    let sizeTotal = tags |> Array.map _.FileSize |> Array.sum
+    let fileCount = tags.Length
+    sizeTotal / (int64 fileCount)
+
 let albumArtPercentage (tags: LibraryTags array) =
     tags
     |> Array.choose (fun t -> if t.ImageCount > 0 then Some t.ImageCount else None)
@@ -27,6 +32,12 @@ let filteredArtists (tags: LibraryTags array) =
         |> Array.distinct
         |> Array.except [| String.Empty; " "; "Various Artists"; "<unknown>" |])
     |> Array.concat
+
+let uniqueArtistCount tags =
+    tags
+    |> filteredArtists
+    |> Array.distinct
+    |> _.Length
 
 let topArtists count (tags: LibraryTags array) =
     tags
