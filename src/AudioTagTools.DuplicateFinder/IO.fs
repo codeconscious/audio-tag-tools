@@ -14,7 +14,7 @@ let readFile (fileInfo: FileInfo) : Result<string, Error> =
     |> readFile
     |> Result.mapError ReadFileError
 
-let savePlaylist (settings: SettingsRoot) (tags: LibraryTags array array option) : Result<unit, Error> =
+let savePlaylist (settings: SettingsRoot) (tags: MultipleLibraryTags array option) : Result<unit, Error> =
     let now = DateTime.Now.ToString("yyyyMMdd_HHmmss")
     let filename = $"Duplicates by AudioTagTools - {now}.m3u"
     let fullPath = Path.Combine(settings.Playlist.SaveDirectory, filename)

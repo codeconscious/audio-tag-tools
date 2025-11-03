@@ -31,7 +31,7 @@ let getFileInfos (dirPath: DirectoryInfo) : Result<FileInfo seq, Error> =
     with
     | e -> Error (GeneralIoError e.Message)
 
-let parseJsonToTags (json: string) : Result<LibraryTags array, Error> =
+let parseJsonToTags (json: string) : Result<MultipleLibraryTags, Error> =
     parseJsonToTags json
     |> Result.mapError LibraryTagParseError
 

@@ -12,7 +12,7 @@ let readFile (fileInfo: FileInfo) : Result<string, Error> =
     |> Result.mapError IoReadError
 
 
-let parseJsonToTags (json: string) : Result<LibraryTags array, Error> =
+let parseJsonToTags (json: string) : Result<MultipleLibraryTags, Error> =
     json
     |> parseJsonToTags
     |> Result.mapError TagParseError

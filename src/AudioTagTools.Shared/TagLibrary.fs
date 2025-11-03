@@ -24,6 +24,8 @@ type LibraryTags =
         LastWriteTime: DateTimeOffset
     }
 
+type MultipleLibraryTags = LibraryTags array
+
 let blankTags (fileInfo: FileInfo) : LibraryTags =
     {
         FileName = fileInfo.Name
@@ -44,8 +46,8 @@ let blankTags (fileInfo: FileInfo) : LibraryTags =
         LastWriteTime = DateTimeOffset fileInfo.LastWriteTime
     }
 
-let parseJsonToTags (json: string) : Result<LibraryTags array, string> =
-    try Ok (JsonSerializer.Deserialize<LibraryTags array>(json))
+let parseJsonToTags (json: string) : Result<MultipleLibraryTags, string> =
+    try Ok (JsonSerializer.Deserialize<MultipleLibraryTags>(json))
     with e -> Error e.Message
 
 let allDistinctArtists (t: LibraryTags) =
@@ -62,5 +64,5 @@ let hasAnyArtist (track: LibraryTags) =
 let hasTitle (track: LibraryTags) =
     not (String.IsNullOrWhiteSpace track.Title)
 
-let hasArtistOrTitle track =
+let hasArtistAndTitle track =
     hasAnyArtist track && hasTitle track
