@@ -41,28 +41,6 @@ let filter (settings: SettingsRoot) (allTags: MultipleLibraryTags) : MultipleLib
     allTags
     |> Array.filter isIncluded
 
-let private mainArtists (separator: string) (track: LibraryTags) : string =
-    let forbiddenArtistNames =
-        [
-            String.Empty
-            "Various"
-            "Various Artists"
-            "Multiple Artists"
-            "\u003Cunknown\u003E"
-        ]
-
-    let noForbiddenAlbumArtists artist =
-        forbiddenArtistNames
-        |> List.exists _.Equals(artist, StringComparison.InvariantCultureIgnoreCase)
-        |> not
-
-    match track with
-    | t when t.AlbumArtists.Length > 0 && noForbiddenAlbumArtists t.AlbumArtists[0] ->
-        t.AlbumArtists
-    | t ->
-        t.Artists
-    |> String.concat separator
-
 let private groupingName (settings: SettingsRoot) (track: LibraryTags) =
     // It appears JSON type providers do not import whitespace-only values. Whitespace should
     // always be ignored to increase the accuracy of duplicate checks, so they are added here.

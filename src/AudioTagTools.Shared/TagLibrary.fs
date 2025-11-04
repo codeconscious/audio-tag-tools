@@ -50,19 +50,41 @@ let parseJsonToTags (json: string) : Result<MultipleLibraryTags, string> =
     try Ok (JsonSerializer.Deserialize<MultipleLibraryTags>(json))
     with e -> Error e.Message
 
-let allDistinctArtists (t: LibraryTags) =
+let allDistinctArtists (t: LibraryTags) : string array =
     Array.concat [| t.Artists; t.AlbumArtists |]
     |> Array.distinct
 
-let firstDistinctArtist (t: LibraryTags) =
+let mainArtists (separator: string) (track: LibraryTags) : string =
+    let forbiddenArtistNames =
+        [
+            String.Empty
+            "Various"
+            "Various Artists"
+            "Multiple Artists"
+            "\u003Cunknown\u003E"
+        ]
+
+    let hasNoForbiddenAlbumArtists artist =
+        forbiddenArtistNames
+        |> List.exists _.Equals(artist, StringComparison.InvariantCultureIgnoreCase)
+        |> not
+
+    match track with
+    | t when t.AlbumArtists.Length > 0 && hasNoForbiddenAlbumArtists t.AlbumArtists[0] ->
+        t.AlbumArtists
+    | t ->
+        t.Artists
+    |> String.concat separator
+
+let firstDistinctArtist (t: LibraryTags) : string =
     t |> allDistinctArtists |> Array.head
 
-let hasAnyArtist (track: LibraryTags) =
+let hasAnyArtist (track: LibraryTags) : bool =
     track.Artists.Length > 0 ||
     track.AlbumArtists.Length > 0
 
-let hasTitle (track: LibraryTags) =
-    not (String.IsNullOrWhiteSpace track.Title)
+let hasTitle (track: LibraryTags) : bool =
+    not <| String.IsNullOrWhiteSpace track.Title
 
-let hasArtistAndTitle track =
+let hasArtistAndTitle track : bool =
     hasAnyArtist track && hasTitle track
