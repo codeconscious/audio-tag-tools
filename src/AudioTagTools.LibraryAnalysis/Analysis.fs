@@ -1,6 +1,5 @@
 module LibraryAnalysis.Analysis
 
-open System
 open System.IO
 open Shared.TagLibrary
 open Shared.Utilities
@@ -23,18 +22,18 @@ let averageFileSize tags =
     let fileCount = tags.Length
     sizeTotal / (int64 fileCount)
 
-let albumArtPercentage (tags: MultipleLibraryTags) =
+let albumArtPercentage tags =
     tags
     |> Array.choose (fun t -> if t.ImageCount > 0 then Some t.ImageCount else None)
     |> Array.length
-    |> fun count -> float count / float tags.Length * 100.
+    |> fun count -> asPercentage count tags.Length 2
 
-let filteredArtists (tags: MultipleLibraryTags) =
+let filteredArtists tags =
     tags
     |> Array.map (fun t ->
         t
         |> allDistinctArtists
-        |> Array.except [| String.Empty; " "; "Various Artists"; "<unknown>" |])
+        |> Array.except ignorableArtists)
     |> Array.concat
 
 let uniqueArtistCount tags =
@@ -43,8 +42,8 @@ let uniqueArtistCount tags =
     |> Array.distinct
     |> _.Length
 
-let topArtists count (tags: MultipleLibraryTags) =
-    let artists = tags |> filteredArtists
+let topArtists count tags =
+    let artists = filteredArtists tags
     let artistCount = artists.Length
 
     artists
@@ -54,19 +53,24 @@ let topArtists count (tags: MultipleLibraryTags) =
            formatInt count
            asPercentage count artistCount 3 |])
 
-let topAlbums count (tags: MultipleLibraryTags) =
-    tags
-    |> Array.map _.Album
-    |> mostPopulous count id
-    |> Array.map (fun (album, count) -> [| album; formatInt count |])
+let topAlbums count tags =
+    let albums = tags |> Array.map _.Album
+    let albumCount = albums.Length
 
-let topTitles count (tags: MultipleLibraryTags) =
+    albums
+    |> mostPopulous count id
+    |> Array.map (fun (album, count) ->
+        [| album
+           formatInt count
+           asPercentage count albumCount 2 |])
+
+let topTitles count tags =
     tags
     |> Array.map _.Title
     |> mostPopulous count asLower
     |> Array.map (fun (title, count) -> [| title; formatInt count |])
 
-let topGenres count (tags: MultipleLibraryTags) =
+let topGenres count tags =
     let genres = tags |> Array.map _.Genres
     let genreCount = genres.Length
 
@@ -78,7 +82,7 @@ let topGenres count (tags: MultipleLibraryTags) =
            formatInt count
            asPercentage count genreCount 2 |])
 
-let artistsWithMostGenres count (tags: MultipleLibraryTags) =
+let artistsWithMostGenres count tags =
     let genreCounts (genres: string array) : string =
         genres
         |> Array.countBy id
@@ -92,7 +96,7 @@ let artistsWithMostGenres count (tags: MultipleLibraryTags) =
             |> Array.concat
             |> Array.map _.Trim())
 
-    let uniqueGenreCount (genres : string array) : int =
+    let uniqueGenreCount (genres: string array) =
         genres
         |> Array.distinctBy _.ToLowerInvariant()
         |> _.Length
@@ -104,9 +108,10 @@ let artistsWithMostGenres count (tags: MultipleLibraryTags) =
     |> Array.map (fun (a, gs) -> a, uniqueGenreCount gs, gs)
     |> Array.sortByDescending (fun (_, uniqueCount, _) -> uniqueCount)
     |> Array.take count
-    |> Array.map (fun (a, uniqueCount, gs) -> [| a; formatInt uniqueCount; genreCounts gs |])
+    |> Array.map (fun (a, uniqCount, gs) ->
+        [| a; formatInt uniqCount; genreCounts gs |])
 
-let largestFiles count (tags: MultipleLibraryTags) =
+let largestFiles count tags =
     tags
     |> Array.sortByDescending _.FileSize
     |> Array.truncate count
@@ -126,23 +131,25 @@ let topSampleRates count tags =
     |> mostPopulous count id
     |> Array.map (fun (sampleRate, count) -> [|$"{formatInt sampleRate}"; formatInt count|])
 
+let uppercaseFileExtension tagFile =
+    ((Path.GetExtension tagFile.FileName)[1..]).ToUpperInvariant()
+
 let topFormats count tags =
     tags
-    |> Array.map (fun t -> (Path.GetExtension t.FileName)[1..] |> _.ToUpperInvariant())
+    |> Array.map uppercaseFileExtension
     |> mostPopulous count id
-    |> Array.map (fun (ext, count) -> [|$"{ext}"; formatInt count|])
+    |> Array.map (fun (ext, count) -> [| $"{ext}"; formatInt count |])
 
 let topQualityData count tags =
     tags
-    |> Array.map (fun t -> {| BitRate = t.BitRate
-                              SampleRate = t.SampleRate
-                              Extension = (Path.GetExtension t.FileName)[1..] |> _.ToUpperInvariant() |} )
+    |> Array.map (fun t ->
+        {| BitRate = t.BitRate
+           SampleRate = t.SampleRate
+           Extension = uppercaseFileExtension t |})
     |> mostPopulous count id
     |> Array.map (fun (data, count) ->
-        [|
-           data.Extension
+        [| data.Extension
            $"{data.BitRate} kbps"
            formatInt data.SampleRate
-           formatInt count
-        |])
+           formatInt count |])
 

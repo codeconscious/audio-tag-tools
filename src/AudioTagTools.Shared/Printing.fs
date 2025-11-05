@@ -28,9 +28,7 @@ let printTable (tableData: TableData) =
     table.Border <- TableBorder.SimpleHeavy
 
     match tableData.Headers with
-    | Some h ->
-        h
-        |> List.iter (fun h' -> table.AddColumn h' |> ignore)
+    | Some h -> h |> List.iter (fun h' -> table.AddColumn h' |> ignore)
     | None ->
         tableData.Rows
         |> Array.head
@@ -46,8 +44,7 @@ let printTable (tableData: TableData) =
     match tableData.Title with
     | Some title ->
         let panel = Panel(table)
-        panel.Header <- PanelHeader $"|  {title}  |"
-        // panel.Border <- BoxBorder.None
+        panel.Header <- PanelHeader $"| {title} |"
         AnsiConsole.Write panel
     | None ->
         AnsiConsole.Write table

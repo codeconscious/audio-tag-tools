@@ -18,7 +18,7 @@ type QualityData = {
 let private run (args: string array) : Result<unit, Error> =
     result {
         let! tagLibraryFile = validate args
-        let! tags = tagLibraryFile |> readFile >>= parseJsonToTags
+        let! tags = readFile tagLibraryFile >>= parseJsonToTags
 
         printTable {
             Title = Some "General Data"
@@ -27,7 +27,7 @@ let private run (args: string array) : Result<unit, Error> =
                 [| "Track count"; formatInt tags.Length |]
                 [| "Unique artists"; formatInt <| uniqueArtistCount tags |]
                 [| "Average file size"; formatBytes <| averageFileSize tags  |]
-                [| "Album art percentage"; $"%s{formatFloat <| albumArtPercentage tags}%%" |]
+                [| "Album art percentage"; $"%s{albumArtPercentage tags}%%" |]
             |]
             ColumnAlignments = [Justify.Left; Justify.Right]
         }
@@ -41,9 +41,9 @@ let private run (args: string array) : Result<unit, Error> =
 
         printTable {
             Title = Some "Top Album Names"
-            Headers = Some ["Album"; "Count"]
+            Headers = Some ["Album"; "Count"; "Ratio"]
             Rows = topAlbums 30 tags
-            ColumnAlignments = [Justify.Left; Justify.Right]
+            ColumnAlignments = [Justify.Left; Justify.Right; Justify.Right]
         }
 
         printTable {
@@ -103,7 +103,7 @@ let private run (args: string array) : Result<unit, Error> =
         }
     }
 
-let start (args: string array) : Result<string, string> =
+let start args : Result<string, string> =
     match run args with
     | Ok _ -> Ok "Finished analysis successfully!"
     | Error e -> Error (message e)
