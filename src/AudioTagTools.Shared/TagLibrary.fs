@@ -51,11 +51,11 @@ let parseJsonToTags (json: string) : Result<MultipleLibraryTags, string> =
     with e -> Error e.Message
 
 let ignorableArtists =
-    [| String.Empty
-       "Various"
-       "Various Artists"
-       "Multiple Artists"
-       "\u003Cunknown\u003E" |]
+    [ String.Empty
+      "Various"
+      "Various Artists"
+      "Multiple Artists"
+      "\u003Cunknown\u003E" ]
 
 let allDistinctArtists (t: LibraryTags) : string array =
     Array.concat [| t.Artists; t.AlbumArtists |]
@@ -64,7 +64,7 @@ let allDistinctArtists (t: LibraryTags) : string array =
 let mainArtists (separator: string) (track: LibraryTags) : string =
     let hasNoForbiddenAlbumArtists artist =
         ignorableArtists
-        |> Array.exists _.Equals(artist, StringComparison.InvariantCultureIgnoreCase)
+        |> List.exists _.Equals(artist, StringComparison.InvariantCultureIgnoreCase)
         |> not
 
     match track with
