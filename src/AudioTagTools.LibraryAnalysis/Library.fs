@@ -27,7 +27,7 @@ let private run (args: string array) : Result<unit, Error> =
                 [| "Track count"; formatInt tags.Length |]
                 [| "Unique artists"; formatInt <| uniqueArtistCount tags |]
                 [| "Average file size"; formatBytes <| averageFileSize tags  |]
-                [| "Album art percentage"; $"%s{albumArtPercentage tags}%%" |]
+                [| "Album art percentage"; $"%s{albumArtPercentage tags}" |]
             |]
             ColumnAlignments = [Justify.Left; Justify.Right]
         }
