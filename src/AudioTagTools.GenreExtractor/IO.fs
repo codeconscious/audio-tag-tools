@@ -15,7 +15,7 @@ let readLines (fileInfo: FileInfo) : Result<string array, Error> =
     |> readLines
     |> Result.mapError IoReadError
 
-let parseJsonToTags (json: string) : Result<LibraryTags array, Error> =
+let parseJsonToTags (json: string) : Result<MultipleLibraryTags, Error> =
     json
     |> parseJsonToTags
     |> Result.mapError TagParseError

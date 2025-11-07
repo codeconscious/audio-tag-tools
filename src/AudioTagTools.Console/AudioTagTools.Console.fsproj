@@ -12,13 +12,15 @@
 
     <ItemGroup>
       <PackageReference Include="CodeConscious.Startwatch" Version="1.0.0" />
-      <PackageReference Include="FsToolkit.ErrorHandling" Version="4.18.0" />
+      <PackageReference Include="FsToolkit.ErrorHandling" Version="5.1.0" />
+      <PackageReference Update="FSharp.Core" Version="9.0.303" />
     </ItemGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\AudioTagTools.Cacher\AudioTagTools.Cacher.fsproj" />
       <ProjectReference Include="..\AudioTagTools.DuplicateFinder\AudioTagTools.DuplicateFinder.fsproj" />
       <ProjectReference Include="..\AudioTagTools.GenreExtractor\AudioTagTools.GenreExtractor.fsproj" />
+      <ProjectReference Include="..\AudioTagTools.LibraryAnalysis\AudioTagTools.LibraryAnalysis.fsproj" />
     </ItemGroup>
 
 </Project>

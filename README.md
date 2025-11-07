@@ -1,9 +1,10 @@
 # Audio Tag Tools
 
-This small command line application can do three tasks:
-1. Cache metadata tags from audio files
+This small command line application performs four tasks:
+1. Cache metadata tags from audio files into a "library file"
 2. Report likely duplicate files based on their tags
 3. Export a list of artists with their most common genres
+4. Analyze library files and display various statistics
 
 I originally created this tool to practice with F# [JSON type providers](https://fsprojects.github.io/FSharp.Data/library/JsonProvider.html), but it resolves a couple of small pain points for me as well.
 
@@ -16,9 +17,10 @@ I originally created this tool to practice with F# [JSON type providers](https:/
 
 Ensure you are in the `AudioTagTools.Console` directory in your terminal.
 
-## Caching tags
 
-Creates a tag library, a JSON file containing the text tag data from the audio files in a specified directory.
+## 1. Caching tags
+
+Creates a "tag library," a JSON file containing the text tag data from the audio files in a specified directory.
 
 > [!NOTE]
 > If you have many files, especially on an external device, this process might take a while on its initial run, but will be much faster in subsequent ones. 
@@ -66,12 +68,12 @@ The file will be in this JSON format:
 ```
 
 > [!NOTE]
-> This is the same format that the `--cache-tags` option of [my AudioTagger utility](https://github.com/codeconscious/audiotagger) outputs. The advantage of using this tool instead is that it compares tag data against files' last-modified dates and only updates out-of-date tag information, making the operation considerably faster, particularly when your audio files are on a slow external drive, etc.
+> This is the basically same format that the `--cache-tags` option of [my AudioTagger utility](https://github.com/codeconscious/audiotagger) outputs. The advantage of using this tool instead is that it compares tag data against files' last-modified dates and only updates out-of-date tag information, making the operation considerably faster, particularly when your audio files are on a slow external drive, etc.
 
 
-## Finding duplicates
+## 2. Finding duplicates
 
-First, you must already have a tag library file containing your cached tag data. See the section above if you don't have one yet.
+First, you must already have a tag library file containing your cached tag data. Check the section above if you don't have one yet.
 
 Second, you must have a settings file containing exceptions—i.e., artists, track titles, and strings that you wish to exclude from the search. Actual entries are optional, but the file must be exist in the specified format. I have provided a sample you can use below.
 
@@ -97,7 +99,7 @@ Note: Use `pathSearchFor` and `pathReplaceWith` if you wish to modify the base p
     },
     {
       "title": "SAMPLE_TRACK_NAME"
-    },
+    }
   ],
   "artistReplacements": [
     " ",
@@ -157,7 +159,7 @@ Note: Use `pathSearchFor` and `pathReplaceWith` if you wish to modify the base p
     "=",
     "＝",
     "✖︎",
-    "❌",
+    "❌"
   ]
 }
 ```
@@ -171,7 +173,8 @@ dotnet run -- find-duplicates ~/Documents/settings.json ~/Downloads/Music/tagLib
 
 If any potential duplicates are found, they will be listed, grouped by artist. If you see false positives (i.e., tracks that were detected as duplicates, but are actually not), you can add entries to the exclusions in your settings to ignore them in the future.
 
-## Export artist genres
+
+## 3. Exporting artist genres
 
 Creates a text file containing a list of artists with the genre that they are most associated with in your tag library.
 
@@ -188,7 +191,23 @@ dotnet run -- export-genres ~/Downloads/Music/tagLibrary.json ~/Downloads/Music/
 
 If a genres file already exists at that path, a backup will be created automatically.
 
-## Exit codes
+
+## 4. Analyzing cached tags
+
+You must already have a tag library file containing your cached tag data. Check above if you don't have one yet.
+
+To start, simply use the `analyze-library` command like this:
+
+```sh
+dotnet run -- analyze-library ~/Downloads/Music/tagLibrary.json
+```
+
+Several categories of data (e.g., most common artists, largest files) will be displayed.
+
+
+## Other
+
+### Exit codes
 
 The program returns the following exit codes:
 

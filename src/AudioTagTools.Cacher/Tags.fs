@@ -7,7 +7,7 @@ open Shared
 open Shared.TagLibrary
 open FsToolkit.ErrorHandling
 
-type TagMap = Map<string, LibraryTags>
+type LibraryTagMap = Map<string, LibraryTags>
 
 type LibraryComparisonResult =
     | Unchanged // Library tags match file tags.
@@ -18,7 +18,7 @@ type CategorizedTagsToCache =
     { Type: LibraryComparisonResult
       Tags: LibraryTags }
 
-let createTagLibraryMap (libraryFile: FileInfo) : Result<TagMap, Error> =
+let createTagLibraryMap (libraryFile: FileInfo) : Result<LibraryTagMap, Error> =
     let audioFilePath (fileTags: LibraryTags) : string =
         Path.Combine [| fileTags.DirectoryName; fileTags.FileName |]
 
@@ -32,7 +32,7 @@ let createTagLibraryMap (libraryFile: FileInfo) : Result<TagMap, Error> =
     else
         Ok Map.empty
 
-let private prepareTagsToWrite (tagLibraryMap: TagMap) (fileInfos: FileInfo seq)
+let private prepareTagsToWrite (tagLibraryMap: LibraryTagMap) (fileInfos: FileInfo seq)
     : CategorizedTagsToCache seq
     =
     let copyCachedTags (libraryTags: LibraryTags) =
@@ -67,7 +67,7 @@ let private prepareTagsToWrite (tagLibraryMap: TagMap) (fileInfos: FileInfo seq)
        | Ok (Some tags) -> tagsFromFile fileInfo tags
        | _ -> blankTags fileInfo
 
-    let prepareTagsToCache (tagLibraryMap: TagMap) (audioFile: FileInfo) : CategorizedTagsToCache =
+    let prepareTagsToCache (tagLibraryMap: LibraryTagMap) (audioFile: FileInfo) : CategorizedTagsToCache =
         if Map.containsKey audioFile.FullName tagLibraryMap
         then
             let libraryTags = Map.find audioFile.FullName tagLibraryMap
@@ -106,7 +106,7 @@ let private reportResults (categorizedTags: CategorizedTagsToCache seq) : Catego
     categorizedTags
 
 let generateJson
-    (tagLibraryMap: TagMap)
+    (tagLibraryMap: LibraryTagMap)
     (fileInfos: FileInfo seq)
     : Result<string, Error>
     =

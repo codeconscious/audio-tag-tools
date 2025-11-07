@@ -10,6 +10,8 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "AudioTagTools.Shared", "Aud
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "AudioTagTools.GenreExtractor", "AudioTagTools.GenreExtractor\AudioTagTools.GenreExtractor.fsproj", "{D65E8C93-0997-46DE-9180-1AE95BF8078F}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "AudioTagTools.LibraryAnalysis", "AudioTagTools.LibraryAnalysis\AudioTagTools.LibraryAnalysis.fsproj", "{ADD28F95-8AAB-433B-861C-64B6CBB15983}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -36,5 +38,9 @@ Global
 		{D65E8C93-0997-46DE-9180-1AE95BF8078F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D65E8C93-0997-46DE-9180-1AE95BF8078F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D65E8C93-0997-46DE-9180-1AE95BF8078F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ADD28F95-8AAB-433B-861C-64B6CBB15983}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ADD28F95-8AAB-433B-861C-64B6CBB15983}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ADD28F95-8AAB-433B-861C-64B6CBB15983}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ADD28F95-8AAB-433B-861C-64B6CBB15983}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

@@ -9,7 +9,7 @@ let private mainArtist (fileTags: LibraryTags) =
     | a when a.AlbumArtists.Length > 0 -> a.AlbumArtists[0]
     | _ -> String.Empty
 
-let private allGenres (fileTags: LibraryTags array) : string array =
+let private allGenres (fileTags: MultipleLibraryTags) : string array =
     fileTags
     |> Array.collect _.Genres
 
@@ -24,7 +24,7 @@ let private mostCommon (items: string array) : string =
 
 let private mostCommonGenre = allGenres >> mostCommon
 
-let groupArtistsWithGenres (separator: string) (allFileTags: LibraryTags array) =
+let groupArtistsWithGenres (separator: string) (allFileTags: MultipleLibraryTags) =
     let isNotEmpty s = not (String.IsNullOrWhiteSpace s)
 
     allFileTags
