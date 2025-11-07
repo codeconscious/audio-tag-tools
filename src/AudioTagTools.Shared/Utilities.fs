@@ -7,15 +7,15 @@ open System.Text.Encodings.Web
 open System.Text.Unicode
 open System.Globalization
 
-/// Format an integer to a comma-separated numeric string. Example: 1000 -> "1,000".
+/// Formats an integer to a comma-separated numeric string. Example: 1000 -> "1,000".
 let formatInt (i: int) : string =
     i.ToString("#,##0", CultureInfo.InvariantCulture)
 
-/// Format a 64-bit integer to a comma-separated numeric string. Example: 1000 -> "1,000".
+/// Formats a 64-bit integer to a comma-separated numeric string. Example: 1000 -> "1,000".
 let formatInt64 (i: int64) : string =
     i.ToString("#,##0", CultureInfo.InvariantCulture)
 
-/// Format a float to a comma-separated numeric string. Example: 1000.00 -> "1,000.00".
+/// Formats a float to a comma-separated numeric string. Example: 1000.00 -> "1,000.00".
 let formatFloat (f: float) : string =
     f.ToString("#,##0.00", CultureInfo.InvariantCulture)
 
@@ -25,6 +25,7 @@ let formatPercent (decimalPlaces: int) (n: float) : string =
     let pct = n * 100.0
     pct.ToString("F" + decimalPlaces'.ToString(), CultureInfo.InvariantCulture) + "%"
 
+/// Formats a byte count into a human-friendly size representation using KB, MB, GB, or TB.
 let formatBytes (bytes: int64) =
     let kilobyte = 1024L
     let megabyte = kilobyte * 1024L
@@ -38,12 +39,18 @@ let formatBytes (bytes: int64) =
     | _ when bytes >= kilobyte -> sprintf "%sK" ((float bytes / float kilobyte) |> formatFloat)
     | _ -> sprintf "%s bytes" (bytes |> formatInt64)
 
+/// Formats a TimeSpan to "h:mm:ss" format, where the hours ('h') are optional.
+let formatTimeSpan (timeSpan: TimeSpan) : string =
+    match timeSpan.Hours with
+    | 0 -> sprintf "%dm%ds" timeSpan.Minutes timeSpan.Seconds
+    | _ -> sprintf "%dh%dm%ds" timeSpan.Hours timeSpan.Minutes timeSpan.Seconds
+
 /// Helper for try/with -> Result.
 let private ofTry (f: unit -> 'T) : Result<'T, string> =
     try Ok (f())
     with exn -> Error exn.Message
 
-/// Serialize items to formatted JSON, returning a Result.
+/// Serializes items to a formatted JSON string, returning a Result.
 /// If an exception is thrown during the underlying operation,
 /// the Error only includes its message.
 let serializeToJson items : Result<string, string> =
@@ -72,9 +79,3 @@ let anyContains (collections: string seq seq) (target: string) : bool =
     collections
     |> Seq.concat
     |> Seq.exists (fun text -> StringComparer.InvariantCultureIgnoreCase.Equals(text, target))
-
-/// Formats a TimeSpan to "h:mm:ss" format, where the hours ('h') are optional.
-let formatTimeSpan (timeSpan: TimeSpan) : string =
-    match timeSpan.Hours with
-    | 0 -> sprintf "%dm%ds" timeSpan.Minutes timeSpan.Seconds
-    | _ -> sprintf "%dh%dm%ds" timeSpan.Hours timeSpan.Minutes timeSpan.Seconds
