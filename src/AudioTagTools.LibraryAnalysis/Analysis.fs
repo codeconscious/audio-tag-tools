@@ -106,10 +106,9 @@ let artistsWithMostGenres count tags =
     |> Array.groupBy firstDistinctArtist
     |> Array.map artistsWithAllGenres
     |> Array.map (fun (a, gs) -> a, uniqueGenreCount gs, gs)
-    |> Array.sortByDescending (fun (_, uniqueCount, _) -> uniqueCount)
+    |> Array.sortByDescending (fun (_, uniqCount, _) -> uniqCount)
     |> Array.take count
-    |> Array.map (fun (a, uniqCount, gs) ->
-        [| a; formatInt uniqCount; genreCounts gs |])
+    |> Array.map (fun (a, uniqCount, gs) -> [| a; formatInt uniqCount; genreCounts gs |])
 
 let largestFiles count tags =
     tags
