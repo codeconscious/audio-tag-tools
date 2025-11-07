@@ -9,11 +9,10 @@ open Shared
 open FsToolkit.ErrorHandling
 open Spectre.Console
 
-type QualityData = {
-    BitRate: int
-    Extension: string
-    SampleRate: int
-}
+type QualityData =
+    { BitRate: int
+      Extension: string
+      SampleRate: int }
 
 let private run (args: string array) : Result<unit, Error> =
     result {
@@ -23,12 +22,11 @@ let private run (args: string array) : Result<unit, Error> =
         printTable {
             Title = Some "General Data"
             Headers = None
-            Rows = [|
-                [| "Track count"; formatInt tags.Length |]
-                [| "Unique artists"; formatInt <| uniqueArtistCount tags |]
-                [| "Average file size"; formatBytes <| averageFileSize tags  |]
-                [| "Album art percentage"; $"%s{albumArtPercentage tags}" |]
-            |]
+            Rows =
+                [| [| "Track count"; formatInt tags.Length |]
+                   [| "Unique artists"; formatInt <| uniqueArtistCount tags |]
+                   [| "Average file size"; formatBytes <| averageFileSize tags  |]
+                   [| "Album art percentage"; $"%s{albumArtPercentage tags}" |] |]
             ColumnAlignments = [Justify.Left; Justify.Right]
         }
 
@@ -68,7 +66,7 @@ let private run (args: string array) : Result<unit, Error> =
         }
 
         printTable {
-            Title = Some "Largest files"
+            Title = Some "Largest Files"
             Headers = Some ["File Size"; "Artist & Title"]
             Rows = largestFiles 20 tags |> Array.map Array.rev
             ColumnAlignments = [Justify.Right; Justify.Left]
