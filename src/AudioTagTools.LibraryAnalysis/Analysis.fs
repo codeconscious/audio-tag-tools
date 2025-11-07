@@ -30,17 +30,11 @@ let albumArtPercentage tags =
 
 let filteredArtists tags =
     tags
-    |> Array.map (fun t ->
-        t
-        |> allDistinctArtists
-        |> Array.except ignorableArtists)
+    |> Array.map (fun t -> t |> allDistinctArtists |> Array.except ignorableArtists)
     |> Array.concat
 
 let uniqueArtistCount tags =
-    tags
-    |> filteredArtists
-    |> Array.distinct
-    |> _.Length
+    tags |> filteredArtists |> Array.distinct |> _.Length
 
 let topArtists count tags =
     let artists = filteredArtists tags
@@ -90,25 +84,23 @@ let artistsWithMostGenres count tags =
         |> Array.map (fun (g, count) -> $"{g} ({count})")
         |> String.concat "; "
 
-    let artistsWithAllGenres (a, tags) : 'a * string array =
+    let artistsWithTheirGenres (a, tags) : 'a * string array =
         (a, tags
             |> Array.map _.Genres
             |> Array.concat
             |> Array.map _.Trim())
 
-    let uniqueGenreCount (genres: string array) =
-        genres
-        |> Array.distinctBy _.ToLowerInvariant()
-        |> _.Length
+    let uniqGenreCount (genres: string array) =
+        genres |> Array.distinctBy _.ToLowerInvariant() |> _.Length
 
     tags
     |> Array.filter hasAnyArtist
     |> Array.groupBy firstDistinctArtist
-    |> Array.map artistsWithAllGenres
-    |> Array.map (fun (a, gs) -> a, uniqueGenreCount gs, gs)
-    |> Array.sortByDescending (fun (_, uniqCount, _) -> uniqCount)
+    |> Array.map artistsWithTheirGenres
+    |> Array.map (fun (a, gs) -> a, uniqGenreCount gs, gs)
+    |> Array.sortByDescending (fun (_, uniqGenreCount, _) -> uniqGenreCount)
     |> Array.take count
-    |> Array.map (fun (a, uniqCount, gs) -> [| a; formatInt uniqCount; genreCounts gs |])
+    |> Array.map (fun (a, uniqGenreCount, gs) -> [| a; formatInt uniqGenreCount; genreCounts gs |])
 
 let largestFiles count tags =
     tags

@@ -7,11 +7,7 @@ open System.IO
 open FsToolkit.ErrorHandling
 
 let readFile (fileInfo: FileInfo) : Result<string, Error> =
-    fileInfo
-    |> readFile
-    |> Result.mapError IoReadError
+    readFile fileInfo |> Result.mapError IoReadError
 
 let parseJsonToTags (json: string) : Result<MultipleLibraryTags, Error> =
-    json
-    |> parseJsonToTags
-    |> Result.mapError TagParseError
+    parseJsonToTags json |> Result.mapError TagParseError
