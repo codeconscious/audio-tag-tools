@@ -17,6 +17,7 @@ I originally created this tool to practice with F# [JSON type providers](https:/
 
 Ensure you are in the `AudioTagTools.Console` directory in your terminal.
 
+
 ## Caching tags
 
 Creates a "tag library," a JSON file containing the text tag data from the audio files in a specified directory.
@@ -67,7 +68,7 @@ The file will be in this JSON format:
 ```
 
 > [!NOTE]
-> This is the same format that the `--cache-tags` option of [my AudioTagger utility](https://github.com/codeconscious/audiotagger) outputs. The advantage of using this tool instead is that it compares tag data against files' last-modified dates and only updates out-of-date tag information, making the operation considerably faster, particularly when your audio files are on a slow external drive, etc.
+> This is the basically same format that the `--cache-tags` option of [my AudioTagger utility](https://github.com/codeconscious/audiotagger) outputs. The advantage of using this tool instead is that it compares tag data against files' last-modified dates and only updates out-of-date tag information, making the operation considerably faster, particularly when your audio files are on a slow external drive, etc.
 
 
 ## Finding duplicates
@@ -172,6 +173,7 @@ dotnet run -- find-duplicates ~/Documents/settings.json ~/Downloads/Music/tagLib
 
 If any potential duplicates are found, they will be listed, grouped by artist. If you see false positives (i.e., tracks that were detected as duplicates, but are actually not), you can add entries to the exclusions in your settings to ignore them in the future.
 
+
 ## Exporting artist genres
 
 Creates a text file containing a list of artists with the genre that they are most associated with in your tag library.
@@ -189,6 +191,7 @@ dotnet run -- export-genres ~/Downloads/Music/tagLibrary.json ~/Downloads/Music/
 
 If a genres file already exists at that path, a backup will be created automatically.
 
+
 ## Analyzing cached tags
 
 You must already have a tag library file containing your cached tag data. Check above if you don't have one yet.
@@ -200,6 +203,7 @@ dotnet run -- analyze-library ~/Downloads/Music/tagLibrary.json
 ```
 
 Several categories of data (e.g., most common artists, largest files) will be displayed.
+
 
 ## Other
 
