@@ -33,8 +33,8 @@ let createTagLibraryMap (libraryFile: FileInfo) : Result<LibraryTagMap, Error> =
         Ok Map.empty
 
 let private prepareTagsToWrite (tagLibraryMap: LibraryTagMap) (fileInfos: FileInfo seq)
-    : CategorizedTagsToCache seq
-    =
+    : CategorizedTagsToCache seq =
+
     let copyCachedTags (libraryTags: LibraryTags) =
         { libraryTags with LastWriteTime = DateTimeOffset libraryTags.LastWriteTime.DateTime }
 

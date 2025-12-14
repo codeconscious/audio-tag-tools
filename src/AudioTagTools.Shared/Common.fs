@@ -1,5 +1,5 @@
 [<AutoOpen>]
-module Shared.Utilities
+module Shared.Common
 
 open System
 open System.Text.Json
@@ -46,7 +46,7 @@ let formatTimeSpan (timeSpan: TimeSpan) : string =
     | _ -> sprintf "%dh%dm%ds" timeSpan.Hours timeSpan.Minutes timeSpan.Seconds
 
 /// Helper for try/with -> Result.
-let private ofTry (f: unit -> 'T) : Result<'T, string> =
+let private ofTry (f: unit -> 'a) : Result<'a, string> =
     try Ok (f())
     with exn -> Error exn.Message
 
