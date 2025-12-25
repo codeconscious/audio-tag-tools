@@ -23,7 +23,7 @@ Ensure you are in the `AudioTagTools.Console` directory in your terminal.
 Creates a "tag library," a JSON file containing the text tag data from the audio files in a specified directory.
 
 > [!NOTE]
-> If you have many files, especially on an external device, this process might take a while on its initial run, but will be much faster in subsequent ones. 
+> If you have many files, especially on an external device, this process might take a while on its initial run, but will be much faster in subsequent ones.
 
 Pass `cache-tags` with two arguments:
 
@@ -80,7 +80,7 @@ Second, you must have a settings file containing exceptions—i.e., artists, tra
 <details>
   <summary>Click to expand the sample...</summary>
 
-Note: Use `pathSearchFor` and `pathReplaceWith` if you wish to modify the base path of your media files in the playlist file—for example, if you wish the load the playlist on a different device where the files reside under a different path. Otherwise, they may be left blank. 
+Note: Use `pathSearchFor` and `pathReplaceWith` if you wish to modify the base path of your media files in the playlist file—for example, if you wish the load the playlist on a different device where the files reside under a different path. Otherwise, they may be left blank.
 
 ```json
 {
@@ -100,6 +100,9 @@ Note: Use `pathSearchFor` and `pathReplaceWith` if you wish to modify the base p
     {
       "title": "SAMPLE_TRACK_NAME"
     }
+  ],
+  "equivalentArtists": [
+      ["artistName", "equivalentArtistName"]
   ],
   "artistReplacements": [
     " ",
