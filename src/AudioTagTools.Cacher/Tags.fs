@@ -72,9 +72,9 @@ let private prepareTagsToWrite (tagLibraryMap: LibraryTagMap) (fileInfos: FileIn
         then
             let libraryTags = Map.find audioFile.FullName tagLibraryMap
             if libraryTags.LastWriteTime.DateTime < audioFile.LastWriteTime
-            then { Type = OutOfDate; Tags = (generateNewTags audioFile) }
-            else { Type = Unchanged; Tags = (copyCachedTags libraryTags) }
-        else { Type = NotPresent; Tags = (generateNewTags audioFile) }
+            then { Type = OutOfDate; Tags = generateNewTags audioFile }
+            else { Type = Unchanged; Tags = copyCachedTags libraryTags }
+        else { Type = NotPresent; Tags = generateNewTags audioFile }
 
     fileInfos
     |> Seq.map (prepareTagsToCache tagLibraryMap)
