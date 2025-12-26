@@ -50,14 +50,12 @@ let private groupingName (settings: SettingsRoot) (track: LibraryTags) =
         |> removeSubstrings
 
     let artists =
-        let checkEquivalentArtists trackArtist =
-            Array.fold
-                (fun currentArtist artistGroup ->
-                    match artistGroup |> Array.contains trackArtist with
-                    | true -> artistGroup[0]
-                    | false -> currentArtist)
-                trackArtist
-                settings.EquivalentArtists
+        let checkEquivalentArtists defaultArtist =
+            settings.EquivalentArtists
+            |> Array.tryFind (Array.contains defaultArtist)
+            |> function
+               | Some group -> group[0]
+               | None -> defaultArtist
 
         track
         |> mainArtists String.Empty // Separator unneeded since this text is for grouping only.
