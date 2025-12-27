@@ -23,7 +23,7 @@ Ensure you are in the `AudioTagTools.Console` directory in your terminal.
 Creates a "tag library," a JSON file containing the text tag data from the audio files in a specified directory.
 
 > [!NOTE]
-> If you have many files, especially on an external device, this process might take a while on its initial run, but will be much faster in subsequent ones. 
+> If you have many files, especially on an external device, this process might take a while on its initial run, but will be much faster in subsequent ones.
 
 Pass `cache-tags` with two arguments:
 
@@ -78,9 +78,7 @@ First, you must already have a tag library file containing your cached tag data.
 Second, you must have a settings file containing exceptions—i.e., artists, track titles, and strings that you wish to exclude from the search. Actual entries are optional, but the file must be exist in the specified format. I have provided a sample you can use below.
 
 <details>
-  <summary>Click to expand the sample...</summary>
-
-Note: Use `pathSearchFor` and `pathReplaceWith` if you wish to modify the base path of your media files in the playlist file—for example, if you wish the load the playlist on a different device where the files reside under a different path. Otherwise, they may be left blank. 
+  <summary>Click to expand the sample and notes...</summary>
 
 ```json
 {
@@ -100,6 +98,9 @@ Note: Use `pathSearchFor` and `pathReplaceWith` if you wish to modify the base p
     {
       "title": "SAMPLE_TRACK_NAME"
     }
+  ],
+  "equivalentArtists": [
+      ["artistName", "equivalentArtistName"]
   ],
   "artistReplacements": [
     " ",
@@ -163,12 +164,19 @@ Note: Use `pathSearchFor` and `pathReplaceWith` if you wish to modify the base p
   ]
 }
 ```
+
+Notes:
+
+1. Use `pathSearchFor` and `pathReplaceWith` if you wish to modify the base path of your media files in the playlist file—for example, if you wish the load the playlist on a different device where the files reside under a different base path. Otherwise, they may be left blank.
+
+2. Use `equivalentArtists` to register lists of artists that should be considered identical for the purposes of duplicate-checking. Results will be reported using the first artist in each group.
+
 </details>
 
 To start, use the `find-duplicates` command like this:
 
 ```sh
-dotnet run -- find-duplicates ~/Documents/settings.json ~/Downloads/Music/tagLibrary.json
+dotnet run -- find-duplicates ~/Documents/Audio/findDupeSettings.json ~/Documents/Audio/tagLibrary.json
 ```
 
 If any potential duplicates are found, they will be listed, grouped by artist. If you see false positives (i.e., tracks that were detected as duplicates, but are actually not), you can add entries to the exclusions in your settings to ignore them in the future.
@@ -186,7 +194,7 @@ To use it, pass `export-genres` with two arguments:
 Sample:
 
 ```sh
-dotnet run -- export-genres ~/Downloads/Music/tagLibrary.json ~/Downloads/Music/genres.txt
+dotnet run -- export-genres ~/Downloads/Audio/tagLibrary.json ~/Downloads/Audio/genres.txt
 ```
 
 If a genres file already exists at that path, a backup will be created automatically.
@@ -199,7 +207,7 @@ You must already have a tag library file containing your cached tag data. Check 
 To start, simply use the `analyze-library` command like this:
 
 ```sh
-dotnet run -- analyze-library ~/Downloads/Music/tagLibrary.json
+dotnet run -- analyze-library ~/Downloads/Audio/tagLibrary.json
 ```
 
 Several categories of data (e.g., most common artists, largest files) will be displayed.
@@ -211,9 +219,9 @@ Several categories of data (e.g., most common artists, largest files) will be di
 
 The program returns the following exit codes:
 
-| Code | Meaning                                |
-|------|----------------------------------------|
-| 0    | Finished without issue                 |
-| 1    | Invalid argument count                 |
-| 2    | Invalid command                        |
-| 3    | Failure during the requested operation |
+| Code | Meaning                                           |
+|------|---------------------------------------------------|
+| 0    | Finished successfully                             |
+| 1    | Invalid argument count                            |
+| 2    | Invalid command                                   |
+| 3    | Failure during the requested command's operation  |

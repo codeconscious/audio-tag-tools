@@ -23,6 +23,9 @@ let settingsSample = """
             "title": "title"
         }
     ],
+    "equivalentArtists": [
+        ["artistName", "equivalentArtistName"]
+    ],
     "artistReplacements": [
         "text"
     ],
