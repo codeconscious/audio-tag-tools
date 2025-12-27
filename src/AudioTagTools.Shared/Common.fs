@@ -82,11 +82,10 @@ let anyContains (collections: string seq seq) (target: string) : bool =
 
 let whiteSpaces =
     [|
-        // Source: https://jkorpela.fi/chars/spaces.html 🙇
         "\u0020" // space
         "\u00A0" // non-breaking space
-        "\u1680" // ogham space mark
-        "\u180E" // mongolian vowel separator
+        "\u1680" // Ogham space mark
+        "\u180E" // Mongolian vowel separator
         "\u2000" // en quad
         "\u2001" // em quad
         "\u2002" // en space
@@ -98,9 +97,12 @@ let whiteSpaces =
         "\u2008" // punctuation space
         "\u2009" // thin space
         "\u200A" // hair space
-        "\u200B" // zero width space
-        "\u202F" // narrow no-break space
+        "\u200B" // zero-width space
+        "\u200D" // zero-width joiner (emoji)
+        "\u202F" // narrow non-breaking space
         "\u205F" // medium mathematical space
-        "\u3000" // ideographic space
-        "\uFEFF" // zero width no-break space
+        "\u2063" // invisible separator
+        "\u3000" // ideographic space (i.e., Japanese full-width space)
+        "\u3164" // Hangul filler
+        "\uFEFF" // zero-width non-breaking space
     |]
