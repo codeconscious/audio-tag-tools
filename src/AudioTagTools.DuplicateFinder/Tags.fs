@@ -46,16 +46,16 @@ let private groupingName (settings: SettingsRoot) (track: LibraryTags) =
     // always be ignored to increase the accuracy of duplicate checks, so they are added here.
     let removeSubstrings arr =
         arr
-        |> Array.append [| " "; "　" |] // Single-byte and double-byte spaces.
+        |> Array.append whiteSpaces
         |> removeSubstrings
 
     let artists =
-        let checkEquivalentArtists defaultArtist =
+        let checkEquivalentArtists trackArtist =
             settings.EquivalentArtists
-            |> Array.tryFind (Array.contains defaultArtist)
+            |> Array.tryFind (Array.contains trackArtist)
             |> function
-               | Some group -> group[0]
-               | None -> defaultArtist
+               | Some eqArtists -> eqArtists[0]
+               | None -> trackArtist
 
         track
         |> mainArtists String.Empty // Separator unneeded since this text is for grouping only.
