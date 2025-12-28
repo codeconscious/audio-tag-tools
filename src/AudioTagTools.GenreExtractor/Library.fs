@@ -12,22 +12,22 @@ let private run args : Result<unit, Error> =
         let! tagLibraryFile, genreFile = validate args
 
         let! oldGenres = readLines genreFile
-        printfn "%s entries in the old file." (formatInt oldGenres.Length)
+        printfn "%s entries in the old file." (String.formatInt oldGenres.Length)
 
         let! newGenres =
             tagLibraryFile
             |> readFile
             >>= parseJsonToTags
-            <.> fun tags -> printfn $"Parsed tags for {formatInt tags.Length} files from the tag library."
+            <.> fun tags -> printfn $"Parsed tags for {String.formatInt tags.Length} files from the tag library."
             <!> groupArtistsWithGenres "＼" // Separator should be text highly unlikely to appear in files' tags.
 
         let newTotalCount = newGenres.Length
         let addedCount = newGenres |> Array.except oldGenres |> _.Length
         let deletedCount = oldGenres |> Array.except newGenres |> _.Length
         printfn "Prepared %s artist-genre entries total (%s new, %s deleted)."
-            (formatInt newTotalCount)
-            (formatInt addedCount)
-            (formatInt deletedCount)
+            (String.formatInt newTotalCount)
+            (String.formatInt addedCount)
+            (String.formatInt deletedCount)
 
         do!
             genreFile

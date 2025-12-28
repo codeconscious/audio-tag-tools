@@ -49,8 +49,8 @@ let private groupedArtistName (settings: SettingsRoot) (track: LibraryTags) =
     // always be ignored to increase the accuracy of duplicate checks, so they are added here.
     let removeSubstrings strings =
         strings
-        |> Array.append whiteSpaces
-        |> removeSubstrings
+        |> Array.append String.whiteSpaces
+        |> String.removeSubstrings
 
     let artists =
         let checkEquivalentArtists trackArtist =
@@ -97,7 +97,7 @@ let findDuplicates (settings: SettingsRoot) (tags: MultipleLibraryTags) : Multip
     |> Option.map sortByArtist
 
 let printCount description (tags: MultipleLibraryTags) =
-    printfn $"%s{description}%s{formatInt tags.Length}"
+    printfn $"%s{description}%s{String.formatInt tags.Length}"
 
 let printDuplicates (groupedTracks: MultipleLibraryTags array option) =
     let printfGray = printfColor ConsoleColor.DarkGray
@@ -111,10 +111,10 @@ let printDuplicates (groupedTracks: MultipleLibraryTags array option) =
         let printFileSummary fileTags =
             let artist = artistSummary fileTags
             let title = fileTags.Title
-            let duration = formatTimeSpan fileTags.Duration
+            let duration = String.formatTimeSpan fileTags.Duration
             let periodlessExtension = (Path.GetExtension fileTags.FileName)[1..] |> _.ToUpperInvariant()
             let bitrate = $"{fileTags.BitRate}kbps"
-            let fileSize = formatBytes fileTags.FileSize
+            let fileSize = String.formatBytes fileTags.FileSize
             printf $"    • {artist}"
             printfGray " — "
             printf $"{title}"

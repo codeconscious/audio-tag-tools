@@ -23,9 +23,9 @@ let private run (args: string array) : Result<unit, Error> =
             Title = Some "General Data"
             Headers = None
             Rows =
-                [| [| "Track count"; formatInt tags.Length |]
-                   [| "Unique artists"; formatInt <| uniqueArtistCount tags |]
-                   [| "Average file size"; formatBytes <| averageFileSize tags  |]
+                [| [| "Track count"; String.formatInt tags.Length |]
+                   [| "Unique artists"; String.formatInt <| uniqueArtistCount tags |]
+                   [| "Average file size"; String.formatBytes <| averageFileSize tags  |]
                    [| "Album art percentage"; $"%s{albumArtPercentage tags}" |] |]
             ColumnAlignments = [Justify.Left; Justify.Right]
         }

@@ -10,6 +10,12 @@ let readFile (fileInfo: FileInfo) : Result<string, string> =
         |> Ok
     with ex -> Error ex.Message
 
+/// Reads all text from the specified file, returning a Result.
+/// If an exception is thrown during the underlying operation,
+/// the Error includes the exception itself.
+let readAllText (filePath: string) : Result<string, string> =
+    ofTry (fun _ -> File.ReadAllText filePath)
+
 let readLines (fileInfo: FileInfo) : Result<string array, string> =
     try
         fileInfo.FullName

@@ -89,13 +89,13 @@ let private reportResults (categorizedTags: CategorizedTagsToCache seq) : Catego
         categoryTotals
         |> Map.tryFind comparisonResultType
         |> Option.defaultValue 0
-        |> formatInt
+        |> String.formatInt
 
     let grandTotal =
         categoryTotals
         |> Map.values
         |> Seq.sum
-        |> formatInt
+        |> String.formatInt
 
     printfn "Results:"
     printfn "• New:       %s" (countOf NotPresent)
@@ -108,11 +108,11 @@ let private reportResults (categorizedTags: CategorizedTagsToCache seq) : Catego
 let generateJson
     (tagLibraryMap: LibraryTagMap)
     (fileInfos: FileInfo seq)
-    : Result<string, Error>
-    =
+    : Result<string, Error> =
+
     fileInfos
     |> prepareTagsToWrite tagLibraryMap
     |> reportResults
     |> Seq.map _.Tags
-    |> serializeToJson
+    |> String.serializeToJson
     |> Result.mapError JsonSerializationError
