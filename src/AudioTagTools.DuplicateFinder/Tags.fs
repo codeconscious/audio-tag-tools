@@ -48,8 +48,6 @@ let filter (settings: Settings) (allTags: MultipleLibraryTags) : MultipleLibrary
 /// (2) The track title.
 /// The string is intended to be used solely for track grouping.
 let private groupName (settings: Settings) (track: LibraryTags) =
-    // It appears JSON type providers do not import whitespace-only values. Whitespace should
-    // always be ignored to increase the accuracy of duplicate checks, so they are added here.
     let removeSubstrings strings =
         strings
         |> Array.append String.whiteSpaces
