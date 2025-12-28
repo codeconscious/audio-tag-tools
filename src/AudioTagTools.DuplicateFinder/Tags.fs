@@ -74,28 +74,19 @@ let private groupName (settings: Settings) (track: LibraryTags) =
         .Normalize(NormalizationForm.FormC)
         .ToLowerInvariant()
 
-let private sortByArtist (groupedTags: MultipleLibraryTags array) =
-    let artistAndTrackName (group: MultipleLibraryTags) =
-        let firstFile = group[0]
-        let artist =
-            if firstFile.AlbumArtists.Length > 1
-            then firstFile.AlbumArtists[0]
-            else firstFile.Artists[0]
-        $"{artist}{firstFile.Title}" // Only used for sorting, so spaces aren't needed.
-
-    groupedTags
-    |> Array.sortBy artistAndTrackName
-
 let findDuplicates (settings: Settings) (tags: MultipleLibraryTags) : MultipleLibraryTags array option =
     tags
     |> Array.filter hasArtistAndTitle
     |> Array.groupBy (groupName settings)
-    |> Array.choose (fun (_, groupedTracks) ->
+    |> Array.choose (fun (groupName, groupedTracks) ->
         match groupedTracks with
         | [| _ |] -> None // Sole track with no potential duplicates.
-        | duplicates -> Some duplicates)
-    |> function [||] -> None | duplicates -> Some duplicates
-    |> Option.map sortByArtist
+        | dupes   -> Some (groupName, dupes))
+    |> function
+        | [||]  -> None
+        | dupes -> Some dupes
+    |> Option.map (Array.sortBy fst)
+    |> Option.map (Array.map (fun (_, tags) -> tags |> Array.sortBy (mainArtists String.Empty)))
 
 let printCount description (tags: MultipleLibraryTags) =
     printfn $"%s{description}%s{String.formatInt tags.Length}"
