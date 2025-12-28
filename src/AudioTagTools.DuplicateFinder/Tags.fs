@@ -78,15 +78,10 @@ let findDuplicates (settings: Settings) (tags: MultipleLibraryTags) : MultipleLi
     tags
     |> Array.filter hasArtistAndTitle
     |> Array.groupBy (groupName settings)
-    |> Array.choose (fun (groupName, groupedTracks) ->
-        match groupedTracks with
-        | [| _ |] -> None // Sole track with no potential duplicates.
-        | dupes   -> Some (groupName, dupes))
-    |> function
-        | [||]  -> None
-        | dupes -> Some dupes
-    |> Option.map (Array.sortBy fst)
-    |> Option.map (Array.map (fun (_, tags) -> tags |> Array.sortBy (mainArtists String.Empty)))
+    |> Array.filter (fun (_, ts) -> ts.Length > 1)
+    |> Array.sortBy fst
+    |> Array.map (fun (_, ts) -> ts |> Array.sortBy (mainArtists String.Empty))
+    |> fun dupes -> if dupes.Length = 0 then None else Some dupes
 
 let printCount description (tags: MultipleLibraryTags) =
     printfn $"%s{description}%s{String.formatInt tags.Length}"
