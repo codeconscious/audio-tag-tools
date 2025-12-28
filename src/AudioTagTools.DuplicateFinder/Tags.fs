@@ -41,10 +41,13 @@ let filter (settings: SettingsRoot) (allTags: MultipleLibraryTags) : MultipleLib
     allTags
     |> Array.filter isIncluded
 
-/// Returns the artist name that should be used for artist grouping when searching for duplicates.
-/// If the artist appears in any "equivalent artist" group, then the first equilavent artist name
-/// from that group will be prioritized over the track's artist name.
-let private groupedArtistName (settings: SettingsRoot) (track: LibraryTags) =
+/// Returns a normalized string of two concatenated items:
+/// (1) The artist name that should be used for artist grouping when searching for duplicates.
+///     If the artist appears in any "equivalent artist" group, then the first equilavent artist
+///     name from that group will be prioritized over the track's artist name.
+/// (2) The track title.
+/// The string is intended to be used solely for track grouping.
+let private groupName (settings: SettingsRoot) (track: LibraryTags) =
     // It appears JSON type providers do not import whitespace-only values. Whitespace should
     // always be ignored to increase the accuracy of duplicate checks, so they are added here.
     let removeSubstrings strings =
@@ -88,7 +91,7 @@ let private sortByArtist (groupedTags: MultipleLibraryTags array) =
 let findDuplicates (settings: SettingsRoot) (tags: MultipleLibraryTags) : MultipleLibraryTags array option =
     tags
     |> Array.filter hasArtistAndTitle
-    |> Array.groupBy (groupedArtistName settings)
+    |> Array.groupBy (groupName settings)
     |> Array.choose (fun (_, groupedTracks) ->
         match groupedTracks with
         | [| _ |] -> None // Sole track with no potential duplicates.
