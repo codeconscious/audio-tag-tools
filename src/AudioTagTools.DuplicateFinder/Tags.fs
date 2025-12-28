@@ -47,13 +47,13 @@ let filter (settings: Settings) (allTags: MultipleLibraryTags) : MultipleLibrary
 ///     name from that group will be prioritized over the track's artist name.
 /// (2) The track title.
 /// The string is intended to be used solely for track grouping.
-let private groupName (settings: Settings) (track: LibraryTags) =
+let private groupName (settings: Settings) (fileTags: LibraryTags) =
     let removeSubstrings strings =
         strings
         |> Array.append String.whiteSpaces
         |> String.removeSubstrings
 
-    let artists =
+    let artist =
         let checkEquivalentArtists trackArtist =
             settings.EquivalentArtists
             |> Array.tryFind (Array.contains trackArtist)
@@ -61,24 +61,24 @@ let private groupName (settings: Settings) (track: LibraryTags) =
                | Some eqArtists -> eqArtists[0]
                | None -> trackArtist
 
-        track
+        fileTags
         |> mainArtists String.Empty // Separator unneeded since this text is for grouping only.
         |> checkEquivalentArtists
         |> removeSubstrings settings.ArtistReplacements
 
     let title =
-        track.Title
+        fileTags.Title
         |> removeSubstrings settings.TitleReplacements
 
-    $"{artists}{title}"
+    $"{artist}{title}"
         .Normalize(NormalizationForm.FormC)
         .ToLowerInvariant()
 
-let findDuplicates (settings: Settings) (tags: MultipleLibraryTags) : MultipleLibraryTags array option =
+let findDuplicates settings (tags: MultipleLibraryTags) : MultipleLibraryTags array option =
     tags
     |> Array.filter hasArtistAndTitle
     |> Array.groupBy (groupName settings)
-    |> Array.filter (fun (_, tags) -> tags |> Array.hasMultiple)
+    |> Array.filter (fun (_, tags) -> Array.hasMultiple tags)
     |> Array.sortBy fst // Group name
     |> Array.map (fun (_, tags) -> tags |> Array.sortBy (mainArtists String.Empty))
     |> fun dupes -> if dupes |> Array.isEmpty then None else Some dupes
