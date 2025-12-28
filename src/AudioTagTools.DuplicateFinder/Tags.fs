@@ -13,7 +13,7 @@ let parseToTags json =
     |> parseJsonToTags
     |> Result.mapError TagParseError
 
-let filter (settings: SettingsRoot) (allTags: MultipleLibraryTags) : MultipleLibraryTags =
+let filter (settings: Settings) (allTags: MultipleLibraryTags) : MultipleLibraryTags =
     let(|ArtistAndTitle|ArtistOnly|TitleOnly|Invalid|) (exclusion: Exclusion) =
         match exclusion.Artist, exclusion.Title with
         | Some a, Some t -> ArtistAndTitle (a, t)
@@ -47,7 +47,7 @@ let filter (settings: SettingsRoot) (allTags: MultipleLibraryTags) : MultipleLib
 ///     name from that group will be prioritized over the track's artist name.
 /// (2) The track title.
 /// The string is intended to be used solely for track grouping.
-let private groupName (settings: SettingsRoot) (track: LibraryTags) =
+let private groupName (settings: Settings) (track: LibraryTags) =
     // It appears JSON type providers do not import whitespace-only values. Whitespace should
     // always be ignored to increase the accuracy of duplicate checks, so they are added here.
     let removeSubstrings strings =
@@ -88,7 +88,7 @@ let private sortByArtist (groupedTags: MultipleLibraryTags array) =
     groupedTags
     |> Array.sortBy artistAndTrackName
 
-let findDuplicates (settings: SettingsRoot) (tags: MultipleLibraryTags) : MultipleLibraryTags array option =
+let findDuplicates (settings: Settings) (tags: MultipleLibraryTags) : MultipleLibraryTags array option =
     tags
     |> Array.filter hasArtistAndTitle
     |> Array.groupBy (groupName settings)
