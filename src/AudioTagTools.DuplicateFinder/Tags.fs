@@ -81,7 +81,7 @@ let findDuplicates settings (tags: MultipleLibraryTags) : MultipleLibraryTags ar
     |> Array.filter (fun (_, tags) -> Array.hasMultiple tags)
     |> Array.sortBy fst // Group name
     |> Array.map (fun (_, tags) -> tags |> Array.sortBy (mainArtists String.Empty))
-    |> fun dupes -> if dupes |> Array.isEmpty then None else Some dupes
+    |> Array.toOption
 
 let printCount description (tags: MultipleLibraryTags) =
     printfn $"%s{description}%s{String.formatInt tags.Length}"
