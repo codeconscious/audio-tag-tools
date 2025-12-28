@@ -78,10 +78,10 @@ let findDuplicates (settings: Settings) (tags: MultipleLibraryTags) : MultipleLi
     tags
     |> Array.filter hasArtistAndTitle
     |> Array.groupBy (groupName settings)
-    |> Array.filter (fun (_, ts) -> ts.Length > 1)
-    |> Array.sortBy fst
-    |> Array.map (fun (_, ts) -> ts |> Array.sortBy (mainArtists String.Empty))
-    |> fun dupes -> if dupes.Length = 0 then None else Some dupes
+    |> Array.filter (fun (_, tags) -> tags |> Array.hasMultiple)
+    |> Array.sortBy fst // Group name
+    |> Array.map (fun (_, tags) -> tags |> Array.sortBy (mainArtists String.Empty))
+    |> fun dupes -> if dupes |> Array.isEmpty then None else Some dupes
 
 let printCount description (tags: MultipleLibraryTags) =
     printfn $"%s{description}%s{String.formatInt tags.Length}"
