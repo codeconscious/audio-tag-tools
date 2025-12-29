@@ -99,13 +99,13 @@ let printDuplicates (groupedTracks: MultipleLibraryTags array option) =
             let artist = artistSummary fileTags
             let title = fileTags.Title
             let duration = String.formatTimeSpan fileTags.Duration
-            let periodlessExtension = (Path.GetExtension fileTags.FileName)[1..] |> _.ToUpperInvariant()
-            let bitrate = $"{fileTags.BitRate}kbps"
+            let extNoPeriod = (Path.GetExtension fileTags.FileName)[1..] |> _.ToUpperInvariant()
+            let bitRate = $"{fileTags.BitRate}kbps"
             let fileSize = String.formatBytes fileTags.FileSize
             printf $"    • {artist}"
             printfGray " — "
             printf $"{title}"
-            printfGray $"  [{duration} {periodlessExtension} {bitrate} {fileSize}]{Environment.NewLine}"
+            printfGray $"  [{duration} {extNoPeriod} {bitRate} {fileSize}]{Environment.NewLine}"
 
         let printHeader () =
             groupTracks
