@@ -4,10 +4,10 @@ open Errors
 open Settings
 open Shared.TagLibrary
 open Shared.IO
+open FsToolkit.ErrorHandling
 open System
 open System.Text
 open System.IO
-open FsToolkit.ErrorHandling
 
 let readFile (fileInfo: FileInfo) : Result<string, Error> =
     fileInfo

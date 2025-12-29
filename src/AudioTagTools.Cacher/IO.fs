@@ -8,7 +8,7 @@ open System.IO
 type FileTags = TagLib.File
 
 let readfile filePath : Result<string, Error> =
-    match readAllText filePath with
+    match IO.readAllText filePath with
     | Ok x -> Ok x
     | Error msg -> Error (ReadFileError msg)
 

@@ -15,7 +15,7 @@ let private asLower (x: string) = x.ToLowerInvariant()
 
 let private asPercentage count totalCount decimalPlaces =
     float count / float totalCount
-    |> formatPercent decimalPlaces
+    |> String.formatPercent decimalPlaces
 
 let averageFileSize tags =
     let sizeTotal = tags |> Array.map _.FileSize |> Array.sum
@@ -44,7 +44,7 @@ let topArtists count tags =
     |> mostPopulous count id
     |> Array.map (fun (artist, count) ->
         [| artist
-           formatInt count
+           String.formatInt count
            asPercentage count artistCount 3 |])
 
 let topAlbums count tags =
@@ -55,14 +55,14 @@ let topAlbums count tags =
     |> mostPopulous count id
     |> Array.map (fun (album, count) ->
         [| album
-           formatInt count
+           String.formatInt count
            asPercentage count albumCount 2 |])
 
 let topTitles count tags =
     tags
     |> Array.map _.Title
     |> mostPopulous count asLower
-    |> Array.map (fun (title, count) -> [| title; formatInt count |])
+    |> Array.map (fun (title, count) -> [| title; String.formatInt count |])
 
 let topGenres count tags =
     let genres = tags |> Array.map _.Genres
@@ -73,7 +73,7 @@ let topGenres count tags =
     |> mostPopulous count asLower
     |> Array.map (fun (genre, count) ->
         [| genre
-           formatInt count
+           String.formatInt count
            asPercentage count genreCount 2 |])
 
 let artistsWithMostGenres count tags =
@@ -100,7 +100,7 @@ let artistsWithMostGenres count tags =
     |> Array.map (fun (a, gs) -> a, uniqGenreCount gs, gs)
     |> Array.sortByDescending (fun (_, uniqGenreCount, _) -> uniqGenreCount)
     |> Array.take count
-    |> Array.map (fun (a, uniqGenreCount, gs) -> [| a; formatInt uniqGenreCount; genreCounts gs |])
+    |> Array.map (fun (a, uniqGenreCount, gs) -> [| a; String.formatInt uniqGenreCount; genreCounts gs |])
 
 let largestFiles count tags =
     tags
@@ -108,19 +108,19 @@ let largestFiles count tags =
     |> Array.truncate count
     |> Array.map (fun file ->
         let artist = String.concat ", " file.Artists
-        [| $"{artist} / {file.Title}"; formatBytes file.FileSize |])
+        [| $"{artist} / {file.Title}"; String.formatBytes file.FileSize |])
 
 let topBitRates count tags =
     tags
     |> Array.map _.BitRate
     |> mostPopulous count id
-    |> Array.map (fun (bitrate, count) -> [|$"{bitrate} kbps"; formatInt count|])
+    |> Array.map (fun (bitrate, count) -> [|$"{bitrate} kbps"; String.formatInt count|])
 
 let topSampleRates count tags =
     tags
     |> Array.map _.SampleRate
     |> mostPopulous count id
-    |> Array.map (fun (sampleRate, count) -> [|$"{formatInt sampleRate}"; formatInt count|])
+    |> Array.map (fun (sampleRate, count) -> [|$"{String.formatInt sampleRate}"; String.formatInt count|])
 
 let uppercaseFileExtension tagFile =
     ((Path.GetExtension tagFile.FileName)[1..]).ToUpperInvariant()
@@ -129,7 +129,7 @@ let topFormats count tags =
     tags
     |> Array.map uppercaseFileExtension
     |> mostPopulous count id
-    |> Array.map (fun (ext, count) -> [| $"{ext}"; formatInt count |])
+    |> Array.map (fun (ext, count) -> [| $"{ext}"; String.formatInt count |])
 
 let topQualityData count tags =
     tags
@@ -141,6 +141,6 @@ let topQualityData count tags =
     |> Array.map (fun (data, count) ->
         [| data.Extension
            $"{data.BitRate} kbps"
-           formatInt data.SampleRate
-           formatInt count |])
+           String.formatInt data.SampleRate
+           String.formatInt count |])
 
