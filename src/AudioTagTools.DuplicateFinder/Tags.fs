@@ -47,9 +47,9 @@ let filter (settings: Settings) (allTags: MultipleLibraryTags) : MultipleLibrary
 ///     name from that group will be prioritized over the track's artist name.
 /// (2) The track title.
 /// The string is intended to be used solely for track grouping.
-let private groupName (settings: Settings) (fileTags: LibraryTags) =
-    let removeSubstrings strings =
-        strings
+let private groupName (settings: Settings) fileTags =
+    let removeSubstrings subStrs =
+        subStrs
         |> Array.append String.whiteSpaces
         |> String.removeSubstrings
 
