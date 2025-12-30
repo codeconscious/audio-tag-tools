@@ -164,7 +164,7 @@ module String =
     /// Removes all instances of multiple substrings from a given string.
     let removeSubstrings (substrings: string array) (text: string) : string =
         Array.fold
-            (fun acc x -> acc.Replace(x, String.Empty))
+            (fun acc x -> acc.Replace(x, String.Empty, StringComparison.InvariantCultureIgnoreCase))
             text
             substrings
 
@@ -242,3 +242,6 @@ module Array =
 
     let caseInsensitiveContains text (arr: string array) : bool =
         arr |> Array.exists (fun x -> String.Equals(x, text, StringComparison.OrdinalIgnoreCase))
+
+    /// If the array is empty, returns None. Otherwise, wraps the array in Some.
+    let toOption arr = if Array.isEmpty arr then None else Some arr

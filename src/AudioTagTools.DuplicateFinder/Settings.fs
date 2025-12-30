@@ -36,10 +36,10 @@ let settingsSample = """
 """
 
 type SettingsProvider = JsonProvider<settingsSample>
-type SettingsRoot = SettingsProvider.Root
+type Settings = SettingsProvider.Root
 type Exclusion = SettingsProvider.Exclusion
 
-let parseToSettings (json: string) : Result<SettingsRoot, Error> =
+let parseToSettings (json: string) : Result<Settings, Error> =
     try
         json
         |> SettingsProvider.Parse
@@ -47,7 +47,7 @@ let parseToSettings (json: string) : Result<SettingsRoot, Error> =
     with
     | e -> Error (SettingsParseError e.Message)
 
-let printSummary (settings: SettingsRoot) =
+let printSummary (settings: Settings) =
     printfn "Settings:"
     printfn $"  Exclusions:          %d{settings.Exclusions.Length}"
     printfn $"  Artist Replacements: %d{settings.ArtistReplacements.Length}"
