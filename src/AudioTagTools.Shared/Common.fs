@@ -195,6 +195,11 @@ module String =
             "\uFEFF" // zero-width non-breaking space
         |]
 
+    let removePunctuation (text: string) : string =
+        text.ToCharArray()
+        |> Array.filter (not << Char.IsPunctuation)
+        |> String
+
 [<RequireQualifiedAccess>]
 module Seq =
 
