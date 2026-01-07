@@ -48,10 +48,10 @@ let filter (settings: Settings) (allTags: MultipleLibraryTags) : MultipleLibrary
 /// (2) The track title.
 /// The string is intended to be used solely for track grouping.
 let private groupName (settings: Settings) fileTags =
-    let cleanText customSubStrs =
-        String.removeSubstrings customSubStrs
-        >> String.removeSubstrings String.whiteSpaces
-        >> String.removePunctuation
+    let scrubText subStrs =
+        String.stripSubstrings subStrs
+        >> String.stripSubstrings String.whiteSpaces
+        >> String.stripPunctuation
 
     let artist =
         let checkEquivalentArtists trackArtist =
@@ -62,13 +62,13 @@ let private groupName (settings: Settings) fileTags =
                | None -> trackArtist
 
         fileTags
-        |> mainArtists String.Empty // Separator unneeded since this text is for grouping only.
+        |> mainArtists String.Empty
         |> checkEquivalentArtists
-        |> cleanText settings.ArtistReplacements
+        |> scrubText settings.ArtistReplacements
 
     let title =
         fileTags.Title
-        |> cleanText settings.TitleReplacements
+        |> scrubText settings.TitleReplacements
 
     $"{artist}{title}"
         .Normalize(NormalizationForm.FormC)

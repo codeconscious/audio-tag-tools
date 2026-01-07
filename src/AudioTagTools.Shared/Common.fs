@@ -163,7 +163,7 @@ module String =
         ofTry (fun _ -> JsonSerializer.Serialize(items, options))
 
     /// Removes all instances of multiple substrings from a given string.
-    let removeSubstrings (substrings: string array) (text: string) : string =
+    let stripSubstrings (substrings: string array) (text: string) : string =
         Array.fold
             (fun acc x -> acc.Replace(x, String.Empty, StringComparison.InvariantCultureIgnoreCase))
             text
@@ -196,7 +196,7 @@ module String =
             "\uFEFF" // zero-width non-breaking space
         |]
 
-    let removePunctuation (text: string) : string =
+    let stripPunctuation (text: string) : string =
         text.ToCharArray()
         |> Array.filter (not << Char.IsPunctuation)
         |> String
