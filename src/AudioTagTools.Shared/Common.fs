@@ -27,6 +27,7 @@ module Numerics =
         when ^T : (member ToString : string * IFormatProvider -> string) =
         (^T : (member ToString : string * IFormatProvider -> string) (i, "#,##0", CultureInfo.InvariantCulture))
 
+[<RequireQualifiedAccess>]
 module String =
 
     let newLine = Environment.NewLine
