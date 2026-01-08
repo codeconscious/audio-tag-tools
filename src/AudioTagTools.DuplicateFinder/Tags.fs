@@ -24,7 +24,7 @@ let filter (settings: Settings) (allTags: MultipleLibraryTags) : MultipleLibrary
     let isExcluded tags =
         let containsArtist artist =
             Array.exists
-                (Array.caseInsensitiveContains artist)
+                (Array.containsIgnoreCase artist)
                 [| tags.AlbumArtists; tags.Artists |]
 
         let titleStartsWith title = tags.Title |> String.startsWithIgnoreCase title
