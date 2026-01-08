@@ -22,20 +22,21 @@ let filter (settings: Settings) (allTags: MultipleLibraryTags) : MultipleLibrary
         | _ -> Invalid
 
     let isIncluded (fileTags: LibraryTags) =
-        let isExcluded fileTags = function
-            | ArtistAndTitle (artist, title) ->
-                Array.contains artist fileTags.AlbumArtists ||
-                Array.contains artist fileTags.Artists ||
-                fileTags.Title.StartsWith(title, StringComparison.InvariantCultureIgnoreCase)
-            | ArtistOnly artist ->
-                Array.contains artist fileTags.AlbumArtists ||
-                Array.contains artist fileTags.Artists
-            | TitleOnly title ->
-                fileTags.Title.StartsWith(title, StringComparison.InvariantCultureIgnoreCase)
+        let containsArtist artist =
+            Array.exists
+                (Array.caseInsensitiveContains artist)
+                [| fileTags.AlbumArtists; fileTags.Artists |]
+
+        let titleStartsWith title = fileTags.Title |> String.startsWithIgnoreCase title
+
+        let isExcluded = function
+            | ArtistAndTitle (a, t) -> containsArtist a && titleStartsWith t
+            | ArtistOnly a -> containsArtist a
+            | TitleOnly t -> titleStartsWith t
             | Invalid -> false
 
         settings.Exclusions
-        |> Array.exists (isExcluded fileTags)
+        |> Array.exists isExcluded
         |> not
 
     allTags
