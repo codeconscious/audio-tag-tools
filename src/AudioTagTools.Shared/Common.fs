@@ -212,14 +212,11 @@ module Seq =
 
     let hasMultiple seq = seq |> Seq.length |> (<) 1
 
-    let caseInsensitiveContains text (xs: string seq) : bool =
+    let containsIgnoreCase text (xs: string seq) : bool =
         xs |> Seq.exists (fun x -> String.Equals(x, text, StringComparison.OrdinalIgnoreCase))
 
-    /// Confirms whether the text of a string exists in any element of nested collections.
-    let anyContains (collections: string seq seq) (target: string) : bool =
-        collections
-        |> Seq.concat
-        |> Seq.exists (fun text -> StringComparer.InvariantCultureIgnoreCase.Equals(text, target))
+    let anyContainsIgnoreCase text (seqs: string seq seq) =
+        seqs |> Seq.exists (containsIgnoreCase text)
 
 [<RequireQualifiedAccess>]
 module List =
@@ -232,8 +229,11 @@ module List =
 
     let hasMultiple lst = lst |> List.length |> (<) 1
 
-    let caseInsensitiveContains text (lst: string list) : bool =
+    let containsIgnoreCase text (lst: string list) : bool =
         lst |> List.exists (fun x -> String.Equals(x, text, StringComparison.OrdinalIgnoreCase))
+
+    let anyContainsIgnoreCase txt (lists: string list list) =
+        lists |> List.exists (containsIgnoreCase txt)
 
 [<RequireQualifiedAccess>]
 module Array =
@@ -249,8 +249,8 @@ module Array =
     let containsIgnoreCase text (arr: string array) : bool =
         arr |> Array.exists (fun x -> String.Equals(x, text, StringComparison.OrdinalIgnoreCase))
 
-    let anyContainsIgnoreCase txt (arrays: string array array) =
-        arrays |> Array.exists (containsIgnoreCase txt)
+    let anyContainsIgnoreCase text (arrays: string array array) =
+        arrays |> Array.exists (containsIgnoreCase text)
 
     /// If the array is empty, returns None. Otherwise, wraps the array in Some.
     let toOption arr = if Array.isEmpty arr then None else Some arr
