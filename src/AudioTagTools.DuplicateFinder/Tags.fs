@@ -49,8 +49,9 @@ let filter (settings: Settings) (allTags: MultipleLibraryTags) : MultipleLibrary
 /// The string is intended to be used solely for track grouping.
 let private groupName (settings: Settings) fileTags =
     let scrubText subStrs =
-        String.stripSubstrings subStrs
-        >> String.stripSubstrings String.whiteSpaces
+        [| String.whiteSpaces; subStrs |]
+        |> Array.concat
+        |> String.stripSubstrings
         >> String.stripPunctuation
 
     let artist =
