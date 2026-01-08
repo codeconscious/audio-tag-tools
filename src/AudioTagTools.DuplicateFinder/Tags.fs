@@ -53,11 +53,11 @@ let private groupName (settings: Settings) fileTags =
         >> String.stripPunctuation
 
     let artist =
-        let checkEquivalentArtists trackArtist =
+        let checkEquivalentArtists artist =
             settings.EquivalentArtists
-            |> Array.tryFind (Array.contains trackArtist)
+            |> Array.tryFind (Array.contains artist)
             |> Option.map Array.head
-            |> Option.defaultValue trackArtist
+            |> Option.defaultValue artist
 
         fileTags
         |> mainArtists String.Empty
