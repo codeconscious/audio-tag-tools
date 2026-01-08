@@ -88,10 +88,10 @@ let printDuplicates (groupedTracks: MultipleLibraryTags array option) =
     let printfGray = printfColor ConsoleColor.DarkGray
 
     let printGroup index (groupTracks: MultipleLibraryTags) =
-        let artistSummary (track: LibraryTags) : string =
-            if Array.isEmpty track.Artists
+        let artistSummary (tags: LibraryTags) : string =
+            if Array.isEmpty tags.Artists
             then String.Empty
-            else String.Join(", ", track.Artists)
+            else String.Join(", ", tags.Artists)
 
         let printFileSummary fileTags =
             let artist = artistSummary fileTags
