@@ -10,16 +10,17 @@ open System.Text
 
 let parseToTags json =
     json
-    |> parseJsonToTags
+    |> parseToTags
     |> Result.mapError TagParseError
 
 /// Filters out tags containing artists or titles specified in the exclusions in the settings.
-let filter (settings: Settings) (allTags: MultipleLibraryTags) : MultipleLibraryTags =
+let filter (settings: Settings) allTags : MultipleLibraryTags =
+
     let(|ArtistAndTitle|ArtistOnly|TitleOnly|Invalid|) (excl: Exclusion) =
         match excl.Artist, excl.Title with
         | Some a, Some t -> ArtistAndTitle (a, t)
         | Some a, None ->   ArtistOnly a
-        | None,   Some t ->   TitleOnly t
+        | None,   Some t -> TitleOnly t
         | _ -> Invalid
 
     let isExcluded tags =
@@ -123,4 +124,4 @@ let printDuplicates (groupedTracks: MultipleLibraryTags array option) =
 
     match groupedTracks with
     | None -> printfn "No duplicates found."
-    | Some gt -> gt |> Array.iteri printGroup
+    | Some group -> group |> Array.iteri printGroup

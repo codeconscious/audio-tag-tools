@@ -32,7 +32,7 @@ let getFileInfos (dirPath: DirectoryInfo) : Result<FileInfo seq, Error> =
     | e -> Error (GeneralIoError e.Message)
 
 let parseJsonToTags (json: string) : Result<MultipleLibraryTags, Error> =
-    parseJsonToTags json
+    parseToTags json
     |> Result.mapError LibraryTagParseError
 
 let parseFileTags (filePath: string) : Result<FileTags option, Error> =

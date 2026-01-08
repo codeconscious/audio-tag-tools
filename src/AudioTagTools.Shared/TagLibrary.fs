@@ -42,7 +42,7 @@ let blankTags (fileInfo: FileInfo) : LibraryTags =
       ImageCount = 0
       LastWriteTime = DateTimeOffset fileInfo.LastWriteTime }
 
-let parseJsonToTags (json: string) : Result<MultipleLibraryTags, string> =
+let parseToTags (json: string) : Result<MultipleLibraryTags, string> =
     try Ok (JsonSerializer.Deserialize<MultipleLibraryTags>(json))
     with e -> Error e.Message
 
