@@ -249,5 +249,8 @@ module Array =
     let containsIgnoreCase text (arr: string array) : bool =
         arr |> Array.exists (fun x -> String.Equals(x, text, StringComparison.OrdinalIgnoreCase))
 
+    let anyContainsIgnoreCase txt (arrays: string array array) =
+        arrays |> Array.exists (containsIgnoreCase txt)
+
     /// If the array is empty, returns None. Otherwise, wraps the array in Some.
     let toOption arr = if Array.isEmpty arr then None else Some arr

@@ -24,11 +24,7 @@ let filter (settings: Settings) allTags : MultipleLibraryTags =
         | _ -> Invalid
 
     let isExcluded tags =
-        let containsArtist a =
-            Array.exists
-                (Array.containsIgnoreCase a)
-                [| tags.AlbumArtists; tags.Artists |]
-
+        let containsArtist a = [| tags.AlbumArtists; tags.Artists |] |> Array.anyContainsIgnoreCase a
         let titleStartsWith t = tags.Title |> String.startsWithIgnoreCase t
 
         let check = function
