@@ -21,26 +21,25 @@ let filter (settings: Settings) (allTags: MultipleLibraryTags) : MultipleLibrary
         | None, Some t -> TitleOnly t
         | _ -> Invalid
 
-    let isIncluded (fileTags: LibraryTags) =
+    let isExcluded tags =
         let containsArtist artist =
             Array.exists
                 (Array.caseInsensitiveContains artist)
-                [| fileTags.AlbumArtists; fileTags.Artists |]
+                [| tags.AlbumArtists; tags.Artists |]
 
-        let titleStartsWith title = fileTags.Title |> String.startsWithIgnoreCase title
+        let titleStartsWith title = tags.Title |> String.startsWithIgnoreCase title
 
-        let isExcluded = function
+        let check = function
             | ArtistAndTitle (a, t) -> containsArtist a && titleStartsWith t
             | ArtistOnly a -> containsArtist a
             | TitleOnly t -> titleStartsWith t
             | Invalid -> false
 
         settings.Exclusions
-        |> Array.exists isExcluded
-        |> not
+        |> Array.exists check
 
     allTags
-    |> Array.filter isIncluded
+    |> Array.filter (not << isExcluded)
 
 /// Returns a normalized string of two concatenated items:
 /// (1) The artist name that should be used for artist grouping when searching for duplicates.
