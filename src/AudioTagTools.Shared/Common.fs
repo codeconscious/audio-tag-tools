@@ -27,6 +27,7 @@ module Numerics =
         when ^T : (member ToString : string * IFormatProvider -> string) =
         (^T : (member ToString : string * IFormatProvider -> string) (i, "#,##0", CultureInfo.InvariantCulture))
 
+[<RequireQualifiedAccess>]
 module String =
 
     let newLine = Environment.NewLine
@@ -162,7 +163,7 @@ module String =
         ofTry (fun _ -> JsonSerializer.Serialize(items, options))
 
     /// Removes all instances of multiple substrings from a given string.
-    let removeSubstrings (substrings: string array) (text: string) : string =
+    let stripSubstrings (substrings: string array) (text: string) : string =
         Array.fold
             (fun acc x -> acc.Replace(x, String.Empty, StringComparison.InvariantCultureIgnoreCase))
             text
@@ -194,6 +195,11 @@ module String =
             "\u3164" // Hangul filler
             "\uFEFF" // zero-width non-breaking space
         |]
+
+    let stripPunctuation (text: string) : string =
+        text.ToCharArray()
+        |> Array.filter (not << Char.IsPunctuation)
+        |> String
 
 [<RequireQualifiedAccess>]
 module Seq =

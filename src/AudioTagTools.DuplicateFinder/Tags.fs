@@ -43,32 +43,32 @@ let filter (settings: Settings) (allTags: MultipleLibraryTags) : MultipleLibrary
 
 /// Returns a normalized string of two concatenated items:
 /// (1) The artist name that should be used for artist grouping when searching for duplicates.
-///     If the artist appears in any "equivalent artist" group, then the first equilavent artist
+///     If the artist appears in any "equivalent artist" group, then the first equivalent artist
 ///     name from that group will be prioritized over the track's artist name.
 /// (2) The track title.
 /// The string is intended to be used solely for track grouping.
 let private groupName (settings: Settings) fileTags =
-    let removeSubstrings subStrs =
+    let scrubText subStrs =
         subStrs
         |> Array.append String.whiteSpaces
-        |> String.removeSubstrings
+        |> String.stripSubstrings
+        >> String.stripPunctuation
 
     let artist =
         let checkEquivalentArtists trackArtist =
             settings.EquivalentArtists
             |> Array.tryFind (Array.contains trackArtist)
-            |> function
-               | Some eqArtists -> eqArtists[0]
-               | None -> trackArtist
+            |> Option.map Array.head
+            |> Option.defaultValue trackArtist
 
         fileTags
-        |> mainArtists String.Empty // Separator unneeded since this text is for grouping only.
+        |> mainArtists String.Empty
         |> checkEquivalentArtists
-        |> removeSubstrings settings.ArtistReplacements
+        |> scrubText settings.ArtistReplacements
 
     let title =
         fileTags.Title
-        |> removeSubstrings settings.TitleReplacements
+        |> scrubText settings.TitleReplacements
 
     $"{artist}{title}"
         .Normalize(NormalizationForm.FormC)
