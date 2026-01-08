@@ -49,8 +49,8 @@ let filter (settings: Settings) (allTags: MultipleLibraryTags) : MultipleLibrary
 /// The string is intended to be used solely for track grouping.
 let private groupName (settings: Settings) fileTags =
     let scrubText subStrs =
-        [| String.whiteSpaces; subStrs |]
-        |> Array.concat
+        subStrs
+        |> Array.append String.whiteSpaces
         |> String.stripSubstrings
         >> String.stripPunctuation
 
