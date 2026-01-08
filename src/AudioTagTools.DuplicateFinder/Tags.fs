@@ -13,12 +13,13 @@ let parseToTags json =
     |> parseJsonToTags
     |> Result.mapError TagParseError
 
+/// Filters out tags containing artists or titles specified in the exclusions in the settings.
 let filter (settings: Settings) (allTags: MultipleLibraryTags) : MultipleLibraryTags =
-    let(|ArtistAndTitle|ArtistOnly|TitleOnly|Invalid|) (exclusion: Exclusion) =
-        match exclusion.Artist, exclusion.Title with
+    let(|ArtistAndTitle|ArtistOnly|TitleOnly|Invalid|) (excl: Exclusion) =
+        match excl.Artist, excl.Title with
         | Some a, Some t -> ArtistAndTitle (a, t)
-        | Some a, None -> ArtistOnly a
-        | None, Some t -> TitleOnly t
+        | Some a, None ->   ArtistOnly a
+        | None,   Some t ->   TitleOnly t
         | _ -> Invalid
 
     let isExcluded tags =
