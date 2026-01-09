@@ -10,36 +10,33 @@ open System.Text
 
 let parseToTags json =
     json
-    |> parseJsonToTags
+    |> parseToTags
     |> Result.mapError TagParseError
 
-let filter (settings: Settings) (allTags: MultipleLibraryTags) : MultipleLibraryTags =
-    let(|ArtistAndTitle|ArtistOnly|TitleOnly|Invalid|) (exclusion: Exclusion) =
-        match exclusion.Artist, exclusion.Title with
-        | Some a, Some t -> ArtistAndTitle (a, t)
-        | Some a, None -> ArtistOnly a
-        | None, Some t -> TitleOnly t
-        | _ -> Invalid
+/// Filters out tags containing artists or titles specified in the exclusions in the settings.
+let filter (settings: Settings) allTags : MultipleLibraryTags =
+    let isExcluded tags =
+        let (|ArtistAndTitle|ArtistOnly|TitleOnly|Invalid|) (excl: Exclusion) =
+            match excl.Artist, excl.Title with
+            | Some a, Some t -> ArtistAndTitle (a, t)
+            | Some a, None   -> ArtistOnly a
+            | None,   Some t -> TitleOnly t
+            | _ -> Invalid
 
-    let isIncluded (fileTags: LibraryTags) =
-        let isExcluded fileTags = function
-            | ArtistAndTitle (artist, title) ->
-                Array.contains artist fileTags.AlbumArtists ||
-                Array.contains artist fileTags.Artists ||
-                fileTags.Title.StartsWith(title, StringComparison.InvariantCultureIgnoreCase)
-            | ArtistOnly artist ->
-                Array.contains artist fileTags.AlbumArtists ||
-                Array.contains artist fileTags.Artists
-            | TitleOnly title ->
-                fileTags.Title.StartsWith(title, StringComparison.InvariantCultureIgnoreCase)
+        let containsArtist a = [| tags.AlbumArtists; tags.Artists |] |> Array.anyContainsIgnoreCase a
+        let titleStartsWith t = tags.Title |> String.startsWithIgnoreCase t
+
+        let check = function
+            | ArtistAndTitle (a, t) -> containsArtist a && titleStartsWith t
+            | ArtistOnly a -> containsArtist a
+            | TitleOnly t -> titleStartsWith t
             | Invalid -> false
 
         settings.Exclusions
-        |> Array.exists (isExcluded fileTags)
-        |> not
+        |> Array.exists check
 
     allTags
-    |> Array.filter isIncluded
+    |> Array.filter (not << isExcluded)
 
 /// Returns a normalized string of two concatenated items:
 /// (1) The artist name that should be used for artist grouping when searching for duplicates.
@@ -55,11 +52,11 @@ let private groupName (settings: Settings) fileTags =
         >> String.stripPunctuation
 
     let artist =
-        let checkEquivalentArtists trackArtist =
+        let checkEquivalentArtists artist =
             settings.EquivalentArtists
-            |> Array.tryFind (Array.contains trackArtist)
+            |> Array.tryFind (Array.contains artist)
             |> Option.map Array.head
-            |> Option.defaultValue trackArtist
+            |> Option.defaultValue artist
 
         fileTags
         |> mainArtists String.Empty
@@ -90,10 +87,10 @@ let printDuplicates (groupedTracks: MultipleLibraryTags array option) =
     let printfGray = printfColor ConsoleColor.DarkGray
 
     let printGroup index (groupTracks: MultipleLibraryTags) =
-        let artistSummary (track: LibraryTags) : string =
-            if Array.isEmpty track.Artists
+        let artistSummary (tags: LibraryTags) : string =
+            if Array.isEmpty tags.Artists
             then String.Empty
-            else String.Join(", ", track.Artists)
+            else String.Join(", ", tags.Artists)
 
         let printFileSummary fileTags =
             let artist = artistSummary fileTags
@@ -122,4 +119,4 @@ let printDuplicates (groupedTracks: MultipleLibraryTags array option) =
 
     match groupedTracks with
     | None -> printfn "No duplicates found."
-    | Some gt -> gt |> Array.iteri printGroup
+    | Some group -> group |> Array.iteri printGroup

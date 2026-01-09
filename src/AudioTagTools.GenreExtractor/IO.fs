@@ -17,7 +17,7 @@ let readLines (fileInfo: FileInfo) : Result<string array, Error> =
 
 let parseJsonToTags (json: string) : Result<MultipleLibraryTags, Error> =
     json
-    |> parseJsonToTags
+    |> parseToTags
     |> Result.mapError TagParseError
 
 let writeLines (filePath: string) (lines: string array) : Result<unit, Error> =

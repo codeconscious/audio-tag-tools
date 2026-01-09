@@ -10,4 +10,4 @@ let readFile (fileInfo: FileInfo) : Result<string, Error> =
     readFile fileInfo |> Result.mapError IoReadError
 
 let parseJsonToTags (json: string) : Result<MultipleLibraryTags, Error> =
-    parseJsonToTags json |> Result.mapError TagParseError
+    parseToTags json |> Result.mapError TagParseError
