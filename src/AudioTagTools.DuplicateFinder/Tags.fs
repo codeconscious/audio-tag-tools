@@ -19,7 +19,7 @@ let filter (settings: Settings) allTags : MultipleLibraryTags =
     let(|ArtistAndTitle|ArtistOnly|TitleOnly|Invalid|) (excl: Exclusion) =
         match excl.Artist, excl.Title with
         | Some a, Some t -> ArtistAndTitle (a, t)
-        | Some a, None ->   ArtistOnly a
+        | Some a, None   -> ArtistOnly a
         | None,   Some t -> TitleOnly t
         | _ -> Invalid
 
@@ -53,11 +53,11 @@ let private groupName (settings: Settings) fileTags =
         >> String.stripPunctuation
 
     let artist =
-        let checkEquivalentArtists trackArtist =
+        let checkEquivalentArtists artist =
             settings.EquivalentArtists
-            |> Array.tryFind (Array.contains trackArtist)
+            |> Array.tryFind (Array.contains artist)
             |> Option.map Array.head
-            |> Option.defaultValue trackArtist
+            |> Option.defaultValue artist
 
         fileTags
         |> mainArtists String.Empty
