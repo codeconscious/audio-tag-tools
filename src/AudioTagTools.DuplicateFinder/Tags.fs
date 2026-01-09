@@ -15,15 +15,14 @@ let parseToTags json =
 
 /// Filters out tags containing artists or titles specified in the exclusions in the settings.
 let filter (settings: Settings) allTags : MultipleLibraryTags =
-
-    let(|ArtistAndTitle|ArtistOnly|TitleOnly|Invalid|) (excl: Exclusion) =
-        match excl.Artist, excl.Title with
-        | Some a, Some t -> ArtistAndTitle (a, t)
-        | Some a, None   -> ArtistOnly a
-        | None,   Some t -> TitleOnly t
-        | _ -> Invalid
-
     let isExcluded tags =
+        let (|ArtistAndTitle|ArtistOnly|TitleOnly|Invalid|) (excl: Exclusion) =
+            match excl.Artist, excl.Title with
+            | Some a, Some t -> ArtistAndTitle (a, t)
+            | Some a, None   -> ArtistOnly a
+            | None,   Some t -> TitleOnly t
+            | _ -> Invalid
+
         let containsArtist a = [| tags.AlbumArtists; tags.Artists |] |> Array.anyContainsIgnoreCase a
         let titleStartsWith t = tags.Title |> String.startsWithIgnoreCase t
 
