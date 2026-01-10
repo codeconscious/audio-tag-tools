@@ -7,28 +7,24 @@ open Tags
 open Settings
 open FsToolkit.ErrorHandling
 open FsToolkit.ErrorHandling.Operator.Result
-open Shared.Operators
+open Shared.Common
 
 let private run (args: string array) : Result<unit, Error> =
     result {
         let! settingsFile, tagLibraryFile = validate args
 
-        let! settings =
-            settingsFile
-            |> readFile
-            >>= parseToSettings
-            |> (<.>) printSummary
+        let! settings = settingsFile |> readFile >>= parseToSettings |> Result.tee printSummary
+
+        let! tags = tagLibraryFile |> readFile >>= parseToTags
 
         return!
-            tagLibraryFile
-            |> readFile
-            >>= parseToTags
-            |> (<.>) (printCount "Total file count:    ")
-            |> (<!>) (filter settings)
-            |> (<.>) (printCount "Filtered file count: ")
-            |> (<!>) (findDuplicates settings)
-            |> (<.>) printDuplicates
-            >>= (savePlaylist settings)
+           tags
+           |> tee (printCount "Total file count:    ")
+           |> filter settings
+           |> tee (printCount "Filtered file count: ")
+           |> findDuplicates settings
+           |> tee printDuplicates
+           |> savePlaylist settings
     }
 
 let start args : Result<string, string> =
