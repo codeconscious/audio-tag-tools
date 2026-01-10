@@ -8,6 +8,7 @@ open IO
 open Shared
 open FsToolkit.ErrorHandling
 open Spectre.Console
+open FsToolkit.ErrorHandling.Operator.Result
 
 type QualityData =
     { BitRate: int
