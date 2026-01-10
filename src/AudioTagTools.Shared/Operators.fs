@@ -3,7 +3,14 @@ module Shared.Operators
 
 open FsToolkit.ErrorHandling
 
-let (>>=) result func = Result.bind func result
-let (<!>) result func = Result.map func result
-let (<.>) result func = Result.tee func result
-let (<&>) result func = Result.iter func result
+let inline (<.>)
+    ([<InlineIfLambda>] sideEffect: 'ok -> unit)
+    (result: Result<'ok, 'error>)
+    : Result<'ok, 'error> =
+    Result.tee sideEffect result
+
+let inline (<&>)
+    ([<InlineIfLambda>] action: 'T -> unit)
+    (result: Result<'T, 'Error>)
+    : unit =
+    Result.iter action result

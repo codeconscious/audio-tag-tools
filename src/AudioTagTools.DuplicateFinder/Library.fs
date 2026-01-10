@@ -5,8 +5,9 @@ open ArgValidation
 open IO
 open Tags
 open Settings
-open Shared
 open FsToolkit.ErrorHandling
+open FsToolkit.ErrorHandling.Operator.Result
+open Shared.Operators
 
 let private run (args: string array) : Result<unit, Error> =
     result {
@@ -16,18 +17,18 @@ let private run (args: string array) : Result<unit, Error> =
             settingsFile
             |> readFile
             >>= parseToSettings
-            <.> printSummary
+            |> (<.>) printSummary
 
         return!
             tagLibraryFile
             |> readFile
             >>= parseToTags
-            <.> printCount "Total file count:    "
-            <!> filter settings
-            <.> printCount "Filtered file count: "
-            <!> findDuplicates settings
-            <.> printDuplicates
-            >>= savePlaylist settings
+            |> (<.>) (printCount "Total file count:    ")
+            |> (<!>) (filter settings)
+            |> (<.>) (printCount "Filtered file count: ")
+            |> (<!>) (findDuplicates settings)
+            |> (<.>) printDuplicates
+            >>= (savePlaylist settings)
     }
 
 let start args : Result<string, string> =

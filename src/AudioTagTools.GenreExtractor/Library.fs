@@ -6,6 +6,7 @@ open Exporting
 open IO
 open Shared
 open FsToolkit.ErrorHandling
+open FsToolkit.ErrorHandling.Operator.Result
 open CCFSharpUtils.Library
 
 let private run args : Result<unit, Error> =
@@ -18,9 +19,9 @@ let private run args : Result<unit, Error> =
         let! newGenres =
             tagLibraryFile
             |> readFile
-            >>= parseJsonToTags
-            <.> fun tags -> printfn $"Parsed tags for {String.formatInt tags.Length} files from the tag library."
-            <!> groupArtistsWithGenres "＼" // Separator should be text highly unlikely to appear in files' tags.
+            |> Result.bind parseJsonToTags
+            |> Result.tee (fun tags -> printfn $"Parsed tags for {String.formatInt tags.Length} files from the tag library.")
+            |> Result.map (groupArtistsWithGenres "＼") // Separator should be text highly unlikely to appear in files' tags.
 
         let newTotalCount = newGenres.Length
         let addedCount = newGenres |> Array.except oldGenres |> _.Length

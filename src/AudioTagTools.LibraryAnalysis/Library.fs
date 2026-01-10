@@ -9,6 +9,7 @@ open Shared
 open CCFSharpUtils.Library
 open FsToolkit.ErrorHandling
 open Spectre.Console
+open FsToolkit.ErrorHandling.Operator.Result
 
 type QualityData =
     { BitRate: int
