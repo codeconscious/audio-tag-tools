@@ -14,6 +14,9 @@ let parseToTags json =
     |> parseToTags
     |> Result.mapError TagParseError
 
+let printCount description (tags: MultipleLibraryTags) =
+    printfn $"%s{description}%s{String.formatInt tags.Length}"
+
 /// Filters out tags containing artists or titles specified in the exclusions in the settings.
 let filter (settings: Settings) allTags : MultipleLibraryTags =
     let isExcluded tags =
@@ -81,9 +84,6 @@ let findDuplicates settings (tags: MultipleLibraryTags) : MultipleLibraryTags ar
     |> Array.map (fun (_, tags) -> tags |> Array.sortBy (mainArtists String.Empty))
     |> Array.toOption
 
-let printCount description (tags: MultipleLibraryTags) =
-    printfn $"%s{description}%s{String.formatInt tags.Length}"
-
 let printDuplicates (groupedTracks: MultipleLibraryTags array option) =
     let printfGray = printfColor ConsoleColor.DarkGray
 
@@ -121,3 +121,4 @@ let printDuplicates (groupedTracks: MultipleLibraryTags array option) =
     match groupedTracks with
     | None -> printfn "No duplicates found."
     | Some group -> group |> Array.iteri printGroup
+
