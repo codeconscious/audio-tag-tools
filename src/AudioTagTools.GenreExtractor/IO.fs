@@ -15,11 +15,6 @@ let readLines (fileInfo: FileInfo) : Result<string array, Error> =
     |> readLines
     |> Result.mapError IoReadError
 
-let parseJsonToTags (json: string) : Result<MultipleLibraryTags, Error> =
-    json
-    |> parseToTags
-    |> Result.mapError TagParseError
-
 let writeLines (filePath: string) (lines: string array) : Result<unit, Error> =
     lines
     |> writeLinesToFile filePath
