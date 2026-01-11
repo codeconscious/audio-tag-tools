@@ -33,13 +33,11 @@ let private mostCommon (items: string array) : string =
 let private mostCommonGenre = allGenres >> mostCommon
 
 let generateNewGenreData (separator: string) (allFileTags: MultipleLibraryTags) =
-    let isNotEmpty s = not (String.IsNullOrWhiteSpace s)
-
     allFileTags
     |> Array.groupBy mainArtist
     |> Array.choose (fun (artist, tags) ->
         let genre = mostCommonGenre tags
-        if isNotEmpty artist && isNotEmpty genre
+        if String.hasText artist && String.hasText genre
         then Some $"{artist}{separator}{genre}"
         else None)
     |> Array.sort
