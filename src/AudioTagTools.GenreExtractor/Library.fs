@@ -8,6 +8,7 @@ open Shared
 open FsToolkit.ErrorHandling
 open FsToolkit.ErrorHandling.Operator.Result
 open CCFSharpUtils.Library
+open Shared.TagLibrary
 
 let private run args : Result<unit, Error> =
     result {
