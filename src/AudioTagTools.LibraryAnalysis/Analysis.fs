@@ -1,7 +1,7 @@
 module LibraryAnalysis.Analysis
 
 open System.IO
-open Shared.Common
+open CCFSharpUtils.Library
 open Shared.TagLibrary
 
 let inline private mostPopulous count (grouper: 'a -> 'a) (items: 'a array) =
