@@ -1,5 +1,7 @@
 module Shared.TagLibrary
 
+open IO
+open FSharpPlus
 open System
 open System.IO
 open System.Text.Json
@@ -45,6 +47,8 @@ let blankTags (fileInfo: FileInfo) : LibraryTags =
 let parseToTags (json: string) : Result<MultipleLibraryTags, string> =
     try Ok (JsonSerializer.Deserialize<MultipleLibraryTags>(json))
     with e -> Error e.Message
+
+let readThenParseToJson = readFile >=> parseToTags
 
 let ignorableArtists =
     [ String.Empty
