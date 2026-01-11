@@ -21,6 +21,7 @@
 
     <ItemGroup>
       <PackageReference Update="FSharp.Core" Version="9.0.303" />
+      <PackageReference Include="FSharpPlus" Version="1.8.0" />
     </ItemGroup>
 
 </Project>
