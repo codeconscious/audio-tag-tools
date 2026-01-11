@@ -18,7 +18,7 @@ let printCount description (tags: MultipleLibraryTags) =
     printfn $"%s{description}%s{String.formatInt tags.Length}"
 
 /// Filters out tags containing artists or titles specified in the exclusions in the settings.
-let filter (settings: Settings) allTags : MultipleLibraryTags =
+let discardExcluded (settings: Settings) allTags : MultipleLibraryTags =
     let isExcluded tags =
         let (|ArtistAndTitle|ArtistOnly|TitleOnly|Invalid|) (excl: Exclusion) =
             match excl.Artist, excl.Title with

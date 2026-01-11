@@ -13,14 +13,15 @@ let private run (args: string array) : Result<unit, Error> =
     result {
         let! settingsFile, tagLibraryFile = validate args
 
-        let! settings = settingsFile |> readFile >>= parseToSettings |> Result.tee printSummary
+        let! settings = readFile settingsFile >>= parseToSettings
+        printSummary settings
 
-        let! tags = tagLibraryFile |> readFile >>= parseToTags
+        let! tags = readFile tagLibraryFile >>= parseToTags
 
         return!
            tags
            |> tee (printCount "Total file count:    ")
-           |> filter settings
+           |> discardExcluded settings
            |> tee (printCount "Filtered file count: ")
            |> findDuplicates settings
            |> tee printDuplicates
@@ -29,5 +30,5 @@ let private run (args: string array) : Result<unit, Error> =
 
 let start args : Result<string, string> =
     match run args with
-    | Ok _ -> Ok "Finished searching successfully!"
+    | Ok _ -> Ok "Finished searching successfully."
     | Error e -> Error (message e)
