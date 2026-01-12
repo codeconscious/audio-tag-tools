@@ -6,6 +6,7 @@ open ArgValidation
 open Errors
 open IO
 open Shared
+open CCFSharpUtils.Library
 open FsToolkit.ErrorHandling
 open Spectre.Console
 

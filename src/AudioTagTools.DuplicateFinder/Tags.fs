@@ -4,6 +4,7 @@ open Errors
 open Settings
 open Shared
 open Shared.TagLibrary
+open CCFSharpUtils.Library
 open System
 open System.IO
 open System.Text
@@ -47,7 +48,7 @@ let filter (settings: Settings) allTags : MultipleLibraryTags =
 let private groupName (settings: Settings) fileTags =
     let scrubText subStrs =
         subStrs
-        |> Array.append String.whiteSpaces
+        |> Array.append (String.whiteSpaces |> Array.map _.ToString())
         |> String.stripSubstrings
         >> String.stripPunctuation
 

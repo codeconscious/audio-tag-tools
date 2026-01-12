@@ -5,6 +5,7 @@ open IO
 open Errors
 open Shared
 open Shared.TagLibrary
+open CCFSharpUtils.Library
 open FsToolkit.ErrorHandling
 
 type LibraryTagMap = Map<string, LibraryTags>

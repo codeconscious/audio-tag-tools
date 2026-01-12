@@ -6,6 +6,7 @@ open Exporting
 open IO
 open Shared
 open FsToolkit.ErrorHandling
+open CCFSharpUtils.Library
 
 let private run args : Result<unit, Error> =
     result {
