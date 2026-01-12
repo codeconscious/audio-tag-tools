@@ -2,6 +2,7 @@ module Shared.TagLibrary
 
 open IO
 open FSharpPlus
+open CCFSharpUtils.Library
 open System
 open System.IO
 open System.Text.Json
@@ -68,7 +69,7 @@ let mainArtists (separator: string) (track: LibraryTags) : string =
         |> not
 
     match track with
-    | t when t.AlbumArtists.Length > 0 && hasNoForbiddenAlbumArtists t.AlbumArtists[0] ->
+    | t when Array.isNotEmpty t.AlbumArtists && hasNoForbiddenAlbumArtists t.AlbumArtists[0] ->
         t.AlbumArtists
     | t ->
         t.Artists
@@ -78,11 +79,10 @@ let firstDistinctArtist (t: LibraryTags) : string =
     t |> allDistinctArtists |> Array.head
 
 let hasAnyArtist (track: LibraryTags) : bool =
-    track.Artists.Length > 0 ||
-    track.AlbumArtists.Length > 0
+    Array.anyNotEmpty [| track.Artists; track.AlbumArtists |]
 
 let hasTitle (track: LibraryTags) : bool =
-    not <| String.IsNullOrWhiteSpace track.Title
+    String.hasText track.Title
 
 let hasArtistAndTitle track : bool =
     hasAnyArtist track && hasTitle track

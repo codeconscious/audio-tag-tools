@@ -4,6 +4,7 @@ open Errors
 open Settings
 open Shared.TagLibrary
 open Shared.IO
+open CCFSharpUtils.Library
 open FsToolkit.ErrorHandling
 open System
 open System.Text
@@ -33,7 +34,7 @@ let savePlaylist (settings: Settings) (tags: MultipleLibraryTags array option) :
 
         let updatedPath =
             match settings.Playlist.SearchPath, settings.Playlist.ReplacePath with
-            | s, _ when String.IsNullOrEmpty s -> fullPath
+            | s, _ when s |> String.hasNoText -> fullPath
             | s, r -> fullPath.Replace(s, r)
 
         builder.AppendLine updatedPath

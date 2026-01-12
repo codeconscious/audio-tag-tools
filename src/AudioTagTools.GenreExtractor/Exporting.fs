@@ -2,12 +2,13 @@ module GenreExtractor.Exporting
 
 open Shared
 open Shared.TagLibrary
+open CCFSharpUtils.Library
 open System
 
 let private mainArtist (fileTags: LibraryTags) =
     match fileTags with
-    | a when a.Artists.Length > 0 -> a.Artists[0]
-    | a when a.AlbumArtists.Length > 0 -> a.AlbumArtists[0]
+    | a when Array.isNotEmpty a.Artists -> a.Artists[0]
+    | a when Array.isNotEmpty a.AlbumArtists -> a.AlbumArtists[0]
     | _ -> String.Empty
 
 let printOldSummary (oldGenres: string array) =
@@ -37,7 +38,7 @@ let generateNewGenreData (separator: string) (allFileTags: MultipleLibraryTags) 
     |> Array.groupBy mainArtist
     |> Array.choose (fun (artist, tags) ->
         let genre = mostCommonGenre tags
-        if String.hasText artist && String.hasText genre
+        if String.allHaveText [artist; genre]
         then Some $"{artist}{separator}{genre}"
         else None)
     |> Array.sort
