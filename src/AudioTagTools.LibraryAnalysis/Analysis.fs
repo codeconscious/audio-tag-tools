@@ -30,7 +30,7 @@ let albumArtPercentage tags =
 
 let filteredArtists tags =
     tags
-    |> Array.map (fun t -> t |> allDistinctArtists |> Array.except ignorableArtists)
+    |> Array.map (fun t -> t |> allDistinctArtists |> Array.except ignorableAlbumArtists)
     |> Array.concat
 
 let uniqueArtistCount tags =

@@ -1,6 +1,5 @@
 module GenreExtractor.Exporting
 
-open Shared
 open Shared.TagLibrary
 open CCFSharpUtils.Library
 open System
@@ -14,7 +13,7 @@ let private mainArtist (fileTags: LibraryTags) =
 let printOldSummary (oldGenres: string array) =
     printfn "%s entries in the old file." (String.formatInt oldGenres.Length)
 
-let printTagSummary (tags: MultipleLibraryTags) =
+let printTagCount (tags: MultipleLibraryTags) =
     printfn $"Parsed tags for {String.formatInt tags.Length} files from the tag library."
 
 let private allGenres (fileTags: MultipleLibraryTags) : string array =
@@ -33,7 +32,7 @@ let private mostCommon (items: string array) : string =
 
 let private mostCommonGenre = allGenres >> mostCommon
 
-let generateNewGenreData (separator: string) (allFileTags: MultipleLibraryTags) =
+let generateGenreData (separator: string) (allFileTags: MultipleLibraryTags) =
     allFileTags
     |> Array.groupBy mainArtist
     |> Array.choose (fun (artist, tags) ->

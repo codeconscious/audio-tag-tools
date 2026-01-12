@@ -14,9 +14,9 @@ let private run (args: string array) : Result<unit, Error> =
         let! settingsFile, tagLibraryFile = validate args
 
         let! settings = readFile settingsFile >>= parseToSettings
-        printSummary settings
-
         let! tags = readFile tagLibraryFile >>= parseToTags
+
+        printSummary settings
 
         return!
            tags

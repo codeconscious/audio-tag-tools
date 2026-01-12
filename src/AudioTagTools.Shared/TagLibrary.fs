@@ -51,38 +51,38 @@ let parseToTags (json: string) : Result<MultipleLibraryTags, string> =
 
 let readThenParseToJson = readFile >=> parseToTags
 
-let ignorableArtists =
+let ignorableAlbumArtists =
     [ String.Empty
       "Various"
       "Various Artists"
       "Multiple Artists"
       "\u003Cunknown\u003E" ]
 
-let allDistinctArtists (t: LibraryTags) : string array =
-    Array.concat [| t.Artists; t.AlbumArtists |]
+let allDistinctArtists (tags: LibraryTags) : string array =
+    Array.concat [| tags.Artists; tags.AlbumArtists |]
     |> Array.distinct
 
 let mainArtists (separator: string) (track: LibraryTags) : string =
-    let hasNoForbiddenAlbumArtists artist =
-        ignorableArtists
+    let hasNoIgnoredAlbumArtists artist =
+        ignorableAlbumArtists
         |> List.exists _.Equals(artist, StringComparison.InvariantCultureIgnoreCase)
         |> not
 
     match track with
-    | t when Array.isNotEmpty t.AlbumArtists && hasNoForbiddenAlbumArtists t.AlbumArtists[0] ->
+    | t when Array.isNotEmpty t.AlbumArtists && hasNoIgnoredAlbumArtists t.AlbumArtists[0] ->
         t.AlbumArtists
     | t ->
         t.Artists
     |> String.concat separator
 
-let firstDistinctArtist (t: LibraryTags) : string =
-    t |> allDistinctArtists |> Array.head
+let firstDistinctArtist (tags: LibraryTags) : string =
+    tags |> allDistinctArtists |> Array.head
 
-let hasAnyArtist (track: LibraryTags) : bool =
-    Array.anyNotEmpty [| track.Artists; track.AlbumArtists |]
+let hasAnyArtist (tags: LibraryTags) : bool =
+    Array.anyNotEmpty [| tags.Artists; tags.AlbumArtists |]
 
-let hasTitle (track: LibraryTags) : bool =
-    String.hasText track.Title
+let hasTitle (tags: LibraryTags) : bool =
+    String.hasText tags.Title
 
 let hasArtistAndTitle track : bool =
     hasAnyArtist track && hasTitle track
