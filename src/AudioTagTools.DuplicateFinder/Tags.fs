@@ -51,7 +51,7 @@ let discardExcluded (settings: Settings) allTags : MultipleLibraryTags =
 let private groupName (settings: Settings) fileTags =
     let scrubText subStrs =
         subStrs
-        |> Array.append (String.whiteSpaces |> Array.map _.ToString())
+        |> Array.append (String.whiteSpaces |> List.map _.ToString() |> Array.ofList)
         |> String.stripSubstrings
         >> String.stripPunctuation
 
