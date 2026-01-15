@@ -10,8 +10,8 @@ open FsToolkit.ErrorHandling
 type LibraryTagMap = Map<string, LibraryTags>
 
 type LibraryComparisonResult =
-    | Unchanged // Library tags match file tags.
-    | OutOfDate // Library tags are older than file tags.
+    | Unchanged  // Library tags match file tags.
+    | OutOfDate  // Library tags are older than file tags.
     | NotPresent // No tags exist in library for file.
 
 type CategorizedTagsToCache =
@@ -100,13 +100,9 @@ let private reportResults (categorizedTags: CategorizedTagsToCache seq) : Catego
 
     categorizedTags
 
-let generateJson
-    (tagLibraryMap: LibraryTagMap)
-    (fileInfos: FileInfo seq)
-    : Result<string, Error> =
-
+let generateJson (tagMap: LibraryTagMap) (fileInfos: FileInfo seq) : Result<string, Error> =
     fileInfos
-    |> prepareTagsToWrite tagLibraryMap
+    |> prepareTagsToWrite tagMap
     |> reportResults
     |> Seq.map _.Tags
     |> String.serializeToJson
