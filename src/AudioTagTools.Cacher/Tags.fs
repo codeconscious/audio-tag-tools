@@ -3,7 +3,6 @@ module Cacher.Tags
 open System
 open IO
 open Errors
-open Shared
 open Shared.TagLibrary
 open CCFSharpUtils.Library
 open FsToolkit.ErrorHandling
@@ -20,15 +19,15 @@ type CategorizedTagsToCache =
       Tags: LibraryTags }
 
 let createTagLibraryMap (libraryFile: FileInfo) : Result<LibraryTagMap, Error> =
-    let audioFilePath (fileTags: LibraryTags) : string =
-        Path.Combine [| fileTags.DirectoryName; fileTags.FileName |]
+    let groupWithPath tags =
+        let path = Path.Combine [| tags.DirectoryName; tags.FileName |]
+        path, tags
 
     if libraryFile.Exists
     then
-        libraryFile.FullName
-        |> readfile
+        readfile libraryFile.FullName
         |> Result.bind parseJsonToTags
-        |> Result.map (Array.map (fun tags -> audioFilePath tags, tags) >> Map.ofArray)
+        |> Result.map (Array.map groupWithPath >> Map.ofArray)
     else
         Ok Map.empty
 
@@ -68,9 +67,9 @@ let private prepareTagsToWrite (tagLibraryMap: LibraryTagMap) (fileInfos: FileIn
        | _ -> blankTags fileInfo
 
     let prepareTagsToCache (tagLibraryMap: LibraryTagMap) (audioFile: FileInfo) : CategorizedTagsToCache =
-        if Map.containsKey audioFile.FullName tagLibraryMap
+        if tagLibraryMap |> Map.containsKey audioFile.FullName
         then
-            let libraryTags = Map.find audioFile.FullName tagLibraryMap
+            let libraryTags = tagLibraryMap |> Map.find audioFile.FullName
             if libraryTags.LastWriteTime.DateTime < audioFile.LastWriteTime
             then { Type = OutOfDate; Tags = generateNewTags audioFile }
             else { Type = Unchanged; Tags = copyCachedTags libraryTags }
