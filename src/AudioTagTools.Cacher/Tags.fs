@@ -28,8 +28,7 @@ let createTagLibraryMap (libraryFile: FileInfo) : Result<LibraryTagMap, Error> =
         libraryFile.FullName
         |> readfile
         |> Result.bind parseJsonToTags
-        |> Result.map (Array.map (fun tags -> audioFilePath tags, tags))
-        |> Result.map Map.ofArray
+        |> Result.map (Array.map (fun tags -> audioFilePath tags, tags) >> Map.ofArray)
     else
         Ok Map.empty
 
