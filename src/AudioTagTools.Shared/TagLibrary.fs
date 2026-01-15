@@ -51,6 +51,12 @@ let parseToTags (json: string) : Result<MultipleLibraryTags, string> =
 
 let readThenParseToJson = readFile >=> parseToTags
 
+let path tags : string =
+    Path.Combine [| tags.DirectoryName; tags.FileName |]
+
+let groupWithPath tags : string * LibraryTags =
+    path tags, tags
+
 let ignorableAlbumArtists =
     [ String.Empty
       "Various"

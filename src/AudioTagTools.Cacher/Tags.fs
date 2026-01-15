@@ -19,10 +19,6 @@ type CategorizedTagsToCache =
       Tags: LibraryTags }
 
 let createTagLibraryMap (libraryFile: FileInfo) : Result<LibraryTagMap, Error> =
-    let groupWithPath tags =
-        let path = Path.Combine [| tags.DirectoryName; tags.FileName |]
-        path, tags
-
     if libraryFile.Exists
     then
         readfile libraryFile.FullName
