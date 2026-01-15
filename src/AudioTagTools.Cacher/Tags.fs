@@ -5,7 +5,7 @@ open IO
 open Errors
 open Shared.TagLibrary
 open CCFSharpUtils.Library
-open FsToolkit.ErrorHandling
+open FSharpPlus.Operators
 
 type LibraryTagMap = Map<string, LibraryTags>
 
@@ -22,8 +22,9 @@ let createTagLibraryMap (libraryFile: FileInfo) : Result<LibraryTagMap, Error> =
     if libraryFile.Exists
     then
         readfile libraryFile.FullName
-        |> Result.bind parseJsonToTags
-        |> Result.map (Array.map groupWithPath >> Map.ofArray)
+        >>= parseJsonToTags
+        |>> Array.map groupWithPath
+        |>> Map.ofArray
     else
         Ok Map.empty
 
