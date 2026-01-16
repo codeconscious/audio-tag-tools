@@ -6,10 +6,10 @@ open Shared.IO
 open System.IO
 
 let readFile (fileInfo: FileInfo) : Result<string, Error> =
-    fileInfo |> readFile |! IoReadError
+    readFile fileInfo |! IoReadError
 
 let readLines (fileInfo: FileInfo) : Result<string array, Error> =
-    fileInfo |> readLines |! IoReadError
+    readLines fileInfo |! IoReadError
 
 let writeLines (filePath: string) (lines: string array) : Result<unit, Error> =
     lines
