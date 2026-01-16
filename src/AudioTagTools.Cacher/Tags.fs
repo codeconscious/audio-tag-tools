@@ -3,6 +3,7 @@ module Cacher.Tags
 open System
 open IO
 open Errors
+open Shared.Operators
 open Shared.TagLibrary
 open CCFSharpUtils.Library
 open FSharpPlus.Operators
@@ -107,4 +108,4 @@ let generateJson (tagMap: LibraryTagMap) (fileInfos: FileInfo seq) : Result<stri
     |> reportResults
     |> Seq.map _.Tags
     |> String.serializeToJson
-    |> Result.mapError JsonSerializationError
+    |>! JsonSerializationError

@@ -12,7 +12,7 @@ open System.Text
 let parseToTags json =
     json
     |> parseToTags
-    |> Result.mapError TagParseError
+    |>! TagParseError
 
 let printCount description (tags: MultipleLibraryTags) =
     printfn $"%s{description}%s{String.formatInt tags.Length}"

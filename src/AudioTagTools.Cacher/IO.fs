@@ -33,7 +33,7 @@ let getFileInfos (dirPath: DirectoryInfo) : Result<FileInfo seq, Error> =
 
 let parseJsonToTags (json: string) : Result<MultipleLibraryTags, Error> =
     parseToTags json
-    |> Result.mapError LibraryTagParseError
+    |>! LibraryTagParseError
 
 let parseFileTags (filePath: string) : Result<FileTags option, Error> =
     try

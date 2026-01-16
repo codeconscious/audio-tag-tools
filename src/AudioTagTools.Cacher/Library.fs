@@ -4,6 +4,7 @@ open ArgValidation
 open Errors
 open IO
 open Tags
+open Shared.Operators
 open Shared.IO
 open FsToolkit.ErrorHandling
 
@@ -17,14 +18,14 @@ let private run (args: string array) : Result<unit, Error> =
         let _ =
             tagLibraryFile
             |> copyToBackupFile
-            |> Result.tee (fun backupFile -> printfn "Backed up previous file to \"%s\"." backupFile.Name)
-            |> Result.mapError WriteFileError
+            |>. (fun backupFile -> printfn "Backed up previous file to \"%s\"." backupFile.Name)
+            |>! WriteFileError
 
         do!
             newJson
             |> writeTextToFile tagLibraryFile.FullName
-            |> Result.tee (fun _ -> printfn "Wrote file \"%s\"." tagLibraryFile.FullName)
-            |> Result.mapError WriteFileError
+            |>. (fun _ -> printfn "Wrote file \"%s\"." tagLibraryFile.FullName)
+            |>! WriteFileError
     }
 
 let start (args: string array) : Result<string, string> =

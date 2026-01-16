@@ -18,14 +18,16 @@ let private run (args: string array) : Result<unit, Error> =
 
         printSummary settings
 
-        return!
+        let duplicates =
            tags
            |> tee (printCount "Total file count:    ")
            |> discardExcluded settings
            |> tee (printCount "Filtered file count: ")
            |> findDuplicates settings
            |> tee printDuplicates
-           |> savePlaylist settings
+
+        return!
+            duplicates |> savePlaylist settings
     }
 
 let start args : Result<string, string> =

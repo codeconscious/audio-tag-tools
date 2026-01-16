@@ -4,6 +4,8 @@ open ArgValidation
 open Errors
 open Exporting
 open IO
+open Shared.Operators
+open FSharpPlus.Operators
 open FsToolkit.ErrorHandling
 open Shared.TagLibrary
 
@@ -11,26 +13,20 @@ let private run args : Result<unit, Error> =
     result {
         let! tagLibraryFile, genreFile = validate args
 
-        let! oldGenres =
-            genreFile
-            |> readLines
-            |> Result.tee printOldSummary
+        let! oldGenres = readLines genreFile |>. printOldSummary
 
         let! tags =
             tagLibraryFile
             |> readThenParseToJson
-            |> Result.mapError TagParseError
-            |> Result.tee printTagCount
+            |>! TagParseError
+            |>. printTagCount
 
         // The separator character should be rare and highly unlikely to appear in files' tags.
         let newGenres = tags |> generateGenreData "＼"
 
         printChanges oldGenres newGenres
 
-        do!
-            genreFile
-            |> copyToBackupFile
-            |> Result.map ignore
+        do! genreFile |> copyToBackupFile |>> ignore
 
         return!
             newGenres
