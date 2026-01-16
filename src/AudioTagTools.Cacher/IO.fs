@@ -3,6 +3,7 @@ module Cacher.IO
 open Errors
 open Shared
 open Shared.TagLibrary
+open CCFSharpUtils.Library
 open System.IO
 
 type FileTags = TagLib.File
@@ -24,10 +25,7 @@ let getFileInfos (dirPath: DirectoryInfo) : Result<FileInfo seq, Error> =
     try
         dirPath.EnumerateFiles("*", SearchOption.AllDirectories)
         |> Seq.filter isSupportedAudioFile
-        |> fun files ->
-            if Seq.isEmpty files
-            then Error (NoFilesFound dirPath.FullName)
-            else Ok files
+        |> Seq.toResult (NoFilesFound dirPath.FullName)
     with
     | e -> Error (GeneralIoError e.Message)
 
