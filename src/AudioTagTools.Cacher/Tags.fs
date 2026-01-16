@@ -108,4 +108,4 @@ let generateJson (tagMap: LibraryTagMap) (fileInfos: FileInfo seq) : Result<stri
     |> reportResults
     |> Seq.map _.Tags
     |> String.serializeToJson
-    |>! JsonSerializationError
+    |! JsonSerializationError

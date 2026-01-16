@@ -13,13 +13,13 @@ let private run args : Result<unit, Error> =
     result {
         let! tagLibraryFile, genreFile = validate args
 
-        let! oldGenres = readLines genreFile |>. printOldSummary
+        let! oldGenres = readLines genreFile |. printOldSummary
 
         let! tags =
             tagLibraryFile
             |> readThenParseToJson
-            |>! TagParseError
-            |>. printTagCount
+            |! TagParseError
+            |. printTagCount
 
         // The separator character should be rare and highly unlikely to appear in files' tags.
         let newGenres = tags |> generateGenreData "＼"

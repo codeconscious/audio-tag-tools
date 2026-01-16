@@ -6,17 +6,17 @@ open Shared.IO
 open System.IO
 
 let readFile (fileInfo: FileInfo) : Result<string, Error> =
-    fileInfo |> readFile |>! IoReadError
+    fileInfo |> readFile |! IoReadError
 
 let readLines (fileInfo: FileInfo) : Result<string array, Error> =
-    fileInfo |> readLines |>! IoReadError
+    fileInfo |> readLines |! IoReadError
 
 let writeLines (filePath: string) (lines: string array) : Result<unit, Error> =
     lines
     |> writeLinesToFile filePath
-    |>! IoWriteError
+    |! IoWriteError
 
 let copyToBackupFile fileInfo : Result<FileInfo, Error> =
     fileInfo
     |> copyToBackupFile
-    |>! IoWriteError
+    |! IoWriteError

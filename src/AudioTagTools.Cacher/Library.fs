@@ -18,14 +18,14 @@ let private run (args: string array) : Result<unit, Error> =
         let _ =
             tagLibraryFile
             |> copyToBackupFile
-            |>. (fun backupFile -> printfn "Backed up previous file to \"%s\"." backupFile.Name)
-            |>! WriteFileError
+            |. (fun backupFile -> printfn "Backed up previous file to \"%s\"." backupFile.Name)
+            |! WriteFileError
 
         do!
             newJson
             |> writeTextToFile tagLibraryFile.FullName
-            |>. (fun _ -> printfn "Wrote file \"%s\"." tagLibraryFile.FullName)
-            |>! WriteFileError
+            |. (fun _ -> printfn "Wrote file \"%s\"." tagLibraryFile.FullName)
+            |! WriteFileError
     }
 
 let start (args: string array) : Result<string, string> =
