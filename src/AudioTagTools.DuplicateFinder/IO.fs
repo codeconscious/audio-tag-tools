@@ -3,7 +3,6 @@ module DuplicateFinder.IO
 open Errors
 open Settings
 open Shared.TagLibrary
-open Shared.Operators
 open Shared.IO
 open CCFSharpUtils.Library
 open System

@@ -3,7 +3,6 @@ module Cacher.Tags
 open System
 open IO
 open Errors
-open Shared.Operators
 open Shared.TagLibrary
 open CCFSharpUtils.Library
 open FSharpPlus.Operators

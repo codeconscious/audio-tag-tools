@@ -4,8 +4,7 @@ open ArgValidation
 open Errors
 open Exporting
 open IO
-open Shared.Operators
-open FSharpPlus.Operators
+open CCFSharpUtils.Library
 open FsToolkit.ErrorHandling
 open Shared.TagLibrary
 
@@ -26,7 +25,7 @@ let private run args : Result<unit, Error> =
 
         printChanges oldGenres newGenres
 
-        do! genreFile |> copyToBackupFile |>> ignore
+        let! _ = genreFile |> copyToBackupFile
 
         return!
             newGenres

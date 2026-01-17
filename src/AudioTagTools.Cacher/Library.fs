@@ -4,8 +4,8 @@ open ArgValidation
 open Errors
 open IO
 open Tags
-open Shared.Operators
 open Shared.IO
+open CCFSharpUtils.Library
 open FsToolkit.ErrorHandling
 
 let private run (args: string array) : Result<unit, Error> =
