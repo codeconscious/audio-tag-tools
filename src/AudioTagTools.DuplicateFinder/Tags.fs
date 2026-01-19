@@ -7,7 +7,6 @@ open Shared.TagLibrary
 open CCFSharpUtils.Library
 open System
 open System.IO
-open System.Text
 
 let parseToTags json =
     json
@@ -54,6 +53,7 @@ let private groupName (settings: Settings) fileTags =
         |> Array.append (String.whiteSpaces |> List.map _.ToString() |> Array.ofList)
         |> String.stripSubstrings
         >> String.stripPunctuation
+        >> String.stripDiacritics
 
     let artist =
         let checkEquivalentArtists artist =
@@ -71,9 +71,7 @@ let private groupName (settings: Settings) fileTags =
         fileTags.Title
         |> scrubText settings.TitleReplacements
 
-    $"{artist}{title}"
-        .Normalize(NormalizationForm.FormC)
-        .ToLowerInvariant()
+    $"{artist}{title}".ToLowerInvariant()
 
 let findDuplicates settings (tags: MultipleLibraryTags) : MultipleLibraryTags array option =
     tags
