@@ -44,5 +44,5 @@ let savePlaylist (settings: Settings) (tags: MultipleLibraryTags array option) :
         |> Array.fold appendFileEntry (StringBuilder "#EXTM3U\n")
         |> _.ToString()
         |> writeTextToFile fullPath
-        |. (fun _ -> printfn $"Created playlist file \"{fullPath}\".")
+        |. fun _ -> printfn $"Created playlist file \"{fullPath}\"."
         |! WriteFileError

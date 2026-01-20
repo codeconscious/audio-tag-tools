@@ -4,9 +4,9 @@ open ArgValidation
 open Errors
 open Exporting
 open IO
+open Shared.TagLibrary
 open CCFSharpUtils.Library
 open FsToolkit.ErrorHandling
-open Shared.TagLibrary
 
 let private run args : Result<unit, Error> =
     result {
@@ -17,8 +17,8 @@ let private run args : Result<unit, Error> =
         let! tags =
             tagLibraryFile
             |> readThenParseToJson
-            |! TagParseError
             |. printTagCount
+            |! TagParseError
 
         // The separator character should be rare and highly unlikely to appear in files' tags.
         let newGenres = tags |> generateGenreData "＼"
