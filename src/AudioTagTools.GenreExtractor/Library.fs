@@ -21,11 +21,14 @@ let private run args : Result<unit, Error> =
             |! TagParseError
 
         // The separator character should be rare and highly unlikely to appear in files' tags.
-        let newGenres = tags |> generateGenreData "＼"
+        let newGenres = generateGenreData "＼" tags
 
         printChanges oldGenres newGenres
 
-        let! _ = genreFile |> copyToBackupFile
+        let! _ =
+            genreFile
+            |> copyToBackupFile
+            |. fun fileInfo -> printfn $"Created backup file \"{fileInfo}\"."
 
         return!
             newGenres
