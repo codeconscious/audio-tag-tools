@@ -32,5 +32,5 @@ let private run (args: string array) : Result<unit, Error> =
 
 let start args : Result<string, string> =
     match run args with
-    | Ok _ -> Ok "Finished searching successfully."
+    | Ok () -> Ok "Finished searching successfully."
     | Error e -> Error (message e)

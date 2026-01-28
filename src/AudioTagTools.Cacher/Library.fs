@@ -30,5 +30,5 @@ let private run (args: string array) : Result<unit, Error> =
 
 let start (args: string array) : Result<string, string> =
     match run args with
-    | Ok _ -> Ok "Finished caching successfully!"
+    | Ok () -> Ok "Finished caching successfully!"
     | Error e -> Error (message e)
