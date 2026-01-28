@@ -9,6 +9,7 @@ open Shared
 open CCFSharpUtils.Library
 open FsToolkit.ErrorHandling
 open Spectre.Console
+open FsToolkit.ErrorHandling.Operator.Result
 
 type QualityData =
     { BitRate: int
@@ -104,5 +105,5 @@ let private run (args: string array) : Result<unit, Error> =
 
 let start args : Result<string, string> =
     match run args with
-    | Ok _ -> Ok "Finished analysis successfully!"
+    | Ok () -> Ok "Finished analysis successfully!"
     | Error e -> Error (message e)

@@ -1,31 +1,22 @@
 module GenreExtractor.IO
 
 open Errors
-open Shared.TagLibrary
 open Shared.IO
+open CCFSharpUtils.Library
 open System.IO
 
 let readFile (fileInfo: FileInfo) : Result<string, Error> =
-    fileInfo
-    |> readFile
-    |> Result.mapError IoReadError
+    readFile fileInfo |! IoReadError
 
 let readLines (fileInfo: FileInfo) : Result<string array, Error> =
-    fileInfo
-    |> readLines
-    |> Result.mapError IoReadError
-
-let parseJsonToTags (json: string) : Result<MultipleLibraryTags, Error> =
-    json
-    |> parseToTags
-    |> Result.mapError TagParseError
+    readLines fileInfo |! IoReadError
 
 let writeLines (filePath: string) (lines: string array) : Result<unit, Error> =
     lines
     |> writeLinesToFile filePath
-    |> Result.mapError IoWriteError
+    |! IoWriteError
 
 let copyToBackupFile fileInfo : Result<FileInfo, Error> =
     fileInfo
     |> copyToBackupFile
-    |> Result.mapError IoWriteError
+    |! IoWriteError

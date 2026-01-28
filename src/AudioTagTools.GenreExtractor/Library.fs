@@ -4,36 +4,31 @@ open ArgValidation
 open Errors
 open Exporting
 open IO
-open Shared
-open FsToolkit.ErrorHandling
+open Shared.TagLibrary
 open CCFSharpUtils.Library
+open FsToolkit.ErrorHandling
 
 let private run args : Result<unit, Error> =
     result {
         let! tagLibraryFile, genreFile = validate args
 
-        let! oldGenres = readLines genreFile
-        printfn "%s entries in the old file." (String.formatInt oldGenres.Length)
+        let! oldGenres = readLines genreFile |. printOldSummary
 
-        let! newGenres =
+        let! tags =
             tagLibraryFile
-            |> readFile
-            >>= parseJsonToTags
-            <.> fun tags -> printfn $"Parsed tags for {String.formatInt tags.Length} files from the tag library."
-            <!> groupArtistsWithGenres "＼" // Separator should be text highly unlikely to appear in files' tags.
+            |> readThenParseToJson
+            |. printTagCount
+            |! TagParseError
 
-        let newTotalCount = newGenres.Length
-        let addedCount = newGenres |> Array.except oldGenres |> _.Length
-        let deletedCount = oldGenres |> Array.except newGenres |> _.Length
-        printfn "Prepared %s artist-genre entries total (%s new, %s deleted)."
-            (String.formatInt newTotalCount)
-            (String.formatInt addedCount)
-            (String.formatInt deletedCount)
+        // The separator character should be rare and highly unlikely to appear in files' tags.
+        let newGenres = generateGenreData "＼" tags
 
-        do!
+        printChanges oldGenres newGenres
+
+        let! _ =
             genreFile
             |> copyToBackupFile
-            |> Result.map ignore
+            |. fun fileInfo -> printfn $"Created backup file \"{fileInfo}\"."
 
         return!
             newGenres

@@ -3,6 +3,7 @@
 [<AutoOpen>]
 module Shared.Printing
 
+open CCFSharpUtils.Library
 open System
 open Spectre.Console
 
@@ -12,15 +13,13 @@ type TableData =
       Rows: string array array
       ColumnAlignments: Justify list }
 
-let newLine = Environment.NewLine
-
 let printfColor color msg =
     Console.ForegroundColor <- color
     printf $"%s{msg}"
     Console.ResetColor()
 
 let printfnColor color msg =
-    printfColor color $"{msg}{newLine}"
+    printfColor color $"{msg}{String.newLine}"
 
 let printTable tableData =
     let table = Table()

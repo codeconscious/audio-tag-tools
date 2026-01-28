@@ -3,16 +3,15 @@ module Cacher.Tags
 open System
 open IO
 open Errors
-open Shared
 open Shared.TagLibrary
 open CCFSharpUtils.Library
-open FsToolkit.ErrorHandling
+open FSharpPlus.Operators
 
 type LibraryTagMap = Map<string, LibraryTags>
 
 type LibraryComparisonResult =
-    | Unchanged // Library tags match file tags.
-    | OutOfDate // Library tags are older than file tags.
+    | Unchanged  // Library tags match file tags.
+    | OutOfDate  // Library tags are older than file tags.
     | NotPresent // No tags exist in library for file.
 
 type CategorizedTagsToCache =
@@ -20,16 +19,12 @@ type CategorizedTagsToCache =
       Tags: LibraryTags }
 
 let createTagLibraryMap (libraryFile: FileInfo) : Result<LibraryTagMap, Error> =
-    let audioFilePath (fileTags: LibraryTags) : string =
-        Path.Combine [| fileTags.DirectoryName; fileTags.FileName |]
-
     if libraryFile.Exists
     then
-        libraryFile.FullName
-        |> readfile
-        >>= IO.parseJsonToTags
-        <!> Array.map (fun tags -> audioFilePath tags, tags)
-        <!> Map.ofArray
+        readfile libraryFile.FullName
+        >>= parseJsonToTags
+        |>> Array.map groupWithPath
+        |>> Map.ofArray
     else
         Ok Map.empty
 
@@ -69,9 +64,9 @@ let private prepareTagsToWrite (tagLibraryMap: LibraryTagMap) (fileInfos: FileIn
        | _ -> blankTags fileInfo
 
     let prepareTagsToCache (tagLibraryMap: LibraryTagMap) (audioFile: FileInfo) : CategorizedTagsToCache =
-        if Map.containsKey audioFile.FullName tagLibraryMap
+        if tagLibraryMap |> Map.containsKey audioFile.FullName
         then
-            let libraryTags = Map.find audioFile.FullName tagLibraryMap
+            let libraryTags = tagLibraryMap |> Map.find audioFile.FullName
             if libraryTags.LastWriteTime.DateTime < audioFile.LastWriteTime
             then { Type = OutOfDate; Tags = generateNewTags audioFile }
             else { Type = Unchanged; Tags = copyCachedTags libraryTags }
@@ -106,14 +101,10 @@ let private reportResults (categorizedTags: CategorizedTagsToCache seq) : Catego
 
     categorizedTags
 
-let generateJson
-    (tagLibraryMap: LibraryTagMap)
-    (fileInfos: FileInfo seq)
-    : Result<string, Error> =
-
+let generateJson (tagMap: LibraryTagMap) (fileInfos: FileInfo seq) : Result<string, Error> =
     fileInfos
-    |> prepareTagsToWrite tagLibraryMap
+    |> prepareTagsToWrite tagMap
     |> reportResults
     |> Seq.map _.Tags
-    |> String.serializeToJson
-    |> Result.mapError JsonSerializationError
+    |> String.toJson
+    |! JsonSerializationError

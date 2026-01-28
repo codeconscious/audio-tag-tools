@@ -7,15 +7,17 @@ open Shared.TagLibrary
 open CCFSharpUtils.Library
 open System
 open System.IO
-open System.Text
 
 let parseToTags json =
     json
     |> parseToTags
-    |> Result.mapError TagParseError
+    |! TagParseError
+
+let printCount description (tags: MultipleLibraryTags) =
+    printfn $"%s{description}%s{String.formatInt tags.Length}"
 
 /// Filters out tags containing artists or titles specified in the exclusions in the settings.
-let filter (settings: Settings) allTags : MultipleLibraryTags =
+let discardExcluded (settings: Settings) allTags : MultipleLibraryTags =
     let isExcluded tags =
         let (|ArtistAndTitle|ArtistOnly|TitleOnly|Invalid|) (excl: Exclusion) =
             match excl.Artist, excl.Title with
@@ -48,9 +50,10 @@ let filter (settings: Settings) allTags : MultipleLibraryTags =
 let private groupName (settings: Settings) fileTags =
     let scrubText subStrs =
         subStrs
-        |> Array.append (String.whiteSpaces |> Array.map _.ToString())
+        |> Array.append (String.whiteSpaceStrs |> Array.ofList)
         |> String.stripSubstrings
         >> String.stripPunctuation
+        >> String.stripDiacritics
 
     let artist =
         let checkEquivalentArtists artist =
@@ -68,9 +71,7 @@ let private groupName (settings: Settings) fileTags =
         fileTags.Title
         |> scrubText settings.TitleReplacements
 
-    $"{artist}{title}"
-        .Normalize(NormalizationForm.FormC)
-        .ToLowerInvariant()
+    $"{artist}{title}".ToLowerInvariant()
 
 let findDuplicates settings (tags: MultipleLibraryTags) : MultipleLibraryTags array option =
     tags
@@ -80,9 +81,6 @@ let findDuplicates settings (tags: MultipleLibraryTags) : MultipleLibraryTags ar
     |> Array.sortBy fst // Group name
     |> Array.map (fun (_, tags) -> tags |> Array.sortBy (mainArtists String.Empty))
     |> Array.toOption
-
-let printCount description (tags: MultipleLibraryTags) =
-    printfn $"%s{description}%s{String.formatInt tags.Length}"
 
 let printDuplicates (groupedTracks: MultipleLibraryTags array option) =
     let printfGray = printfColor ConsoleColor.DarkGray
@@ -103,7 +101,7 @@ let printDuplicates (groupedTracks: MultipleLibraryTags array option) =
             printf $"    • {artist}"
             printfGray " — "
             printf $"{title}"
-            printfGray $"  [{duration} {extNoPeriod} {bitRate} {fileSize}]{Environment.NewLine}"
+            printfGray $"  [{duration} {extNoPeriod} {bitRate} {fileSize}]{String.newLine}"
 
         let printHeader () =
             groupTracks
@@ -121,3 +119,4 @@ let printDuplicates (groupedTracks: MultipleLibraryTags array option) =
     match groupedTracks with
     | None -> printfn "No duplicates found."
     | Some group -> group |> Array.iteri printGroup
+

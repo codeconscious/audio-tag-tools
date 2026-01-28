@@ -8,19 +8,18 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Compile Include="Operators.fs" />
         <Compile Include="IO.fs" />
         <Compile Include="TagLibrary.fs" />
         <Compile Include="Printing.fs" />
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="CCFSharpUtils" Version="0.1.3.1" />
+      <PackageReference Include="CCFSharpUtils" Version="0.1.15" />
       <PackageReference Include="FSharp.Data" Version="6.6.0" />
-      <PackageReference Include="FSharpPlus" Version="1.8.0" />
+      <PackageReference Include="FSharpPlus" Version="1.9.1" />
       <PackageReference Include="FsToolkit.ErrorHandling" Version="5.1.0" />
-      <PackageReference Update="FSharp.Core" Version="10.0.101" />
-      <PackageReference Include="Spectre.Console" Version="0.52.0" />
+      <PackageReference Update="FSharp.Core" Version="10.0.102" />
+      <PackageReference Include="Spectre.Console" Version="0.54.0" />
     </ItemGroup>
 
 </Project>
