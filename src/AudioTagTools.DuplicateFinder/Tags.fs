@@ -50,7 +50,7 @@ let discardExcluded (settings: Settings) allTags : MultipleLibraryTags =
 let private groupName (settings: Settings) fileTags =
     let scrubText subStrs =
         subStrs
-        |> Set.union (String.whiteSpaceStrs |> Set.ofList)
+        |> Array.append (String.whiteSpaceStrs |> Array.ofList)
         |> String.stripSubstrings
         >> String.stripPunctuation
         >> String.stripDiacritics
@@ -65,11 +65,11 @@ let private groupName (settings: Settings) fileTags =
         fileTags
         |> mainArtists String.Empty
         |> checkEquivalentArtists
-        |> scrubText (settings.ArtistReplacements |> Set.ofArray)
+        |> scrubText settings.ArtistReplacements
 
     let title =
         fileTags.Title
-        |> scrubText (settings.TitleReplacements |> Set.ofArray)
+        |> scrubText settings.TitleReplacements
 
     $"{artist}{title}".ToLowerInvariant()
 
