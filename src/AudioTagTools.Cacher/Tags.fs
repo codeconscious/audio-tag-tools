@@ -83,8 +83,7 @@ let private reportResults (categorizedTags: CategorizedTagsToCache seq) : Catego
 
     let countOf comparisonResultType =
         categoryTotals
-        |> Map.tryFind comparisonResultType
-        |> Option.defaultValue 0
+        |> Map.tryFindElse comparisonResultType 0
         |> String.formatInt
 
     let grandTotal =
