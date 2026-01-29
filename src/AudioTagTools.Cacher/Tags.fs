@@ -35,7 +35,7 @@ let private prepareTagsToWrite (tagLibraryMap: LibraryTagMap) (fileInfos: FileIn
         { libraryTags with LastWriteTime = DateTimeOffset libraryTags.LastWriteTime.DateTime }
 
     let generateNewTags (fileInfo: FileInfo) : LibraryTags =
-       let tagsFromFile (fileInfo: FileInfo) (fileTags: FileTags) =
+       let tagsFromFile (fileTags: FileTags) =
             {
                 FileName = fileInfo.Name
                 DirectoryName = fileInfo.DirectoryName
@@ -60,7 +60,7 @@ let private prepareTagsToWrite (tagLibraryMap: LibraryTagMap) (fileInfos: FileIn
             }
 
        match parseFileTags fileInfo.FullName with
-       | Ok (Some tags) -> tagsFromFile fileInfo tags
+       | Ok (Some tags) -> tagsFromFile tags
        | _ -> blankTags fileInfo
 
     let prepareTagsToCache (tagLibraryMap: LibraryTagMap) (audioFile: FileInfo) : CategorizedTagsToCache =
