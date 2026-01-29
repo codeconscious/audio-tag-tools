@@ -1,6 +1,7 @@
 module Cacher.Tags
 
 open System
+open FSharpPlus.Data
 open IO
 open Errors
 open Shared.TagLibrary
@@ -100,7 +101,7 @@ let private reportResults (categorizedTags: CategorizedTagsToCache seq) : Catego
 
     categorizedTags
 
-let generateJson (tagMap: LibraryTagMap) (fileInfos: FileInfo seq) : Result<string, Error> =
+let generateJson (tagMap: LibraryTagMap) (fileInfos: FileInfo NonEmptySeq) : Result<string, Error> =
     fileInfos
     |> prepareTagsToWrite tagMap
     |> reportResults

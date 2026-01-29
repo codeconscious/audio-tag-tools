@@ -1,6 +1,8 @@
 module Cacher.IO
 
 open Errors
+open FSharpPlus
+open FSharpPlus.Data
 open Shared
 open Shared.TagLibrary
 open CCFSharpUtils.Library
@@ -13,7 +15,7 @@ let readfile filePath : Result<string, Error> =
     | Ok x -> Ok x
     | Error msg -> Error (ReadFileError msg)
 
-let getFileInfos (dirPath: DirectoryInfo) : Result<FileInfo seq, Error> =
+let getFileInfos (dirPath: DirectoryInfo) : Result<FileInfo NonEmptySeq, Error> =
     let isSupportedAudioFile (fileInfo: FileInfo) =
         // Supported file format extensions from https://github.com/mono/taglib-sharp,
         // plus some additional ones. Initial periods are needed.
@@ -25,7 +27,7 @@ let getFileInfos (dirPath: DirectoryInfo) : Result<FileInfo seq, Error> =
     try
         dirPath.EnumerateFiles("*", SearchOption.AllDirectories)
         |> Seq.filter isSupportedAudioFile
-        |> Seq.toResult (NoFilesFound dirPath.FullName)
+        |> Seq.toNonEmptySeqResult (NoFilesFound dirPath.FullName)
     with
     | e -> Error (GeneralIoError e.Message)
 
