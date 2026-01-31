@@ -1,13 +1,16 @@
 module Cacher.ArgValidation
 
 open Errors
+open CCFSharpUtils.Library
+open FSharpPlus
+open FSharpPlus.Data
 open System.IO
 
-let validate (args: string array) : Result<DirectoryInfo * FileInfo, Error> =
+let validate args =
     match args with
-    | [| mediaDirPath; tagLibraryPath |] ->
-        match Directory.Exists mediaDirPath with
-        | false -> Error (MediaDirectoryMissing mediaDirPath)
-        | true  -> Ok (DirectoryInfo mediaDirPath, FileInfo tagLibraryPath)
+    | [| mediaDirArg; tagLibArg |] ->
+        (fun mediaDir -> (DirectoryInfo mediaDir, FileInfo tagLibArg))
+        <!> (mediaDirArg |> Directory.verifyExists (MediaDirectoryMissing mediaDirArg))
     | _ ->
-        Error InvalidArgCount
+        Failure InvalidArgCount
+    |> Validation.toResult
