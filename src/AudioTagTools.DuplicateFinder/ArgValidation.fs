@@ -1,7 +1,7 @@
 module DuplicateFinder.ArgValidation
 
 open Errors
-open CCFSharpUtils.Library
+open FSharpPlus.Data
 open FsToolkit.ErrorHandling
 open System.IO
 
@@ -12,9 +12,11 @@ let verifyExists err file =
 
 let validationToResult (v: Validation<'a, string>) : Result<'a, Error> =
     match v with
-    | Ok ok -> Ok ok
+    | Ok ok ->
+        Ok ok
     | Error errs ->
         errs
+        |> NonEmptyList.ofList
         |> IoFileMissing
         |> Error
 
