@@ -1,11 +1,32 @@
 module DuplicateFinder.ArgValidation
 
 open Errors
+open CCFSharpUtils.Library
+open FsToolkit.ErrorHandling
 open System.IO
 
-let validate (args: string array) : Result<FileInfo * FileInfo, Error> =
+let verifyExists err file =
+    if File.Exists file
+    then Ok file
+    else Error [err]
+
+let validationToResult (separator: string) (v: Validation<'a, string>) : Result<'a, Error> =
+    match v with
+    | Ok ok -> Ok ok
+    | Error errs ->
+        errs
+        |> String.concat separator
+        |> ArgValidationError
+        |> Error
+
+let validate args : Result<(FileInfo * FileInfo), Error> =
     match args with
-    | [| settingsFilePath; tagLibraryPath |] ->
-        Ok (FileInfo settingsFilePath, FileInfo tagLibraryPath)
+    | [| settingsFileArg; tagLibArg |] ->
+        Validation.map2
+            (fun settingsFile tagLib -> FileInfo settingsFile, FileInfo tagLib)
+            (settingsFileArg |> verifyExists $"The settings file \"{settingsFileArg}\" does not exist.")
+            (tagLibArg       |> verifyExists $"The tag library file \"{tagLibArg}\" does not exist.")
+        |> validationToResult " "
     | _ ->
-        Error InvalidArgCount
+        Error (ArgValidationError "Invalid arg count. Must be two.")
+

@@ -6,7 +6,7 @@ open FSharpPlus
 open FSharpPlus.Data
 open System.IO
 
-let validate args =
+let validate args : Result<(DirectoryInfo * FileInfo), Error> =
     match args with
     | [| mediaDirArg; tagLibArg |] ->
         (fun mediaDir -> (DirectoryInfo mediaDir, FileInfo tagLibArg))
