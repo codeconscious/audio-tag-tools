@@ -16,7 +16,7 @@ let message = function
         match errs with
         | []    -> "An unspecified file was missing."
         | [err] -> err
-        | errs  -> errs |> String.concat String.newLine
+        | errs  -> errs |> String.concatNL
     | ReadFileError msg -> $"Read failure: {msg}"
     | WriteFileError msg -> $"Write failure: {msg}"
     | SettingsParseError msg -> $"Unable to parse the settings file: {msg}"
