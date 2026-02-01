@@ -10,13 +10,12 @@ let verifyExists err file =
     then Ok file
     else Error [err]
 
-let validationToResult (separator: string) (v: Validation<'a, string>) : Result<'a, Error> =
+let validationToResult (v: Validation<'a, string>) : Result<'a, Error> =
     match v with
     | Ok ok -> Ok ok
     | Error errs ->
         errs
-        |> String.concat separator
-        |> ArgValidationError
+        |> IoFileMissing
         |> Error
 
 let validate args : Result<(FileInfo * FileInfo), Error> =
@@ -26,7 +25,7 @@ let validate args : Result<(FileInfo * FileInfo), Error> =
             (fun settingsFile tagLib -> FileInfo settingsFile, FileInfo tagLib)
             (settingsFileArg |> verifyExists $"The settings file \"{settingsFileArg}\" does not exist.")
             (tagLibArg       |> verifyExists $"The tag library file \"{tagLibArg}\" does not exist.")
-        |> validationToResult " "
+        |> validationToResult
     | _ ->
-        Error (ArgValidationError "Invalid arg count. Must be two.")
+        Error ArgCountError
 
