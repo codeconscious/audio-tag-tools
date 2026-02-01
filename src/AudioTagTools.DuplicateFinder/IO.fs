@@ -10,7 +10,7 @@ open System.Text
 open System.IO
 
 let readFile (fileInfo: FileInfo) : Result<string, Error> =
-    fileInfo |> readFile |! ReadFileError
+    fileInfo |> readFile |! IoFileReadError
 
 let savePlaylist (settings: Settings) (tags: MultipleLibraryTags array option) : Result<unit, Error> =
     let now = DateTime.Now.ToString("yyyyMMdd_HHmmss")
@@ -45,4 +45,4 @@ let savePlaylist (settings: Settings) (tags: MultipleLibraryTags array option) :
         |> _.ToString()
         |> writeTextToFile fullPath
         |. fun _ -> printfn $"Created playlist file \"{fullPath}\"."
-        |! WriteFileError
+        |! IoFileWriteError

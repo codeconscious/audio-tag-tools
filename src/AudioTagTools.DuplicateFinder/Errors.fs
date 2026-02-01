@@ -5,8 +5,8 @@ open CCFSharpUtils.Library
 type Error =
     | ArgCountError
     | IoFileMissing of string list
-    | ReadFileError of string
-    | WriteFileError of string
+    | IoFileReadError of string
+    | IoFileWriteError of string
     | SettingsParseError of string
     | TagParseError of string
 
@@ -17,7 +17,7 @@ let message = function
         | []    -> "An unspecified file was missing."
         | [err] -> err
         | errs  -> errs |> String.concatNL
-    | ReadFileError msg -> $"Read failure: {msg}"
-    | WriteFileError msg -> $"Write failure: {msg}"
+    | IoFileReadError msg -> $"Read failure: {msg}"
+    | IoFileWriteError msg -> $"Write failure: {msg}"
     | SettingsParseError msg -> $"Unable to parse the settings file: {msg}"
     | TagParseError msg -> $"Unable to parse the tag library file: {msg}"
