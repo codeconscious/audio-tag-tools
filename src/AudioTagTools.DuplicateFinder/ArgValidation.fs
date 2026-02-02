@@ -5,11 +5,6 @@ open FSharpPlus.Data
 open FsToolkit.ErrorHandling
 open System.IO
 
-let verifyExists err file =
-    if File.Exists file
-    then Ok file
-    else Error [err]
-
 let validationToResult (v: Validation<'a, string>) : Result<'a, Error> =
     match v with
     | Ok ok ->
@@ -21,6 +16,11 @@ let validationToResult (v: Validation<'a, string>) : Result<'a, Error> =
         |> Error
 
 let validate args : Result<(FileInfo * FileInfo), Error> =
+    let verifyExists err file =
+        if File.Exists file
+        then Ok file
+        else Error [err]
+
     match args with
     | [| settingsFileArg; tagLibArg |] ->
         Validation.map2
