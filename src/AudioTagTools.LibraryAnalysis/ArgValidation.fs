@@ -5,7 +5,9 @@ open System.IO
 
 let validate (args: string array) : Result<FileInfo, Error> =
     match args with
-    | [| tagLibraryPath |] ->
-        Ok (FileInfo tagLibraryPath)
+    | [| tagLibraryArg |] ->
+        if File.Exists tagLibraryArg
+        then Ok (FileInfo tagLibraryArg)
+        else Error (IoMissingFile tagLibraryArg)
     | _ ->
-        Error InvalidArgCount
+        Error ArgInvalidCount
