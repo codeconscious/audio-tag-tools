@@ -25,8 +25,8 @@ let validate args : Result<(FileInfo * FileInfo), Error> =
     | [| settingsFileArg; tagLibArg |] ->
         Validation.map2
             (fun settingsFile tagLib -> FileInfo settingsFile, FileInfo tagLib)
-            (settingsFileArg |> verifyExists $"The settings file \"{settingsFileArg}\" does not exist.")
-            (tagLibArg       |> verifyExists $"The tag library file \"{tagLibArg}\" does not exist.")
+            (settingsFileArg |> verifyExists $"Settings file \"{settingsFileArg}\" does not exist.")
+            (tagLibArg       |> verifyExists $"Tag library file \"{tagLibArg}\" does not exist.")
         |> validationToResult
     | _ ->
         Error ArgCountError
