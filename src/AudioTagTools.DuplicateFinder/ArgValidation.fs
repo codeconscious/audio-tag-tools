@@ -5,16 +5,6 @@ open FSharpPlus.Data
 open FsToolkit.ErrorHandling
 open System.IO
 
-let validationToResult (v: Validation<'a, string>) : Result<'a, Error> =
-    match v with
-    | Ok ok ->
-        Ok ok
-    | Error errs ->
-        errs
-        |> NonEmptyList.ofList
-        |> IoFileMissing
-        |> Error
-
 let validate args : Result<(FileInfo * FileInfo), Error> =
     let verifyExists err file =
         if File.Exists file
@@ -27,7 +17,14 @@ let validate args : Result<(FileInfo * FileInfo), Error> =
             (fun settingsFile tagLib -> FileInfo settingsFile, FileInfo tagLib)
             (settingsFileArg |> verifyExists $"Settings file \"{settingsFileArg}\" does not exist.")
             (tagLibArg       |> verifyExists $"Tag library file \"{tagLibArg}\" does not exist.")
-        |> validationToResult
+        |> function
+        | Ok ok ->
+            Ok ok
+        | Error errs ->
+            errs
+            |> NonEmptyList.ofList
+            |> IoFilesMissing
+            |> Error
     | _ ->
         Error ArgCountError
 
