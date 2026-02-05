@@ -11,6 +11,6 @@ let validate args : Result<(DirectoryInfo * FileInfo), Error> =
     | [| mediaDirArg; tagLibArg |] ->
         (fun mediaDir -> (DirectoryInfo mediaDir, FileInfo tagLibArg))
         <!> (mediaDirArg |> Directory.verifyExists (MediaDirectoryMissing mediaDirArg))
+        |> Validation.toResult
     | _ ->
-        Failure InvalidArgCount
-    |> Validation.toResult
+        Error InvalidArgCount
