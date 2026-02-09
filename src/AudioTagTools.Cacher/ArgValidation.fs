@@ -2,7 +2,6 @@ module Cacher.ArgValidation
 
 open Errors
 open Shared.IO
-open CCFSharpUtils.Library
 open FSharpPlus
 open FSharpPlus.Data
 open System.IO
@@ -15,3 +14,4 @@ let validate args : Result<(DirectoryInfo * FileInfo), Error> =
         |> Validation.toResult
     | _ ->
         Error InvalidArgCount
+
