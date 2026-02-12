@@ -5,7 +5,7 @@ open ArgValidation
 open IO
 open Tags
 open Settings
-open CCFSharpUtils.Library
+open FSharpPlus.Operators
 open FsToolkit.ErrorHandling
 open FsToolkit.ErrorHandling.Operator.Result
 
@@ -20,11 +20,11 @@ let private run (args: string array) : Result<unit, Error> =
 
         let duplicates =
            tags
-           |> tee (printCount "Total file count:    ")
+           |> tap (printCount "Total file count:    ")
            |> discardExcluded settings
-           |> tee (printCount "Filtered file count: ")
+           |> tap (printCount "Filtered file count: ")
            |> findDuplicates settings
-           |> tee printDuplicates
+           |> tap printDuplicates
 
         return!
             duplicates |> savePlaylist settings
