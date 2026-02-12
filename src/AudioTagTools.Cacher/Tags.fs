@@ -1,6 +1,7 @@
 module Cacher.Tags
 
 open System
+open FSharpPlus.Data
 open IO
 open Errors
 open Shared.TagLibrary
@@ -35,7 +36,7 @@ let private prepareTagsToWrite (tagLibraryMap: LibraryTagMap) (fileInfos: FileIn
         { libraryTags with LastWriteTime = DateTimeOffset libraryTags.LastWriteTime.DateTime }
 
     let generateNewTags (fileInfo: FileInfo) : LibraryTags =
-       let tagsFromFile (fileInfo: FileInfo) (fileTags: FileTags) =
+       let tagsFromFile (fileTags: FileTags) =
             {
                 FileName = fileInfo.Name
                 DirectoryName = fileInfo.DirectoryName
@@ -60,7 +61,7 @@ let private prepareTagsToWrite (tagLibraryMap: LibraryTagMap) (fileInfos: FileIn
             }
 
        match parseFileTags fileInfo.FullName with
-       | Ok (Some tags) -> tagsFromFile fileInfo tags
+       | Ok (Some tags) -> tagsFromFile tags
        | _ -> blankTags fileInfo
 
     let prepareTagsToCache (tagLibraryMap: LibraryTagMap) (audioFile: FileInfo) : CategorizedTagsToCache =
@@ -83,8 +84,7 @@ let private reportResults (categorizedTags: CategorizedTagsToCache seq) : Catego
 
     let countOf comparisonResultType =
         categoryTotals
-        |> Map.tryFind comparisonResultType
-        |> Option.defaultValue 0
+        |> Map.tryFindElse comparisonResultType 0
         |> String.formatInt
 
     let grandTotal =
@@ -101,7 +101,7 @@ let private reportResults (categorizedTags: CategorizedTagsToCache seq) : Catego
 
     categorizedTags
 
-let generateJson (tagMap: LibraryTagMap) (fileInfos: FileInfo seq) : Result<string, Error> =
+let generateJson (tagMap: LibraryTagMap) (fileInfos: FileInfo NonEmptySeq) : Result<string, Error> =
     fileInfos
     |> prepareTagsToWrite tagMap
     |> reportResults

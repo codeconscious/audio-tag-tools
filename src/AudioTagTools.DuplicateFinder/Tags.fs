@@ -59,8 +59,7 @@ let private groupName (settings: Settings) fileTags =
         let checkEquivalentArtists artist =
             settings.EquivalentArtists
             |> Array.tryFind (Array.contains artist)
-            |> Option.map Array.head
-            |> Option.defaultValue artist
+            |> Option.mapElse Array.head artist
 
         fileTags
         |> mainArtists String.Empty
