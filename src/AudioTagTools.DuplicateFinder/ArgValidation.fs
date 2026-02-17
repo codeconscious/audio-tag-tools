@@ -5,17 +5,17 @@ open Shared.IO
 open CCFSharpUtils.Library
 open FSharpPlus
 open FSharpPlus.Data
-open FsToolkit.ErrorHandling
 open System.IO
 
 let validate args : Result<(FileInfo * FileInfo), Error> =
     match args with
-    | [| settingsFileArg; tagLibArg |] ->
+    | [| settingsArg; tagLibArg |] ->
         applicative {
-            let! settingsFile = settingsFileArg |> validateToFileInfo $"Settings file \"{settingsFileArg}\" does not exist."
-            and! tagLib = tagLibArg |> validateToFileInfo $"Tag library file \"{tagLibArg}\" does not exist."
-            return (settingsFile, tagLib)
+            let! settingsFile = settingsArg |> toFileInfo $"Settings file \"{settingsArg}\" does not exist."
+            and! tagLibFile = tagLibArg |> toFileInfo $"Tag library file \"{tagLibArg}\" does not exist."
+            return (settingsFile, tagLibFile)
         }
-        |! (fun errs -> errs |> NonEmptyList.ofList |> IoFilesMissing)
+        |> Validation.toResult
+        |! (NonEmptyList.ofList >> ArgErrors)
     | _ ->
         Error ArgCountError

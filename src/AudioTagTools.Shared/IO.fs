@@ -58,10 +58,10 @@ let copyToBackupFile (tagLibrary: FileInfo) : Result<FileInfo, string> =
 
 /// If the file exists, returns its FileInfo wrapped in Ok. Otherwise, returns an error list.
 /// Intended to be used in applicative validation chains. (Thus, the list.)
-let validateToFileInfo (err: 'err) (file: string) : Result<FileInfo, 'err list> =
+let toFileInfo (err: 'err) (file: string) : Validation<'err list, FileInfo> =
     if File.Exists file
-    then Ok (FileInfo file)
-    else Error [err]
+    then Success (FileInfo file)
+    else Failure [err]
 
 /// If the directory exists, returns its DirectoryInfo wrapped in Success.
 /// Otherwise, returns the error wrapped in Failure.
