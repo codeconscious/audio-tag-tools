@@ -16,7 +16,11 @@ let writeLines (filePath: string) (lines: string array) : Result<unit, Error> =
     |> writeLinesToFile filePath
     |! IoFileWriteError
 
-let copyToBackupFile fileInfo : Result<FileInfo, Error> =
-    fileInfo
-    |> copyToBackupFile
-    |! IoFileWriteError
+let backupFileIfExists (fileInfo: FileInfo) : Result<string, Error> =
+    if fileInfo.Exists then
+        fileInfo
+        |> copyToBackupFile
+        |! IoFileWriteError
+        |> Result.map (fun fileInfo -> $"Created backup file \"{fileInfo}\".")
+    else
+        Ok $"File \"{fileInfo.FullName}\" does not exist, so no back up was done."
