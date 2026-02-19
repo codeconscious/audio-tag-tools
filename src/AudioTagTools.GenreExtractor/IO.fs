@@ -11,6 +11,12 @@ let readFile (fileInfo: FileInfo) : Result<string, Error> =
 let readLines (fileInfo: FileInfo) : Result<string array, Error> =
     readLines fileInfo |! IoFileReadError
 
+let readOldGenres (genreFile: FileInfo) : Result<string array, Error> =
+    if genreFile.Exists then
+        readLines genreFile
+    else
+        Ok Array.empty
+
 let writeLines (filePath: string) (lines: string array) : Result<unit, Error> =
     lines
     |> writeLinesToFile filePath

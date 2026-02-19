@@ -14,14 +14,7 @@ let private run args : Result<unit, Error> =
     result {
         let! tagLibraryFile, genreFile = validate args
 
-        let! oldGenres =
-            if genreFile.Exists then
-                genreFile
-                |> readLines
-                |. printOldSummary
-            else
-                printfn $"File \"{genreFile.FullName}\" will be created."
-                Ok Array.empty
+        let! oldGenres = genreFile |> readOldGenres |. printOldSummary
 
         let! tags =
             tagLibraryFile
