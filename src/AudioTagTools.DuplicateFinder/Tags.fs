@@ -4,6 +4,7 @@ open Errors
 open Settings
 open Shared
 open Shared.TagLibrary
+open FSharpPlus
 open CCFSharpUtils.Library
 open System
 open System.IO
@@ -59,7 +60,7 @@ let private groupName (settings: Settings) fileTags =
         let checkEquivalentArtists artist =
             settings.EquivalentArtists
             |> Array.tryFind (Array.contains artist)
-            |> Option.mapElse Array.head artist
+            |> option Array.head artist
 
         fileTags
         |> mainArtists String.Empty

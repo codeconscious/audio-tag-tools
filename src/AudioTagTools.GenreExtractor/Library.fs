@@ -8,11 +8,13 @@ open Shared.TagLibrary
 open CCFSharpUtils.Library
 open FsToolkit.ErrorHandling
 
+let private separator = "＼"
+
 let private run args : Result<unit, Error> =
     result {
         let! tagLibraryFile, genreFile = validate args
 
-        let! oldGenres = readLines genreFile |. printOldSummary
+        let! oldGenres = genreFile |> readGenres |. printOldSummary
 
         let! tags =
             tagLibraryFile
@@ -21,14 +23,14 @@ let private run args : Result<unit, Error> =
             |! TagParseError
 
         // The separator character should be rare and highly unlikely to appear in files' tags.
-        let newGenres = generateGenreData "＼" tags
+        let newGenres = tags |> generateGenreData separator
 
         printChanges oldGenres newGenres
 
         let! _ =
             genreFile
-            |> copyToBackupFile
-            |. fun fileInfo -> printfn $"Created backup file \"{fileInfo}\"."
+            |> backupFileIfExists
+            |. printfn "%s"
 
         return!
             newGenres

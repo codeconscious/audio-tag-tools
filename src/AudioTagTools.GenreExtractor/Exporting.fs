@@ -10,8 +10,13 @@ let private mainArtist (fileTags: LibraryTags) =
     | a when Array.isNotEmpty a.AlbumArtists -> a.AlbumArtists[0]
     | _ -> String.Empty
 
-let printOldSummary (oldGenres: string array) =
-    printfn "%s entries in the old file." (String.formatInt oldGenres.Length)
+let printOldSummary (oldGenres: string array) : unit =
+    match oldGenres with
+    | [||] ->
+        printfn "No existing genre data found."
+    | _  ->
+        let count = oldGenres.Length
+        printfn "%s %s in the old file." (String.formatInt count) (String.pluralize "entry" "entries" count)
 
 let printTagCount (tags: MultipleLibraryTags) =
     printfn $"Parsed tags for {String.formatInt tags.Length} files from the tag library."

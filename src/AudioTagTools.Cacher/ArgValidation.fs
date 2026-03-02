@@ -9,9 +9,10 @@ open System.IO
 let validate args : Result<(DirectoryInfo * FileInfo), Error> =
     match args with
     | [| mediaDirArg; tagLibArg |] ->
-        (fun mediaDir -> (mediaDir, FileInfo tagLibArg))
-        <!> (mediaDirArg |> validateToDirInfo (MediaDirectoryMissing mediaDirArg))
+        applicative {
+            let! mediaDir = mediaDirArg |> validateToDirInfo (MediaDirectoryMissing mediaDirArg)
+            return (mediaDir, FileInfo tagLibArg)
+        }
         |> Validation.toResult
     | _ ->
         Error InvalidArgCount
-

@@ -3,18 +3,18 @@ module DuplicateFinder.ArgValidation
 open Errors
 open Shared.IO
 open CCFSharpUtils.Library
+open FSharpPlus
 open FSharpPlus.Data
-open FsToolkit.ErrorHandling
 open System.IO
 
 let validate args : Result<(FileInfo * FileInfo), Error> =
     match args with
-    | [| settingsFileArg; tagLibArg |] ->
-        Validation.map2
-            (fun settingsFile tagLib -> settingsFile, tagLib)
-            (settingsFileArg |> validateToFileInfo $"Settings file \"{settingsFileArg}\" does not exist.")
-            (tagLibArg       |> validateToFileInfo $"Tag library file \"{tagLibArg}\" does not exist.")
-        |! (fun errs -> errs |> NonEmptyList.ofList |> IoFilesMissing)
+    | [| settingsArg; tagLibArg |] ->
+        applicative {
+            let! settingsFile = settingsArg |> toFileInfo $"Settings file \"{settingsArg}\" does not exist."
+            and! tagLibFile = tagLibArg |> toFileInfo $"Tag library file \"{tagLibArg}\" does not exist."
+            return (settingsFile, tagLibFile)
+        }
+        ||! (NonEmptyList.ofList >> ArgErrors)
     | _ ->
         Error ArgCountError
-
