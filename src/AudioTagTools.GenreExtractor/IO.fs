@@ -11,7 +11,7 @@ let readFile (fileInfo: FileInfo) : Result<string, Error> =
 let readLines (fileInfo: FileInfo) : Result<string array, Error> =
     readLines fileInfo |! IoFileReadError
 
-let readOldGenres (genreFile: FileInfo) : Result<string array, Error> =
+let readGenres (genreFile: FileInfo) : Result<string array, Error> =
     if genreFile.Exists then
         readLines genreFile
     else

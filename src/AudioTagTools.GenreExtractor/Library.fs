@@ -14,7 +14,7 @@ let private run args : Result<unit, Error> =
     result {
         let! tagLibraryFile, genreFile = validate args
 
-        let! oldGenres = genreFile |> readOldGenres |. printOldSummary
+        let! oldGenres = genreFile |> readGenres |. printOldSummary
 
         let! tags =
             tagLibraryFile
