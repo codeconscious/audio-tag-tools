@@ -1,7 +1,6 @@
 module GenreExtractor.ArgValidation
 
 open Errors
-open Shared.IO
 open CCFSharpUtils.Library
 open FSharpPlus
 open FSharpPlus.Data
