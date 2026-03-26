@@ -10,7 +10,7 @@ let validate args : Result<(FileInfo * FileInfo), Error>=
     match args with
     | [| tagLibArg; genreFileArg |] ->
         applicative {
-            let! tagLib = tagLibArg |> File.toFileInfo $"Tag library file \"{tagLibArg}\" does not exist."
+            let! tagLib = tagLibArg |> File.toFileInfoV $"Tag library file \"{tagLibArg}\" does not exist."
             return (tagLib, FileInfo genreFileArg)
         }
         |> Validation.toResult
