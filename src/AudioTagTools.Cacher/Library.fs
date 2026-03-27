@@ -4,7 +4,6 @@ open ArgValidation
 open Errors
 open IO
 open Tags
-open Shared.IO
 open CCFSharpUtils.Library
 open FsToolkit.ErrorHandling
 
@@ -17,13 +16,13 @@ let private run (args: string array) : Result<unit, Error> =
 
         let _ =
             tagLibraryFile
-            |> copyToBackupFile
+            |> File.copyToBackupFile "yyyyMMdd_HHmmss"
             |. fun backupFile -> printfn "Backed up previous file to \"%s\"." backupFile.Name
             |! WriteFileError
 
         do!
             newJson
-            |> writeTextToFile tagLibraryFile.FullName
+            |> File.writeTextToFile tagLibraryFile.FullName
             |. fun _ -> printfn "Wrote file \"%s\"." tagLibraryFile.FullName
             |! WriteFileError
     }

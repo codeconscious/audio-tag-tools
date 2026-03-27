@@ -3,14 +3,13 @@ module DuplicateFinder.IO
 open Errors
 open Settings
 open Shared.TagLibrary
-open Shared.IO
 open CCFSharpUtils.Library
 open System
 open System.Text
 open System.IO
 
 let readFile (fileInfo: FileInfo) : Result<string, Error> =
-    fileInfo |> readFile |! IoFileReadError
+    fileInfo |> File.readText' |! IoFileReadError
 
 let savePlaylist (settings: Settings) (tags: MultipleLibraryTags array option) : Result<unit, Error> =
     let now = DateTime.Now.ToString("yyyyMMdd_HHmmss")
@@ -43,6 +42,6 @@ let savePlaylist (settings: Settings) (tags: MultipleLibraryTags array option) :
         |> Array.collect id
         |> Array.fold appendFileEntry (StringBuilder "#EXTM3U\n")
         |> _.ToString()
-        |> writeTextToFile fullPath
+        |> File.writeTextToFile fullPath
         |. fun _ -> printfn $"Created playlist file \"{fullPath}\"."
         |! IoFileWriteError

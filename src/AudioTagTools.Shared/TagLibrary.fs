@@ -1,6 +1,5 @@
 module Shared.TagLibrary
 
-open IO
 open FSharpPlus
 open CCFSharpUtils.Library
 open System
@@ -49,7 +48,7 @@ let parseToTags (json: string) : Result<MultipleLibraryTags, string> =
     try Ok (JsonSerializer.Deserialize<MultipleLibraryTags>(json))
     with e -> Error e.Message
 
-let readThenParseToJson = readFile >=> parseToTags
+let readThenParseToJson = File.readText' >=> parseToTags
 
 let path tags : string =
     Path.Combine [| tags.DirectoryName; tags.FileName |]

@@ -1,7 +1,7 @@
 module Cacher.Errors
 
 type Error =
-    | InvalidArgCount
+    | ArgInvalidCount
     | MediaDirectoryMissing of string
     | ReadFileError of string
     | WriteFileError of string
@@ -12,7 +12,7 @@ type Error =
     | JsonSerializationError of string
 
 let message = function
-    | InvalidArgCount -> "Invalid arguments. Pass in (1) the directory containing your audio files and (2) a path to a JSON file containing cached tag data."
+    | ArgInvalidCount -> "Invalid arguments. Pass in (1) the directory containing your audio files and (2) a path to a JSON file containing cached tag data."
     | MediaDirectoryMissing dir -> $"Directory \"{dir}\" was not found."
     | ReadFileError msg -> $"Read failure: {msg}"
     | WriteFileError msg -> $"Write failure: {msg}"
