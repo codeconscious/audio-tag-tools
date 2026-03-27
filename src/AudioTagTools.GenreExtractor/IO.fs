@@ -21,12 +21,3 @@ let writeLines (filePath: string) (lines: string array) : Result<unit, Error> =
     lines
     |> File.writeLinesToFile filePath
     |! IoFileWriteError
-
-let backupFileIfExists (fileInfo: FileInfo) : Result<string, Error> =
-    if fileInfo.Exists then
-        fileInfo
-        |> File.copyToBackupFile timeStampFormat
-        |* sprintf "Created backup file \"%O\"." // %O formats any object via ToString().
-        |! IoFileWriteError
-    else
-        Ok $"File \"{fileInfo.FullName}\" does not exist, so no back up was done."

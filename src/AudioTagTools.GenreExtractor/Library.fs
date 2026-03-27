@@ -5,6 +5,7 @@ open Errors
 open Exporting
 open IO
 open Shared.TagLibrary
+open Shared.Constants
 open CCFSharpUtils.Library
 open FsToolkit.ErrorHandling
 
@@ -27,10 +28,11 @@ let private run args : Result<unit, Error> =
 
         printChanges oldGenres newGenres
 
-        let! _ =
+        do!
             genreFile
-            |> backupFileIfExists
-            |. printfn "%s"
+            |> File.copyToBackupFile timeStampFormat
+            |* printfn "Created backup file \"%O\"." // %O formats any object via ToString().
+            |! IoFileWriteError
 
         return!
             newGenres
