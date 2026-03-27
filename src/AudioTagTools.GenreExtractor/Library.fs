@@ -32,7 +32,7 @@ let private run args : Result<unit, Error> =
             genreFile
             |> File.copyToBackupFile timeStampFormat
             |* printfn "Created backup file \"%O\"." // %O formats any object via ToString().
-            |! IoFileWriteError
+            |! FileWriteError
 
         return!
             newGenres

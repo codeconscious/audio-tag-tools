@@ -6,15 +6,15 @@ open FSharpPlus.Data
 type Error =
     | ArgCountError
     | ArgErrors of string NonEmptyList
-    | IoFileReadError of string
-    | IoFileWriteError of string
+    | FileReadError of string
+    | FileWriteError of string
     | SettingsParseError of string
     | TagParseError of string
 
 let message = function
     | ArgCountError -> "Invalid arguments. Pass in two JSON file paths: (1) your settings file and (2) your tag library."
     | ArgErrors errs -> errs |> String.concatNL
-    | IoFileReadError msg -> $"I/O read failure: {msg}"
-    | IoFileWriteError msg -> $"I/O write failure: {msg}"
+    | FileReadError msg -> $"I/O read failure: {msg}"
+    | FileWriteError msg -> $"I/O write failure: {msg}"
     | SettingsParseError msg -> $"Failure parsing settings file: {msg}"
     | TagParseError msg -> $"Failure parsing tag library file: {msg}"

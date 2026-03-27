@@ -8,6 +8,6 @@ let validate (args: string array) : Result<FileInfo, Error> =
     | [| tagLibraryArg |] ->
         if File.Exists tagLibraryArg
         then Ok (FileInfo tagLibraryArg)
-        else Error (IoMissingFile tagLibraryArg)
+        else Error (FileMissing tagLibraryArg)
     | _ ->
         Error ArgInvalidCount

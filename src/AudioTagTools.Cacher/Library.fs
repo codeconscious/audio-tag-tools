@@ -19,13 +19,13 @@ let private run (args: string array) : Result<unit, Error> =
             tagLibraryFile
             |> File.copyToBackupFile timeStampFormat
             |. fun backupFile -> printfn "Backed up previous file to \"%s\"." backupFile.Name
-            |! WriteFileError
+            |! FileWriteError
 
         do!
             newJson
             |> File.writeTextToFile tagLibraryFile.FullName
             |. fun _ -> printfn "Wrote file \"%s\"." tagLibraryFile.FullName
-            |! WriteFileError
+            |! FileWriteError
     }
 
 let start (args: string array) : Result<string, string> =

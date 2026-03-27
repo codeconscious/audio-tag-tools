@@ -13,7 +13,7 @@ type FileTags = TagLib.File
 let readfile filePath : Result<string, Error> =
     match File.readText filePath with
     | Ok x -> Ok x
-    | Error msg -> Error (ReadFileError msg)
+    | Error msg -> Error (FileReadError msg)
 
 let getFileInfos (dirPath: DirectoryInfo) : Result<FileInfo NonEmptySeq, Error> =
     let isSupportedAudioFile (fileInfo: FileInfo) =
@@ -44,4 +44,4 @@ let parseFileTags (filePath: string) : Result<FileTags option, Error> =
 
 let writeFile (filePath: string) (content: string) : Result<unit, Error> =
     try Ok (File.WriteAllText(filePath, content))
-    with e -> Error (WriteFileError e.Message)
+    with e -> Error (FileWriteError e.Message)
