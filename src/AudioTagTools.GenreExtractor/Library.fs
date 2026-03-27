@@ -9,6 +9,7 @@ open Shared.Constants
 open CCFSharpUtils.Library
 open FsToolkit.ErrorHandling
 
+// The separator character should be rare and highly unlikely to appear in files' tags.
 let private separator = "＼"
 
 let private run args : Result<unit, Error> =
@@ -23,7 +24,6 @@ let private run args : Result<unit, Error> =
             |. printTagCount
             |! TagParseError
 
-        // The separator character should be rare and highly unlikely to appear in files' tags.
         let newGenres = tags |> generateGenreData separator
 
         printChanges oldGenres newGenres
