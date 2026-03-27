@@ -8,6 +8,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <Compile Include="Constants.fs" />
         <Compile Include="TagLibrary.fs" />
         <Compile Include="Printing.fs" />
     </ItemGroup>

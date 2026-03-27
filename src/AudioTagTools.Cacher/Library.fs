@@ -4,6 +4,7 @@ open ArgValidation
 open Errors
 open IO
 open Tags
+open Shared.Constants
 open CCFSharpUtils.Library
 open FsToolkit.ErrorHandling
 
@@ -16,7 +17,7 @@ let private run (args: string array) : Result<unit, Error> =
 
         let _ =
             tagLibraryFile
-            |> File.copyToBackupFile "yyyyMMdd_HHmmss"
+            |> File.copyToBackupFile timeStampFormat
             |. fun backupFile -> printfn "Backed up previous file to \"%s\"." backupFile.Name
             |! WriteFileError
 

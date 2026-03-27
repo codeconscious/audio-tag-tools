@@ -2,6 +2,7 @@ module DuplicateFinder.IO
 
 open Errors
 open Settings
+open Shared.Constants
 open Shared.TagLibrary
 open CCFSharpUtils.Library
 open System
@@ -12,7 +13,7 @@ let readFile (fileInfo: FileInfo) : Result<string, Error> =
     fileInfo |> File.readText' |! IoFileReadError
 
 let savePlaylist (settings: Settings) (tags: MultipleLibraryTags array option) : Result<unit, Error> =
-    let now = DateTime.Now.ToString("yyyyMMdd_HHmmss")
+    let now = DateTime.Now.ToString timeStampFormat
     let filename = $"Duplicates by AudioTagTools - {now}.m3u"
     let fullPath = Path.Combine(settings.Playlist.SaveDirectory, filename)
 

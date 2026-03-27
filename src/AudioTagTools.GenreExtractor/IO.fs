@@ -1,6 +1,7 @@
 module GenreExtractor.IO
 
 open Errors
+open Shared.Constants
 open CCFSharpUtils.Library
 open System.IO
 
@@ -24,7 +25,7 @@ let writeLines (filePath: string) (lines: string array) : Result<unit, Error> =
 let backupFileIfExists (fileInfo: FileInfo) : Result<string, Error> =
     if fileInfo.Exists then
         fileInfo
-        |> File.copyToBackupFile "yyyyMMdd_HHmmss"
+        |> File.copyToBackupFile timeStampFormat
         |! IoFileWriteError
         |> Result.map (fun fileInfo -> $"Created backup file \"{fileInfo}\".")
     else
