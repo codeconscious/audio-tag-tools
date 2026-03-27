@@ -12,8 +12,7 @@ let validate args : Result<(FileInfo * FileInfo), Error> =
         applicative {
             let! settingsFile = settingsArg |> File.toFileInfoV $"Settings file \"{settingsArg}\" does not exist."
             and! tagLibFile = tagLibArg |> File.toFileInfoV $"Tag library file \"{tagLibArg}\" does not exist."
-            return (settingsFile, tagLibFile)
-        }
+            return (settingsFile, tagLibFile) }
         |> Validation.toResult
         |> Result.mapError (NonEmptyList.ofList >> ArgErrors)
     | _ ->

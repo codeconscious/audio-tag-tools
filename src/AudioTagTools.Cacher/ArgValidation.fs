@@ -11,8 +11,7 @@ let validate args : Result<(DirectoryInfo * FileInfo), Error> =
     | [| mediaDirArg; tagLibArg |] ->
         applicative {
             let! mediaDir = mediaDirArg |> validateToDirInfo (MediaDirectoryMissing mediaDirArg)
-            return (mediaDir, FileInfo tagLibArg)
-        }
+            return (mediaDir, FileInfo tagLibArg) }
         |> Validation.toResult
     | _ ->
         Error InvalidArgCount
