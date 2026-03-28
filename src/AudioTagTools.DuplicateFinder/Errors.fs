@@ -3,12 +3,13 @@ module DuplicateFinder.Errors
 open CCFSharpUtils.Library
 open FSharpPlus.Data
 
+// TODO: Rename all 'Error' types.
 type Error =
     | ArgCountError
     | ArgErrors of string NonEmptyList
     | FileReadError of string
     | FileWriteError of string
-    | SettingsParseError of string
+    | SettingParseError of string
     | TagParseError of string
 
 let message = function
@@ -16,5 +17,5 @@ let message = function
     | ArgErrors errs -> errs |> String.concatNL
     | FileReadError msg -> $"I/O read failure: {msg}"
     | FileWriteError msg -> $"I/O write failure: {msg}"
-    | SettingsParseError msg -> $"Failure parsing settings file: {msg}"
+    | SettingParseError msg -> $"Failure parsing settings file: {msg}"
     | TagParseError msg -> $"Failure parsing tag library file: {msg}"

@@ -9,9 +9,6 @@ open System
 open System.Text
 open System.IO
 
-let readFile (fileInfo: FileInfo) : Result<string, Error> =
-    fileInfo |> File.readText' |! FileReadError
-
 let savePlaylist (settings: Settings) (tags: MultipleLibraryTags array option) : Result<unit, Error> =
     let now = DateTime.Now.ToString timeStampFormat
     let filename = $"Duplicates by AudioTagTools - {now}.m3u"

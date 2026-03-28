@@ -45,7 +45,7 @@ let parseToSettings (json: string) : Result<Settings, Error> =
         |> SettingsProvider.Parse
         |> Ok
     with
-    | e -> Error (SettingsParseError e.Message)
+    | e -> Error (SettingParseError e.Message)
 
 let printSummary (settings: Settings) =
     printfn "Settings:"
