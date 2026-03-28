@@ -1,19 +1,11 @@
 module Cacher.IO
 
 open Errors
-open FSharpPlus
 open FSharpPlus.Data
-open Shared
-open Shared.TagLibrary
 open CCFSharpUtils.Library
 open System.IO
 
 type FileTags = TagLib.File
-
-let readfile filePath : Result<string, Error> =
-    match File.readText filePath with
-    | Ok x -> Ok x
-    | Error msg -> Error (FileReadError msg)
 
 let getFileInfos (dirPath: DirectoryInfo) : Result<FileInfo NonEmptySeq, Error> =
     let isSupportedAudioFile (fileInfo: FileInfo) =
@@ -30,18 +22,3 @@ let getFileInfos (dirPath: DirectoryInfo) : Result<FileInfo NonEmptySeq, Error> 
         |> Seq.toNonEmptySeqResult (NoFilesFound dirPath.FullName)
     with
     | e -> Error (GeneralIoError e.Message)
-
-let parseJsonToTags (json: string) : Result<MultipleLibraryTags, Error> =
-    parseToTags json
-    |! LibraryTagParseError
-
-let parseFileTags (filePath: string) : Result<FileTags option, Error> =
-    try
-        FileTags.Create filePath
-        |> Option.ofObj
-        |> Ok
-    with e -> Error (FileTagParseError e.Message)
-
-let writeFile (filePath: string) (content: string) : Result<unit, Error> =
-    try Ok (File.WriteAllText(filePath, content))
-    with e -> Error (FileWriteError e.Message)

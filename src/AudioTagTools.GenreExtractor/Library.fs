@@ -7,6 +7,7 @@ open IO
 open Shared.TagLibrary
 open Shared.Constants
 open CCFSharpUtils.Library
+open FSharpPlus
 open FsToolkit.ErrorHandling
 
 // The separator character should be rare and highly unlikely to appear in files' tags.
@@ -30,9 +31,9 @@ let private run args : Result<unit, Error> =
 
         do!
             genreFile
-            |> File.copyToBackupFile timeStampFormat
-            |* printfn "Created backup file \"%O\"." // %O formats any object via ToString().
-            |! FileWriteError
+            |>  File.copyToBackupFile timeStampFormat
+            |>> printfn "Created backup file \"%O\"." // %O formats any object via ToString().
+            |!  FileWriteError
 
         return!
             newGenres

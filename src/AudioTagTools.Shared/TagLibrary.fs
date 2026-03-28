@@ -6,6 +6,8 @@ open System
 open System.IO
 open System.Text.Json
 
+type FileTags = TagLib.File
+
 type LibraryTags =
     { FileName: string
       DirectoryName: string
@@ -49,6 +51,13 @@ let parseToTags (json: string) : Result<MultipleLibraryTags, string> =
     with e -> Error e.Message
 
 let readThenParseToJson = File.readText' >=> parseToTags
+
+let parseFileTags (filePath: string) : Result<FileTags option, string> =
+    try
+        FileTags.Create filePath
+        |> Option.ofObj
+        |> Ok
+    with exn -> Error exn.Message
 
 let path tags : string =
     Path.Combine [| tags.DirectoryName; tags.FileName |]

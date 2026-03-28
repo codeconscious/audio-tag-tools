@@ -22,10 +22,12 @@ type CategorizedTagsToCache =
 let createTagLibraryMap (libraryFile: FileInfo) : Result<LibraryTagMap, Error> =
     if libraryFile.Exists
     then
-        readfile libraryFile.FullName
-        >>= parseJsonToTags
+        libraryFile.FullName
+        |>  File.readText
+        >>= parseToTags
         |>> Array.map groupWithPath
         |>> Map.ofArray
+        |!  LibraryTagParseError
     else
         Ok Map.empty
 
