@@ -31,7 +31,7 @@ let private run args : Result<unit, Error> =
 
         do!
             genreFile
-            |>  File.copyToBackupFile timeStampFormat
+            |>  File.backUpWithTimestamp timeStampFormat
             |>> printfn "Created backup file \"%O\"." // %O formats any object via ToString().
             |!  FileWriteError
 

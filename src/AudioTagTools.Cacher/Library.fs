@@ -17,7 +17,7 @@ let private run (args: string array) : Result<unit, Error> =
 
         let _ =
             tagLibraryFile
-            |> File.copyToBackupFile timeStampFormat
+            |> File.backUpWithTimestamp timeStampFormat
             |. fun backupFile -> printfn "Backed up previous file to \"%s\"." backupFile.Name
             |! FileWriteError
 
