@@ -37,7 +37,8 @@ let private run args : Result<unit, Error> =
 
         return!
             newGenres
-            |> writeLines genreFile.FullName
+            |> File.writeLinesToFile genreFile.FullName
+            |! FileWriteError
     }
 
 let start args : Result<string, string> =
