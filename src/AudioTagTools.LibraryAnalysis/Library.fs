@@ -1,11 +1,10 @@
 ﻿module LibraryAnalysis.Library
 
 open Analysis
-open System
 open ArgValidation
 open Errors
-open IO
 open Shared
+open Shared.TagLibrary
 open CCFSharpUtils.Library
 open FsToolkit.ErrorHandling
 open Spectre.Console
@@ -19,7 +18,7 @@ type QualityData =
 let private run (args: string array) : Result<unit, Error> =
     result {
         let! tagLibraryFile = validate args
-        let! tags = readFile tagLibraryFile >>= parseJsonToTags
+        let! tags = tagLibraryFile |> File.readText' >>= parseToTags |! TagParseError
 
         printTable {
             Title = Some "General Data"
