@@ -50,8 +50,6 @@ let parseToTags (json: string) : Result<MultipleLibraryTags, string> =
     try Ok (JsonSerializer.Deserialize<MultipleLibraryTags>(json))
     with e -> Error e.Message
 
-let readThenParseToJson = File.readText' >=> parseToTags
-
 let parseFileTags (filePath: string) : Result<FileTags option, string> =
     try
         FileTags.Create filePath

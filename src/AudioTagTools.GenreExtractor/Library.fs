@@ -21,9 +21,10 @@ let private run args : Result<unit, GenreExtractorError> =
 
         let! tags =
             tagLibraryFile
-            |> readThenParseToJson
-            |. printTagCount
-            |! TagParseError
+            |>  File.readText'
+            >>= parseToTags
+            |!  TagParseError
+            |.  printTagCount
 
         let newGenres = tags |> generateGenreData separator
 
@@ -31,8 +32,8 @@ let private run args : Result<unit, GenreExtractorError> =
 
         do!
             genreFile
-            |>  File.backUpWithTimestamp timeStampFormat
-            |>> printfn "Created backup file \"%O\"." // %O formats any object via ToString().
+            |> File.backUpWithTimestamp timeStampFormat
+            |>> printfn "Created backup file \"%O\"." // %O formats with ToString().
             |!  FileWriteError
 
         return!
