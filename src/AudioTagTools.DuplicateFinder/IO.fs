@@ -9,7 +9,7 @@ open System
 open System.Text
 open System.IO
 
-let savePlaylist (settings: Settings) (tags: MultipleLibraryTags array option) : Result<unit, Error> =
+let savePlaylist (settings: Settings) (tags: MultipleLibraryTags array option) : Result<unit, DupeFinderError> =
     let now = DateTime.Now.ToString timeStampFormat
     let filename = $"Duplicates by AudioTagTools - {now}.m3u"
     let fullPath = Path.Combine(settings.Playlist.SaveDirectory, filename)

@@ -4,7 +4,7 @@ open Errors
 open CCFSharpUtils.Library
 open System.IO
 
-let readGenres (genreFile: FileInfo) : Result<string array, Error> =
+let readGenres (genreFile: FileInfo) : Result<string array, GenreExtractorError> =
     if genreFile.Exists then
         genreFile |> File.readLines' |! FileReadError
     else

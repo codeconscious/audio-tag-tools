@@ -10,7 +10,7 @@ open FSharpPlus.Operators
 open FsToolkit.ErrorHandling
 open FsToolkit.ErrorHandling.Operator.Result
 
-let private run (args: string array) : Result<unit, Error> =
+let private run (args: string array) : Result<unit, DupeFinderError> =
     result {
         let! settingsFile, tagLibraryFile = validate args
 

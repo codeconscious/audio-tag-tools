@@ -13,7 +13,7 @@ open FsToolkit.ErrorHandling
 // The separator character should be rare and highly unlikely to appear in files' tags.
 let private separator = "＼"
 
-let private run args : Result<unit, Error> =
+let private run args : Result<unit, GenreExtractorError> =
     result {
         let! tagLibraryFile, genreFile = validate args
 

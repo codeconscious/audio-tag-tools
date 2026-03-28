@@ -8,7 +8,7 @@ open Shared.Constants
 open CCFSharpUtils.Library
 open FsToolkit.ErrorHandling
 
-let private run (args: string array) : Result<unit, Error> =
+let private run (args: string array) : Result<unit, CacherError> =
     result {
         let! mediaDir, tagLibraryFile = validate args
         let! fileInfos = getFileInfos mediaDir

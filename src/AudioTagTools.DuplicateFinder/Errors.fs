@@ -3,8 +3,7 @@ module DuplicateFinder.Errors
 open CCFSharpUtils.Library
 open FSharpPlus.Data
 
-// TODO: Rename all 'Error' types.
-type Error =
+type DupeFinderError =
     | ArgCountError
     | ArgErrors of string NonEmptyList
     | FileReadError of string

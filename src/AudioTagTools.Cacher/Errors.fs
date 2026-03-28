@@ -1,6 +1,6 @@
 module Cacher.Errors
 
-type Error =
+type CacherError =
     | ArgInvalidCount
     | MediaDirectoryMissing of string
     | FileReadError of string

@@ -6,7 +6,7 @@ open FSharpPlus
 open FSharpPlus.Data
 open System.IO
 
-let validate args : Result<(FileInfo * FileInfo), Error>=
+let validate args : Result<(FileInfo * FileInfo), GenreExtractorError>=
     match args with
     | [| tagLibArg; genreFileArg |] ->
         applicative {

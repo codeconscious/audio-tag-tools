@@ -1,6 +1,6 @@
 module LibraryAnalysis.Errors
 
-type Error =
+type AnalysisError =
     | ArgInvalidCount
     | FileMissing of string
     | FileReadError of string
