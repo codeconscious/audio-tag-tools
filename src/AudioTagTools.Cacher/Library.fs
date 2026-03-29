@@ -8,8 +8,6 @@ open Shared.Constants
 open CCFSharpUtils.Library
 open FsToolkit.ErrorHandling
 
-let flip f x y = f y x
-
 let private run (args: string array) : Result<unit, CacherError> =
     result {
         let! mediaDir, tagLibraryFile = validate args
@@ -25,7 +23,7 @@ let private run (args: string array) : Result<unit, CacherError> =
 
         do!
             newJson
-            |> flip File.writeTextToFile tagLibraryFile.FullName
+            |> File.writeTextToFile tagLibraryFile.FullName
             |. fun _ -> printfn "Wrote file \"%s\"." tagLibraryFile.FullName
             |! FileWriteError
     }
