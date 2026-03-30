@@ -8,10 +8,12 @@ This small command line application performs four tasks:
 
 I originally created this tool to practice with F# [JSON type providers](https://fsprojects.github.io/FSharp.Data/library/JsonProvider.html), but it resolves a couple of small pain points for me as well.
 
+
 # Requirements
 
-- [.NET 9 runtime](https://dotnet.microsoft.com/en-us/download/dotnet/9.0)
+- [.NET 10 runtime](https://dotnet.microsoft.com/en-us/download/dotnet/10.0)
 - JSON settings file (only for the duplicate search) — plus comfort manually editing such JSON files
+
 
 # Running
 
