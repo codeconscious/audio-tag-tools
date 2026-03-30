@@ -23,7 +23,7 @@ let private run (args: string array) : Result<unit, CacherError> =
 
         do!
             newJson
-            |> File.writeText tagLibraryFile.FullName
+            |> File.writeText' tagLibraryFile
             |. fun _ -> printfn "Wrote file \"%s\"." tagLibraryFile.FullName
             |! FileWriteError
     }

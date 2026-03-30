@@ -11,8 +11,8 @@ open System.IO
 
 let savePlaylist (settings: Settings) (tags: MultipleLibraryTags array option) : Result<unit, DupeFinderError> =
     let now = DateTime.Now.ToString timeStampFormat
-    let filename = $"Duplicates by AudioTagTools - {now}.m3u"
-    let fullPath = Path.Combine(settings.Playlist.SaveDirectory, filename)
+    let fileName = $"Duplicates by AudioTagTools - {now}.m3u"
+    let file = FileInfo <| Path.Combine(settings.Playlist.SaveDirectory, fileName)
 
     let appendFileEntry (builder: StringBuilder) (m: LibraryTags) : StringBuilder =
         let seconds = m.Duration.TotalSeconds
@@ -24,14 +24,14 @@ let savePlaylist (settings: Settings) (tags: MultipleLibraryTags array option) :
         let extInf = $"#EXTINF:{seconds},{artistWithTitle}"
         builder.AppendLine extInf |> ignore
 
-        let fullPath = Path.Combine(m.DirectoryName, m.FileName)
+        let oldPath = Path.Combine(m.DirectoryName, m.FileName)
 
-        let updatedPath =
+        let savePath =
             match settings.Playlist.SearchPath, settings.Playlist.ReplacePath with
-            | s, _ when s |> String.hasNoText -> fullPath
-            | s, r -> fullPath.Replace(s, r)
+            | s, _ when s |> String.hasNoText -> oldPath
+            | s, r -> oldPath.Replace(s, r)
 
-        builder.AppendLine updatedPath
+        builder.AppendLine savePath
 
     match tags with
     | None -> Ok ()
@@ -40,6 +40,6 @@ let savePlaylist (settings: Settings) (tags: MultipleLibraryTags array option) :
         |> Array.collect id
         |> Array.fold appendFileEntry (StringBuilder "#EXTM3U\n")
         |> _.ToString()
-        |> File.writeText fullPath
-        |. fun _ -> printfn $"Created playlist file \"{fullPath}\"."
+        |> File.writeText' file
         |! FileWriteError
+        |. fun _ -> printfn $"Created playlist file \"{file}\"."
