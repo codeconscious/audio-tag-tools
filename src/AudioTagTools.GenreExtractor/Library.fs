@@ -38,7 +38,7 @@ let private run args : Result<unit, GenreExtractorError> =
 
         return!
             newGenres
-            |> File.writeLinesToFile genreFile.FullName
+            |> File.writeLines genreFile.FullName
             |! FileWriteError
     }
 
