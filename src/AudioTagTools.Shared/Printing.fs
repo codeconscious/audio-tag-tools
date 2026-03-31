@@ -15,7 +15,7 @@ type TableData =
 
 let printfColor color msg =
     Console.ForegroundColor <- color
-    printf $"%s{msg}"
+    printf $"%s{Markup.Escape msg}"
     Console.ResetColor()
 
 let printfnColor color msg =
@@ -27,7 +27,8 @@ let printTable tableData =
 
     match tableData.Headers with
     | Some header ->
-        header |> List.iter (fun h -> table.AddColumn h |> ignore)
+        header
+        |> List.iter (fun h -> h |> Markup.Escape |> table.AddColumn |> ignore)
     | None ->
         tableData.Rows[0] |> Array.iter (fun _ -> table.AddColumn String.Empty |> ignore)
         table.HideHeaders() |> ignore
@@ -36,16 +37,12 @@ let printTable tableData =
     |> List.iteri (fun i alignment -> table.Columns[i].Alignment alignment |> ignore)
 
     tableData.Rows
-    |> Array.iter (fun row ->
-        row
-        |> Array.map Markup.Escape
-        |> table.AddRow
-        |> ignore)
+    |> Array.iter (fun row -> row |> Array.map Markup.Escape |> table.AddRow |> ignore)
 
     match tableData.Title with
     | Some tableTitle ->
         let panel = Panel table
-        panel.Header <- PanelHeader $"| {tableTitle} |"
+        panel.Header <- PanelHeader $"| {Markup.Escape tableTitle} |"
         AnsiConsole.Write panel
     | None ->
         AnsiConsole.Write table
