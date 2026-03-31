@@ -9,7 +9,8 @@ type TableData =
     { Title: string option
       Headers: string list option
       Rows: string array array
-      ColumnAlignments: Justify list }
+      ColumnAlignments: Justify list
+      ShowRowSeparators: bool }
 
 // Be careful with color because we don't know the user's terminal color scheme,
 // so it's easy to unintentionally output invisible or hard-to-read text.
@@ -24,6 +25,9 @@ let printfnColor color msg =
 let printTable tableData =
     let table = Table()
     table.Border <- TableBorder.SimpleHeavy
+
+    if tableData.ShowRowSeparators then
+        table.ShowRowSeparators() |> ignore
 
     match tableData.Headers with
     | Some header ->
