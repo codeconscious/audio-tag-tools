@@ -144,10 +144,8 @@ let topQualityData count tags =
            String.formatInt data.SampleRate
            String.formatInt count |])
 
-let longestFileNames count (tags: LibraryTags array) =
+let longestFileNames count tags =
     tags
-    |> Array.groupBy _.FileName.Length
-    |> Array.sortByDescending fst
-    |> Array.collect snd
+    |> Array.sortByDescending _.FileName.Length
     |> Array.take count
     |> Array.map (fun t -> [| $"""{mainArtists "; " t}{String.nl}↪︎ {t.Title}"""; t.FileName |])
