@@ -37,7 +37,7 @@ let printTable tableData =
     |> List.iteri (fun i alignment -> table.Columns[i].Alignment alignment |> ignore)
 
     tableData.Rows
-    |> Array.iter (fun row -> row |> Array.map Markup.Escape |> table.AddRow |> ignore)
+    |> Array.iter (fun rowItems -> rowItems |> Array.map Markup.Escape |> table.AddRow |> ignore)
 
     match tableData.Title with
     | Some tableTitle ->
