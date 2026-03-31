@@ -33,10 +33,14 @@ let printTable tableData =
         table.HideHeaders() |> ignore
 
     tableData.ColumnAlignments
-    |> List.iteri (fun i alignment -> table.Columns[i].Alignment(alignment) |> ignore)
+    |> List.iteri (fun i alignment -> table.Columns[i].Alignment alignment |> ignore)
 
     tableData.Rows
-    |> Array.iter (fun row -> table.AddRow row |> ignore)
+    |> Array.iter (fun row ->
+        row
+        |> Array.map Markup.Escape
+        |> table.AddRow
+        |> ignore)
 
     match tableData.Title with
     | Some tableTitle ->
@@ -45,4 +49,3 @@ let printTable tableData =
         AnsiConsole.Write panel
     | None ->
         AnsiConsole.Write table
-

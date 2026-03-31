@@ -100,6 +100,13 @@ let private run (args: string array) : Result<unit, AnalysisError> =
             Rows = topQualityData 10 tags
             ColumnAlignments = [Justify.Left; Justify.Right; Justify.Right; Justify.Right]
         }
+
+        printTable {
+            Title = Some "Longest File Names"
+            Headers = Some ["Artist"; "Title"; "Filename"]
+            Rows = longestFileNames 10 tags
+            ColumnAlignments = [Justify.Left; Justify.Left; Justify.Left]
+        }
     }
 
 let start args : Result<string, string> =
