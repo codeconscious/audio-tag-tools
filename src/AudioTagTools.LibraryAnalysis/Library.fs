@@ -103,9 +103,9 @@ let private run (args: string array) : Result<unit, AnalysisError> =
 
         printTable {
             Title = Some "Longest File Names"
-            Headers = Some ["Artist"; "Title"; "Filename"]
+            Headers = Some ["Artist & Title"; "Filename"]
             Rows = longestFileNames 10 tags
-            ColumnAlignments = [Justify.Left; Justify.Left; Justify.Left]
+            ColumnAlignments = [Justify.Left; Justify.Left]
         }
     }
 

@@ -150,4 +150,4 @@ let longestFileNames count (tags: LibraryTags array) =
     |> Array.sortByDescending fst
     |> Array.collect snd
     |> Array.take count
-    |> Array.map (fun t -> [| mainArtists "; " t; t.Title; t.FileName |])
+    |> Array.map (fun t -> [| $"""{mainArtists "; " t}{String.nl}↪︎ {t.Title}"""; t.FileName |])
