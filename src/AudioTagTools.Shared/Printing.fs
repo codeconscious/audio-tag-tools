@@ -20,7 +20,7 @@ let printfColor color msg =
     Console.ResetColor()
 
 let printfnColor color msg =
-    printfColor color $"{msg}{String.newLine}"
+    printfColor color $"{msg}{String.nl}"
 
 let printTable tableData =
     let table = Table()
