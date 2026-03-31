@@ -1,5 +1,3 @@
-// Be careful with color because we don't know the user's terminal color scheme,
-// so it's easy to unintentionally output invisible or hard-to-read text.
 [<AutoOpen>]
 module Shared.Printing
 
@@ -13,6 +11,8 @@ type TableData =
       Rows: string array array
       ColumnAlignments: Justify list }
 
+// Be careful with color because we don't know the user's terminal color scheme,
+// so it's easy to unintentionally output invisible or hard-to-read text.
 let printfColor color msg =
     Console.ForegroundColor <- color
     printf $"%s{Markup.Escape msg}"
