@@ -148,4 +148,6 @@ let longestFileNames count tags =
     tags
     |> Array.sortByDescending _.FileName.Length
     |> Array.take count
-    |> Array.map (fun t -> [| $"""{mainArtists "; " t}{String.nl}↪︎ {t.Title}"""; t.FileName |])
+    |> Array.map (fun t ->
+        [| $"""{mainArtists "; " t}{String.nl}↪︎ {t.Title}"""
+           t.FileName |])

@@ -6,8 +6,8 @@ open Errors
 open Shared
 open Shared.TagLibrary
 open CCFSharpUtils.Library
-open FsToolkit.ErrorHandling
 open Spectre.Console
+open FsToolkit.ErrorHandling
 open FsToolkit.ErrorHandling.Operator.Result
 
 type QualityData =
