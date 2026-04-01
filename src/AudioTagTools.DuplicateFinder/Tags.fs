@@ -101,7 +101,7 @@ let printDuplicates (groupedTracks: MultipleLibraryTags array option) =
             printf $"    • {artist}"
             printfGray " — "
             printf $"{title}"
-            printfGray $"  [{duration} {extNoPeriod} {bitRate} {fileSize}]{String.newLine}"
+            printfGray $"  [{duration} {extNoPeriod} {bitRate} {fileSize}]{String.nl}"
 
         let printHeader () =
             groupTracks
@@ -119,4 +119,3 @@ let printDuplicates (groupedTracks: MultipleLibraryTags array option) =
     match groupedTracks with
     | None -> printfn "No duplicates found."
     | Some group -> group |> Array.iteri printGroup
-

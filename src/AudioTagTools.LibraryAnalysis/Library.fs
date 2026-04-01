@@ -6,8 +6,8 @@ open Errors
 open Shared
 open Shared.TagLibrary
 open CCFSharpUtils.Library
-open FsToolkit.ErrorHandling
 open Spectre.Console
+open FsToolkit.ErrorHandling
 open FsToolkit.ErrorHandling.Operator.Result
 
 type QualityData =
@@ -29,6 +29,7 @@ let private run (args: string array) : Result<unit, AnalysisError> =
                    [| "Average file size"; String.formatBytes <| averageFileSize tags  |]
                    [| "Album art percentage"; $"%s{albumArtPercentage tags}" |] |]
             ColumnAlignments = [Justify.Left; Justify.Right]
+            ShowRowSeparators = false
         }
 
         printTable {
@@ -36,6 +37,7 @@ let private run (args: string array) : Result<unit, AnalysisError> =
             Headers = Some ["Artist"; "Count"; "Ratio"]
             Rows = topArtists 30 tags
             ColumnAlignments = [Justify.Left; Justify.Right; Justify.Right]
+            ShowRowSeparators = false
         }
 
         printTable {
@@ -43,6 +45,7 @@ let private run (args: string array) : Result<unit, AnalysisError> =
             Headers = Some ["Album"; "Count"; "Ratio"]
             Rows = topAlbums 30 tags
             ColumnAlignments = [Justify.Left; Justify.Right; Justify.Right]
+            ShowRowSeparators = false
         }
 
         printTable {
@@ -50,6 +53,7 @@ let private run (args: string array) : Result<unit, AnalysisError> =
             Headers = Some ["Title"; "Count"]
             Rows = topTitles 30 tags
             ColumnAlignments = [Justify.Left; Justify.Right]
+            ShowRowSeparators = false
         }
 
         printTable {
@@ -57,6 +61,7 @@ let private run (args: string array) : Result<unit, AnalysisError> =
             Headers = Some ["Genre"; "Count"; "Ratio"]
             Rows = topGenres 30 tags
             ColumnAlignments = [Justify.Left; Justify.Right; Justify.Right]
+            ShowRowSeparators = false
         }
 
         printTable {
@@ -64,6 +69,7 @@ let private run (args: string array) : Result<unit, AnalysisError> =
             Headers = Some ["Artist"; "Count"; "Genres"]
             Rows = artistsWithMostGenres 20 tags
             ColumnAlignments = [Justify.Left; Justify.Right; Justify.Left]
+            ShowRowSeparators = false
         }
 
         printTable {
@@ -71,6 +77,7 @@ let private run (args: string array) : Result<unit, AnalysisError> =
             Headers = Some ["File Size"; "Artist & Title"]
             Rows = largestFiles 20 tags |> Array.map Array.rev
             ColumnAlignments = [Justify.Right; Justify.Left]
+            ShowRowSeparators = false
         }
 
         printTable {
@@ -78,6 +85,7 @@ let private run (args: string array) : Result<unit, AnalysisError> =
             Headers = Some ["Extension"; "Count"]
             Rows = topFormats 10 tags
             ColumnAlignments = [Justify.Left; Justify.Right]
+            ShowRowSeparators = false
         }
 
         printTable {
@@ -85,6 +93,7 @@ let private run (args: string array) : Result<unit, AnalysisError> =
             Headers = Some ["Bitrate"; "Count"]
             Rows = topBitRates 10 tags
             ColumnAlignments = [Justify.Right; Justify.Right]
+            ShowRowSeparators = false
         }
 
         printTable {
@@ -92,6 +101,7 @@ let private run (args: string array) : Result<unit, AnalysisError> =
             Headers = Some ["Sample Rate"; "Count"]
             Rows = topSampleRates 10 tags
             ColumnAlignments = [Justify.Right; Justify.Right]
+            ShowRowSeparators = false
         }
 
         printTable {
@@ -99,6 +109,15 @@ let private run (args: string array) : Result<unit, AnalysisError> =
             Headers = Some ["Format"; "Bit Rate"; "Sample Rate"; "Count"]
             Rows = topQualityData 10 tags
             ColumnAlignments = [Justify.Left; Justify.Right; Justify.Right; Justify.Right]
+            ShowRowSeparators = false
+        }
+
+        printTable {
+            Title = Some "Longest File Names"
+            Headers = Some ["Artist & Title"; "Filename"; "Length"]
+            Rows = longestFileNames 5 tags
+            ColumnAlignments = [Justify.Left; Justify.Left; Justify.Right]
+            ShowRowSeparators = true
         }
     }
 
