@@ -32,7 +32,7 @@ let private run args : Result<unit, GenreExtractorError> =
 
         do!
             genreFile
-            |> backUpFile
+            |>  backUpFile
             |>> printfn "Created backup file \"%O\"." // %O formats with ToString().
             |!  FileWriteError
 
@@ -44,5 +44,5 @@ let private run args : Result<unit, GenreExtractorError> =
 
 let start args : Result<string, string> =
     match run args with
-    | Ok () -> Ok "Finished exporting genres successfully!"
+    | Ok ()   -> Ok "Finished exporting genres successfully!"
     | Error e -> Error (message e)

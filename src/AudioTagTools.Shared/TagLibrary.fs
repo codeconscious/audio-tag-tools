@@ -1,6 +1,5 @@
 module Shared.TagLibrary
 
-open FSharpPlus
 open CCFSharpUtils.Library
 open System
 open System.IO
@@ -46,13 +45,10 @@ let blankTags (fileInfo: FileInfo) : LibraryTags =
 
 let parseToTags (json: string) : Result<LibraryTags array, string> =
     try Ok (JsonSerializer.Deserialize<LibraryTags array>(json))
-    with e -> Error e.Message
+    with exn -> Error exn.Message
 
 let parseFileTags (filePath: string) : Result<FileTags option, string> =
-    try
-        FileTags.Create filePath
-        |> Option.ofObj
-        |> Ok
+    try filePath |> FileTags.Create |> Option.ofObj |> Ok
     with exn -> Error exn.Message
 
 let path tags : string =

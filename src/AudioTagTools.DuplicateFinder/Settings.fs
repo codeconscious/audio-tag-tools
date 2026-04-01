@@ -40,12 +40,8 @@ type Settings = SettingsProvider.Root
 type Exclusion = SettingsProvider.Exclusion
 
 let parseToSettings (json: string) : Result<Settings, DupeFinderError> =
-    try
-        json
-        |> SettingsProvider.Parse
-        |> Ok
-    with
-    | e -> Error (SettingParseError e.Message)
+    try SettingsProvider.Parse json |> Ok
+    with e -> Error (SettingParseError e.Message)
 
 let printSummary (settings: Settings) =
     printfn "Settings:"
