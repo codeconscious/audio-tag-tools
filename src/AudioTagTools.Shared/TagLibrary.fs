@@ -26,8 +26,6 @@ type LibraryTags =
       ImageCount: int
       LastWriteTime: DateTimeOffset }
 
-type MultipleLibraryTags = LibraryTags array
-
 let blankTags (fileInfo: FileInfo) : LibraryTags =
     { FileName = fileInfo.Name
       DirectoryName = fileInfo.DirectoryName
@@ -46,8 +44,8 @@ let blankTags (fileInfo: FileInfo) : LibraryTags =
       ImageCount = 0
       LastWriteTime = DateTimeOffset fileInfo.LastWriteTime }
 
-let parseToTags (json: string) : Result<MultipleLibraryTags, string> =
-    try Ok (JsonSerializer.Deserialize<MultipleLibraryTags>(json))
+let parseToTags (json: string) : Result<LibraryTags array, string> =
+    try Ok (JsonSerializer.Deserialize<LibraryTags array>(json))
     with e -> Error e.Message
 
 let parseFileTags (filePath: string) : Result<FileTags option, string> =

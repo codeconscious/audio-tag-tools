@@ -11,7 +11,7 @@ open System.IO
 
 let savePlaylist
     (settings: Settings)
-    (tags: MultipleLibraryTags array option)
+    (tags: LibraryTags array array option)
     : Result<unit, DupeFinderError> =
 
     let now = DateTime.Now.ToString timeStampFormat

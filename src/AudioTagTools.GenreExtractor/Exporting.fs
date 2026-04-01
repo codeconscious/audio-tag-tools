@@ -18,10 +18,10 @@ let printOldSummary (oldGenres: string array) : unit =
         let count = oldGenres.Length
         printfn "%s %s in the old file." (String.formatInt count) (String.pluralize "entry" "entries" count)
 
-let printTagCount (tags: MultipleLibraryTags) =
+let printTagCount (tags: LibraryTags array) =
     printfn $"Parsed tags for {String.formatInt tags.Length} files from the tag library."
 
-let private allGenres (fileTags: MultipleLibraryTags) : string array =
+let private allGenres (fileTags: LibraryTags array) : string array =
     fileTags
     |> Array.collect _.Genres
 
@@ -37,7 +37,7 @@ let private mostCommon (items: string array) : string =
 
 let private mostCommonGenre = allGenres >> mostCommon
 
-let generateGenreData (separator: string) (allFileTags: MultipleLibraryTags) =
+let generateGenreData (separator: string) (allFileTags: LibraryTags array) =
     allFileTags
     |> Array.groupBy mainArtist
     |> Array.choose (fun (artist, tags) ->

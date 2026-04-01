@@ -14,11 +14,11 @@ let parseToTags json =
     |> parseToTags
     |! TagParseError
 
-let printCount description (tags: MultipleLibraryTags) =
+let printCount description (tags: LibraryTags array) =
     printfn $"%s{description}%s{String.formatInt tags.Length}"
 
 /// Filters out tags containing artists or titles specified in the exclusions in the settings.
-let discardExcluded (settings: Settings) allTags : MultipleLibraryTags =
+let discardExcluded (settings: Settings) allTags : LibraryTags array =
     let isExcluded tags =
         let (|ArtistAndTitle|ArtistOnly|TitleOnly|Invalid|) (excl: Exclusion) =
             match excl.Artist, excl.Title with
@@ -73,7 +73,7 @@ let private groupName (settings: Settings) fileTags =
 
     $"{artist}{title}".ToLowerInvariant()
 
-let findDuplicates settings (tags: MultipleLibraryTags) : MultipleLibraryTags array option =
+let findDuplicates settings (tags: LibraryTags array) : LibraryTags array array option =
     tags
     |> Array.filter hasArtistAndTitle
     |> Array.groupBy (groupName settings)
@@ -82,10 +82,10 @@ let findDuplicates settings (tags: MultipleLibraryTags) : MultipleLibraryTags ar
     |> Array.map (fun (_, tags) -> tags |> Array.sortBy (mainArtists String.Empty))
     |> Array.toOption
 
-let printDuplicates (groupedTracks: MultipleLibraryTags array option) =
+let printDuplicates (groupedTracks: LibraryTags array array option) =
     let printfGray = printfColor ConsoleColor.DarkGray
 
-    let printGroup index (groupTracks: MultipleLibraryTags) =
+    let printGroup index (groupTracks: LibraryTags array) =
         let artistSummary (tags: LibraryTags) : string =
             if Array.isEmpty tags.Artists
             then String.Empty
