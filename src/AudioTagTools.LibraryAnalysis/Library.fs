@@ -114,9 +114,9 @@ let private run (args: string array) : Result<unit, AnalysisError> =
 
         printTable {
             Title = Some "Longest File Names"
-            Headers = Some ["Artist & Title"; "Filename"]
-            Rows = longestFileNames 10 tags
-            ColumnAlignments = [Justify.Left; Justify.Left]
+            Headers = Some ["Artist & Title"; "Filename"; "Length"]
+            Rows = longestFileNames 5 tags
+            ColumnAlignments = [Justify.Left; Justify.Left; Justify.Right]
             ShowRowSeparators = true
         }
     }

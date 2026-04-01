@@ -146,8 +146,10 @@ let topQualityData count tags =
 
 let longestFileNames count tags =
     tags
-    |> Array.sortByDescending _.FileName.Length
+    |> Array.map (fun t -> t.FileName.Length, t)
+    |> Array.sortByDescending fst
     |> Array.take count
-    |> Array.map (fun t ->
+    |> Array.map (fun (count, t) ->
         [| $"""{mainArtists "; " t}{String.nl}↪︎ {t.Title}"""
-           t.FileName |])
+           t.FileName
+           String.formatInt count |])
