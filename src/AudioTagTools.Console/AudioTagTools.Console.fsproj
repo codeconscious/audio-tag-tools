@@ -13,11 +13,11 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="CCFSharpUtils" Version="0.1.33" />
+      <PackageReference Include="CCFSharpUtils" Version="0.1.51" />
       <PackageReference Include="CodeConscious.Startwatch" Version="1.0.0" />
       <PackageReference Include="FSharpPlus" Version="1.9.1" />
-      <PackageReference Include="FsToolkit.ErrorHandling" Version="5.1.0" />
-      <PackageReference Update="FSharp.Core" Version="10.0.103" />
+      <PackageReference Include="FsToolkit.ErrorHandling" Version="5.2.0" />
+      <PackageReference Update="FSharp.Core" Version="10.1.201" />
     </ItemGroup>
 
     <ItemGroup>

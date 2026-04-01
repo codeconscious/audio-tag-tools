@@ -39,13 +39,13 @@ type SettingsProvider = JsonProvider<settingsSample>
 type Settings = SettingsProvider.Root
 type Exclusion = SettingsProvider.Exclusion
 
-let parseToSettings (json: string) : Result<Settings, Error> =
+let parseToSettings (json: string) : Result<Settings, DupeFinderError> =
     try
         json
         |> SettingsProvider.Parse
         |> Ok
     with
-    | e -> Error (SettingsParseError e.Message)
+    | e -> Error (SettingParseError e.Message)
 
 let printSummary (settings: Settings) =
     printfn "Settings:"

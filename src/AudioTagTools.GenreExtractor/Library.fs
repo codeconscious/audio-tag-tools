@@ -5,12 +5,15 @@ open Errors
 open Exporting
 open IO
 open Shared.TagLibrary
+open Shared.Constants
 open CCFSharpUtils.Library
+open FSharpPlus
 open FsToolkit.ErrorHandling
 
+// The separator character should be rare and highly unlikely to appear in files' tags.
 let private separator = "＼"
 
-let private run args : Result<unit, Error> =
+let private run args : Result<unit, GenreExtractorError> =
     result {
         let! tagLibraryFile, genreFile = validate args
 
@@ -18,23 +21,25 @@ let private run args : Result<unit, Error> =
 
         let! tags =
             tagLibraryFile
-            |> readThenParseToJson
-            |. printTagCount
-            |! TagParseError
+            |>  File.readText'
+            >>= parseToTags
+            |!  TagParseError
+            |.  printTagCount
 
-        // The separator character should be rare and highly unlikely to appear in files' tags.
         let newGenres = tags |> generateGenreData separator
 
         printChanges oldGenres newGenres
 
-        let! _ =
+        do!
             genreFile
-            |> backupFileIfExists
-            |. printfn "%s"
+            |> backUpFile
+            |>> printfn "Created backup file \"%O\"." // %O formats with ToString().
+            |!  FileWriteError
 
         return!
             newGenres
-            |> writeLines genreFile.FullName
+            |> File.writeLines genreFile.FullName
+            |! FileWriteError
     }
 
 let start args : Result<string, string> =

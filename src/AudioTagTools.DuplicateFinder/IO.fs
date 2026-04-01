@@ -2,20 +2,21 @@ module DuplicateFinder.IO
 
 open Errors
 open Settings
+open Shared.Constants
 open Shared.TagLibrary
-open Shared.IO
 open CCFSharpUtils.Library
 open System
 open System.Text
 open System.IO
 
-let readFile (fileInfo: FileInfo) : Result<string, Error> =
-    fileInfo |> readFile |! IoFileReadError
+let savePlaylist
+    (settings: Settings)
+    (tags: MultipleLibraryTags array option)
+    : Result<unit, DupeFinderError> =
 
-let savePlaylist (settings: Settings) (tags: MultipleLibraryTags array option) : Result<unit, Error> =
-    let now = DateTime.Now.ToString("yyyyMMdd_HHmmss")
-    let filename = $"Duplicates by AudioTagTools - {now}.m3u"
-    let fullPath = Path.Combine(settings.Playlist.SaveDirectory, filename)
+    let now = DateTime.Now.ToString timeStampFormat
+    let fileName = $"Duplicates by AudioTagTools - {now}.m3u"
+    let file = FileInfo <| Path.Combine(settings.Playlist.SaveDirectory, fileName)
 
     let appendFileEntry (builder: StringBuilder) (m: LibraryTags) : StringBuilder =
         let seconds = m.Duration.TotalSeconds
@@ -27,14 +28,15 @@ let savePlaylist (settings: Settings) (tags: MultipleLibraryTags array option) :
         let extInf = $"#EXTINF:{seconds},{artistWithTitle}"
         builder.AppendLine extInf |> ignore
 
-        let fullPath = Path.Combine(m.DirectoryName, m.FileName)
+        let oldPath = Path.Combine(m.DirectoryName, m.FileName)
 
-        let updatedPath =
-            match settings.Playlist.SearchPath, settings.Playlist.ReplacePath with
-            | s, _ when s |> String.hasNoText -> fullPath
-            | s, r -> fullPath.Replace(s, r)
+        let savePath =
+            match settings.Playlist.SearchPath,
+                  settings.Playlist.ReplacePath with
+            | s, _ when s |> String.hasNoText -> oldPath
+            | s, r -> oldPath.Replace(s, r)
 
-        builder.AppendLine updatedPath
+        builder.AppendLine savePath
 
     match tags with
     | None -> Ok ()
@@ -43,6 +45,6 @@ let savePlaylist (settings: Settings) (tags: MultipleLibraryTags array option) :
         |> Array.collect id
         |> Array.fold appendFileEntry (StringBuilder "#EXTM3U\n")
         |> _.ToString()
-        |> writeTextToFile fullPath
-        |. fun _ -> printfn $"Created playlist file \"{fullPath}\"."
-        |! IoFileWriteError
+        |> File.writeText' file
+        |! FileWriteError
+        |. fun _ -> printfn $"Created playlist file \"{file}\"."

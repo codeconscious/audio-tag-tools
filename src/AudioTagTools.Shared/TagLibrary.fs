@@ -1,11 +1,12 @@
 module Shared.TagLibrary
 
-open IO
 open FSharpPlus
 open CCFSharpUtils.Library
 open System
 open System.IO
 open System.Text.Json
+
+type FileTags = TagLib.File
 
 type LibraryTags =
     { FileName: string
@@ -49,7 +50,12 @@ let parseToTags (json: string) : Result<MultipleLibraryTags, string> =
     try Ok (JsonSerializer.Deserialize<MultipleLibraryTags>(json))
     with e -> Error e.Message
 
-let readThenParseToJson = readFile >=> parseToTags
+let parseFileTags (filePath: string) : Result<FileTags option, string> =
+    try
+        FileTags.Create filePath
+        |> Option.ofObj
+        |> Ok
+    with exn -> Error exn.Message
 
 let path tags : string =
     Path.Combine [| tags.DirectoryName; tags.FileName |]

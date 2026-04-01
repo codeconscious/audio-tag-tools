@@ -4,11 +4,11 @@ open ArgValidation
 open Errors
 open IO
 open Tags
-open Shared.IO
+open Shared.Constants
 open CCFSharpUtils.Library
 open FsToolkit.ErrorHandling
 
-let private run (args: string array) : Result<unit, Error> =
+let private run (args: string array) : Result<unit, CacherError> =
     result {
         let! mediaDir, tagLibraryFile = validate args
         let! fileInfos = getFileInfos mediaDir
@@ -17,15 +17,15 @@ let private run (args: string array) : Result<unit, Error> =
 
         let _ =
             tagLibraryFile
-            |> copyToBackupFile
+            |> backUpFile
             |. fun backupFile -> printfn "Backed up previous file to \"%s\"." backupFile.Name
-            |! WriteFileError
+            |! FileWriteError
 
         do!
             newJson
-            |> writeTextToFile tagLibraryFile.FullName
+            |> File.writeText' tagLibraryFile
             |. fun _ -> printfn "Wrote file \"%s\"." tagLibraryFile.FullName
-            |! WriteFileError
+            |! FileWriteError
     }
 
 let start (args: string array) : Result<string, string> =

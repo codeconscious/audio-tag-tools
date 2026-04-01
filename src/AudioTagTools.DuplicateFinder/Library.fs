@@ -5,16 +5,17 @@ open ArgValidation
 open IO
 open Tags
 open Settings
+open CCFSharpUtils.Library
 open FSharpPlus.Operators
 open FsToolkit.ErrorHandling
 open FsToolkit.ErrorHandling.Operator.Result
 
-let private run (args: string array) : Result<unit, Error> =
+let private run (args: string array) : Result<unit, DupeFinderError> =
     result {
         let! settingsFile, tagLibraryFile = validate args
 
-        let! settings = readFile settingsFile >>= parseToSettings
-        let! tags = readFile tagLibraryFile >>= parseToTags
+        let! settings = settingsFile |> File.readText' |! FileReadError >>= parseToSettings
+        let! tags = tagLibraryFile |> File.readText' |! FileReadError >>= parseToTags
 
         printSummary settings
 
