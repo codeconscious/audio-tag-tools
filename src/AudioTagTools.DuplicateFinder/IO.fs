@@ -5,13 +5,14 @@ open Settings
 open Shared.Constants
 open Shared.TagLibrary
 open CCFSharpUtils.Library
+open FSharpPlus.Data
 open System
 open System.Text
 open System.IO
 
 let savePlaylist
     (settings: Settings)
-    (tags: LibraryTags array array option)
+    (tags: LibraryTags array NonEmptyList option)
     : Result<unit, DupeFinderError> =
 
     let now = DateTime.Now.ToString timeStampFormat
@@ -42,9 +43,10 @@ let savePlaylist
     | None -> Ok ()
     | Some tags ->
         tags
-        |> Array.collect id
-        |> Array.fold appendFileEntry (StringBuilder "#EXTM3U\n")
-        |> _.ToString()
+        |> NonEmptyList.gather id
+        |> Seq.concat
+        |> Seq.fold appendFileEntry (StringBuilder "#EXTM3U\n")
+        |> string
         |> File.writeText' file
         |! FileWriteError
         |. fun _ -> printfn $"Created playlist file \"{file}\"."

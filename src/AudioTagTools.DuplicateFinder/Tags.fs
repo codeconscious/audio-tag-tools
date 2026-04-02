@@ -5,6 +5,7 @@ open Settings
 open Shared
 open Shared.TagLibrary
 open FSharpPlus
+open FSharpPlus.Data
 open CCFSharpUtils.Library
 open System
 open System.IO
@@ -73,16 +74,16 @@ let private groupName (settings: Settings) fileTags =
 
     $"{artist}{title}".ToLowerInvariant()
 
-let findDuplicates settings (tags: LibraryTags array) : LibraryTags array array option =
+let findDuplicates settings (tags: LibraryTags array) : LibraryTags array NonEmptyList option =
     tags
     |> Array.filter hasArtistAndTitle
     |> Array.groupBy (groupName settings)
     |> Array.filter (fun (_, tags) -> Array.hasMultiple tags)
     |> Array.sortBy fst // Group name
     |> Array.map (fun (_, tags) -> tags |> Array.sortBy (mainArtists String.Empty))
-    |> Array.toOption
+    |> Array.toNonEmptyListOption
 
-let printDuplicates (groupedTracks: LibraryTags array array option) =
+let printDuplicates (groupedTracks: LibraryTags array NonEmptyList option) =
     let printfGray = printfColor ConsoleColor.DarkGray
 
     let printGroup index (groupTracks: LibraryTags array) =
@@ -118,4 +119,4 @@ let printDuplicates (groupedTracks: LibraryTags array array option) =
 
     match groupedTracks with
     | None -> printfn "No duplicates found."
-    | Some group -> group |> Array.iteri printGroup
+    | Some group -> group |> NonEmptyList.iteri printGroup
