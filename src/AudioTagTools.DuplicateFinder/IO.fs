@@ -19,25 +19,25 @@ let savePlaylist
     let fileName = $"Duplicates by AudioTagTools - {now}.m3u"
     let file = FileInfo <| Path.Combine(settings.Playlist.SaveDirectory, fileName)
 
-    let appendFileEntry (builder: StringBuilder) (m: LibraryTags) : StringBuilder =
-        let seconds = m.Duration.TotalSeconds
+    let appendFileEntry (builder: StringBuilder) (t: LibraryTags) : StringBuilder =
+        let seconds = t.Duration.TotalSeconds
         let artist =
-            m.Artists
-            |> Array.append m.AlbumArtists
+            t.Artists
+            |> Array.append t.AlbumArtists
             |> String.concat "; "
-        let artistWithTitle = $"{artist} - {m.Title}"
+        let artistWithTitle = $"{artist} - {t.Title}"
         let extInf = $"#EXTINF:{seconds},{artistWithTitle}"
+
         builder.AppendLine extInf |> ignore
 
-        let oldPath = Path.Combine(m.DirectoryName, m.FileName)
-
-        let savePath =
+        let filePath =
+            let oldPath = Path.Combine(t.DirectoryName, t.FileName)
             match settings.Playlist.SearchPath,
                   settings.Playlist.ReplacePath with
             | s, _ when s |> String.hasNoText -> oldPath
             | s, r -> oldPath.Replace(s, r)
 
-        builder.AppendLine savePath
+        builder.AppendLine filePath
 
     match tags with
     | None -> Ok ()
