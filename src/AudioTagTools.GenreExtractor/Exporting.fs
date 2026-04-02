@@ -32,7 +32,7 @@ let private mostCommon (items: string array) : string =
     | _ ->
         items
         |> Array.groupBy id
-        |> Array.maxBy (fun (_, groupItems) -> Array.length groupItems)
+        |> Array.maxBy (snd >> Array.length)
         |> fst
 
 let private mostCommonGenre = allGenres >> mostCommon

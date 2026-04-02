@@ -76,9 +76,9 @@ let findDuplicates settings (tags: LibraryTags array) : LibraryTags array NonEmp
     tags
     |> Array.filter hasArtistAndTitle
     |> Array.groupBy (groupName settings)
-    |> Array.filter (fun (_, tags) -> Array.hasMultiple tags)
+    |> Array.filter (snd >> Array.hasMultiple)
     |> Array.sortBy fst // Group name
-    |> Array.map (fun (_, tags) -> tags |> Array.sortBy (mainArtists String.Empty))
+    |> Array.map (snd >> Array.sortBy (mainArtists String.Empty))
     |> Array.toNonEmptyListOption
 
 let printDuplicates (groupedTracks: LibraryTags array NonEmptyList option) =
