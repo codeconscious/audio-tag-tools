@@ -11,9 +11,7 @@ open System
 open System.IO
 
 let parseToTags json =
-    json
-    |> parseToTags
-    |! TagParseError
+    json |> parseToTags |! TagParseError
 
 let printCount description (tags: LibraryTags array) =
     printfn $"%s{description}%s{String.formatInt tags.Length}"
