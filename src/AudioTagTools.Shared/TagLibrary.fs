@@ -4,6 +4,7 @@ open CCFSharpUtils.Library
 open System
 open System.IO
 open System.Text.Json
+open FSharpPlus
 open FSharpPlus.Data
 
 type FileTags = TagLib.File
@@ -51,9 +52,8 @@ let parseJsonToTags (json: string) : Result<LibraryTags list, string> =
 let parseJsonToNonEmptyTags (json: string) : Result<LibraryTags NonEmptyList option, string> =
     try
         json
-        |> JsonSerializer.Deserialize<LibraryTags list>
-        |> List.toNonEmptyListOption
-        |> Ok
+        |> parseJsonToTags
+        |>> List.toNonEmptyListOption
     with exn -> Error exn.Message
 
 let parseFileTags (filePath: string) : Result<FileTags option, string> =
