@@ -24,9 +24,9 @@ let createTagLibraryMap (libraryFile: FileInfo) : Result<LibraryTagMap, CacherEr
     then
         libraryFile
         |>  File.readText'
-        >>= parseToTags
+        >>= parseJsonToTags
         |!  LibraryTagParseError
-        |>> (Array.map groupWithPath >> Map.ofArray)
+        |>> (List.map groupWithPath >> Map.ofList)
     else
         Ok Map.empty
 

@@ -12,7 +12,7 @@ open System.IO
 
 let savePlaylist
     (settings: Settings)
-    (tags: LibraryTags array NonEmptyList option)
+    (tags: LibraryTags list NonEmptyList option)
     : Result<unit, DupeFinderError> =
 
     let now = DateTime.Now.ToString timeStampFormat

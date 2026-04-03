@@ -18,16 +18,16 @@ type QualityData =
 let private run (args: string array) : Result<unit, AnalysisError> =
     result {
         let! tagLibraryFile = validate args
-        let! tags = tagLibraryFile |> File.readText' >>= parseToTags |! TagParseError
+        let! tags = tagLibraryFile |> File.readText' >>= parseJsonToTags |! TagParseError
 
         printTable {
             Title = Some "General Data"
             Headers = None
             Rows =
-                [| [| "Track count"; String.formatInt tags.Length |]
-                   [| "Unique artists"; String.formatInt <| uniqueArtistCount tags |]
-                   [| "Average file size"; String.formatBytes <| averageFileSize tags  |]
-                   [| "Album art percentage"; $"%s{albumArtPercentage tags}" |] |]
+                [ [ "Track count"; String.formatInt tags.Length ]
+                  [ "Unique artists"; String.formatInt <| uniqueArtistCount tags ]
+                  [ "Average file size"; String.formatBytes <| averageFileSize tags  ]
+                  [ "Album art percentage"; $"%s{albumArtPercentage tags}" ] ]
             ColumnAlignments = [Justify.Left; Justify.Right]
             ShowRowSeparators = false
         }
@@ -75,7 +75,7 @@ let private run (args: string array) : Result<unit, AnalysisError> =
         printTable {
             Title = Some "Largest Files"
             Headers = Some ["File Size"; "Artist & Title"]
-            Rows = largestFiles 20 tags |> Array.map Array.rev
+            Rows = largestFiles 20 tags |> List.map List.rev
             ColumnAlignments = [Justify.Right; Justify.Left]
             ShowRowSeparators = false
         }

@@ -8,7 +8,7 @@ open Spectre.Console
 type TableData =
     { Title: string option
       Headers: string list option
-      Rows: string array array
+      Rows: string list list
       ColumnAlignments: Justify list
       ShowRowSeparators: bool }
 
@@ -34,14 +34,14 @@ let printTable tableData =
         header
         |> List.iter (fun h -> h |> Markup.Escape |> table.AddColumn |> ignore)
     | None ->
-        tableData.Rows[0] |> Array.iter (fun _ -> table.AddColumn String.Empty |> ignore)
+        tableData.Rows[0] |> List.iter (fun _ -> table.AddColumn String.Empty |> ignore)
         table.HideHeaders() |> ignore
 
     tableData.ColumnAlignments
     |> List.iteri (fun i alignment -> table.Columns[i].Alignment alignment |> ignore)
 
     tableData.Rows
-    |> Array.iter (fun rowItems -> rowItems |> Array.map Markup.Escape |> table.AddRow |> ignore)
+    |> List.iter (fun rowItems -> rowItems |> List.map Markup.Escape |> Array.ofList |> table.AddRow |> ignore)
 
     match tableData.Title with
     | Some tableTitle ->
