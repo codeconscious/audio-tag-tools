@@ -17,7 +17,9 @@ let printOldSummary (oldGenres: string list) : unit =
         printfn "No existing genre data found."
     | _  ->
         let count = oldGenres.Length
-        printfn "%s %s in the old file." (String.formatInt count) (String.pluralize "entry" "entries" count)
+        printfn "%s %s in the old file."
+            (String.formatInt count)
+            (String.pluralize "entry" "entries" count)
 
 let printTagCount (tags: LibraryTags NonEmptyList) =
     printfn $"Parsed tags for {String.formatInt tags.Length} files from the tag library."
