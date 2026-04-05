@@ -2,7 +2,7 @@ module GenreExtractor.IO
 
 open Errors
 open FSharpPlus
-open CCFSharpUtils.Library
+open CCFSharpUtils
 open System.IO
 
 let readGenres (genreFile: FileInfo) : Result<string list, GenreExtractorError> =

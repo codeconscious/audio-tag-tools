@@ -4,7 +4,7 @@ open Errors
 open Settings
 open Shared.Constants
 open Shared.TagLibrary
-open CCFSharpUtils.Library
+open CCFSharpUtils
 open FSharpPlus.Data
 open System
 open System.Text

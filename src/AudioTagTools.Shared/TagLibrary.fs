@@ -1,6 +1,6 @@
 module Shared.TagLibrary
 
-open CCFSharpUtils.Library
+open CCFSharpUtils
 open System
 open System.IO
 open System.Text.Json

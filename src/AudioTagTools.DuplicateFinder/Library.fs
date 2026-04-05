@@ -5,7 +5,7 @@ open ArgValidation
 open IO
 open Tags
 open Settings
-open CCFSharpUtils.Library
+open CCFSharpUtils
 open FSharpPlus.Operators
 open FsToolkit.ErrorHandling
 open FsToolkit.ErrorHandling.Operator.Result

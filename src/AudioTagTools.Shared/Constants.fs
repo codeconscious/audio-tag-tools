@@ -1,7 +1,7 @@
 [<AutoOpen>]
 module Shared.Constants
 
-open CCFSharpUtils.Library
+open CCFSharpUtils
 open System.IO
 
 let timeStampFormat = "yyyyMMdd_HHmmss"

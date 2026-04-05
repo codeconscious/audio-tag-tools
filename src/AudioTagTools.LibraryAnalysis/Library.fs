@@ -5,7 +5,7 @@ open ArgValidation
 open Errors
 open Shared
 open Shared.TagLibrary
-open CCFSharpUtils.Library
+open CCFSharpUtils
 open Spectre.Console
 open FsToolkit.ErrorHandling
 open FsToolkit.ErrorHandling.Operator.Result

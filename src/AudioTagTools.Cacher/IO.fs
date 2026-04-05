@@ -2,7 +2,7 @@ module Cacher.IO
 
 open Errors
 open FSharpPlus.Data
-open CCFSharpUtils.Library
+open CCFSharpUtils
 open System.IO
 
 type FileTags = TagLib.File

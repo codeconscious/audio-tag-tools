@@ -1,7 +1,7 @@
 [<AutoOpen>]
 module Shared.Printing
 
-open CCFSharpUtils.Library
+open CCFSharpUtils
 open System
 open Spectre.Console
 

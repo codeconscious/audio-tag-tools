@@ -1,7 +1,7 @@
 module GenreExtractor.Exporting
 
 open Shared.TagLibrary
-open CCFSharpUtils.Library
+open CCFSharpUtils
 open FSharpPlus.Data
 open System
 

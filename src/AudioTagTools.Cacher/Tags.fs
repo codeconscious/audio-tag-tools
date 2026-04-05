@@ -5,7 +5,7 @@ open FSharpPlus.Data
 open IO
 open Errors
 open Shared.TagLibrary
-open CCFSharpUtils.Library
+open CCFSharpUtils
 open FSharpPlus.Operators
 
 type LibraryTagMap = Map<string, LibraryTags>

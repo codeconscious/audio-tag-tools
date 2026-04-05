@@ -1,7 +1,7 @@
 module DuplicateFinder.ArgValidation
 
 open Errors
-open CCFSharpUtils.Library
+open CCFSharpUtils
 open FSharpPlus
 open FSharpPlus.Data
 open System.IO

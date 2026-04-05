@@ -1,6 +1,6 @@
 module GenreExtractor.Errors
 
-open CCFSharpUtils.Library
+open CCFSharpUtils
 open FSharpPlus.Data
 
 type GenreExtractorError =

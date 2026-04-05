@@ -6,7 +6,7 @@ open Shared
 open Shared.TagLibrary
 open FSharpPlus
 open FSharpPlus.Data
-open CCFSharpUtils.Library
+open CCFSharpUtils
 open System
 open System.IO
 
