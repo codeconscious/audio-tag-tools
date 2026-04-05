@@ -89,7 +89,7 @@ let artistsWithMostGenres count tags =
         (a, tags
             |> List.map _.Genres
             |> Array.concat
-            |> Array.map (fun x -> x.Trim()) |> List.ofArray)
+            |> Array.map _.Trim() |> List.ofArray)
 
     let uniqGenreCount (genres: string list) =
         genres |> List.distinctBy _.ToLowerInvariant() |> _.Length
@@ -101,7 +101,10 @@ let artistsWithMostGenres count tags =
     |> List.map (fun (a, gs) -> a, uniqGenreCount gs, gs)
     |> List.sortByDescending (fun (_, uniqGenreCount, _) -> uniqGenreCount)
     |> List.take count
-    |> List.map (fun (a, uniqGenreCount, gs) -> [ a; String.formatInt uniqGenreCount; genreCounts gs ])
+    |> List.map (fun (a, uniqGenreCount, gs) ->
+        [ a
+          String.formatInt uniqGenreCount
+          genreCounts gs ])
 
 let largestFiles count tags =
     tags
@@ -109,19 +112,24 @@ let largestFiles count tags =
     |> List.truncate count
     |> List.map (fun file ->
         let artist = String.concat ", " file.Artists
-        [ $"{artist} / {file.Title}"; String.formatBytes file.FileSize ])
+        [ $"{artist} / {file.Title}"
+          String.formatBytes file.FileSize ])
 
 let topBitRates count tags =
     tags
     |> List.map _.BitRate
     |> mostPopulous count id
-    |> List.map (fun (bitrate, count) -> [$"{bitrate} kbps"; String.formatInt count])
+    |> List.map (fun (bitrate, count) ->
+        [ $"{bitrate} kbps"
+          String.formatInt count ])
 
 let topSampleRates count tags =
     tags
     |> List.map _.SampleRate
     |> mostPopulous count id
-    |> List.map (fun (sampleRate, count) -> [$"{String.formatInt sampleRate}"; String.formatInt count])
+    |> List.map (fun (sampleRate, count) ->
+        [ $"{String.formatInt sampleRate}"
+          String.formatInt count ])
 
 let uppercaseFileExtension tagFile =
     ((Path.GetExtension tagFile.FileName)[1..]).ToUpperInvariant()
