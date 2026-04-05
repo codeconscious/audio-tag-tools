@@ -22,7 +22,7 @@ let private run args : Result<unit, GenreExtractorError> =
         let! tags =
             tagLibraryFile
             |>  File.readText'
-            >>= parseJsonToTags
+            >>= parseJsonToNonEmptyTags
             |!  TagParseError
             |.  printTagCount
 

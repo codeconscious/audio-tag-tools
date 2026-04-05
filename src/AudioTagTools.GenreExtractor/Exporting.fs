@@ -2,6 +2,7 @@ module GenreExtractor.Exporting
 
 open Shared.TagLibrary
 open CCFSharpUtils.Library
+open FSharpPlus.Data
 open System
 
 let private mainArtist (fileTags: LibraryTags) =
@@ -18,38 +19,35 @@ let printOldSummary (oldGenres: string list) : unit =
         let count = oldGenres.Length
         printfn "%s %s in the old file." (String.formatInt count) (String.pluralize "entry" "entries" count)
 
-let printTagCount (tags: LibraryTags list) =
+let printTagCount (tags: LibraryTags NonEmptyList) =
     printfn $"Parsed tags for {String.formatInt tags.Length} files from the tag library."
 
-let private allGenres (fileTags: LibraryTags list) : string list =
+let private allGenres (fileTags: LibraryTags NonEmptyList) : string list =
     fileTags
+    |> NonEmptyList.toList
     |> List.collect (fun x -> x.Genres |> List.ofArray)
 
 let private mostCommon (items: string list) : string =
-    match items with
-    | [] ->
-        String.Empty
-    | _ ->
-        items
-        |> List.groupBy id
-        |> List.maxBy (snd >> List.length)
-        |> fst
+    items
+    |> List.groupBy id
+    |> List.maxBy (snd >> List.length)
+    |> fst
 
 let private mostCommonGenre = allGenres >> mostCommon
 
-let generateGenreData (separator: string) (allFileTags: LibraryTags list) =
+let generateGenreData (separator: string) (allFileTags: LibraryTags NonEmptyList) =
     allFileTags
-    |> List.groupBy mainArtist
-    |> List.choose (fun (artist, tags) ->
+    |> NonEmptyList.groupBy mainArtist
+    |> NonEmptyList.choose (fun (artist, tags) ->
         let genre = mostCommonGenre tags
         if String.allHaveText [artist; genre]
         then Some $"{artist}{separator}{genre}"
         else None)
-    |> List.sort
+    |> NonEmptyList.sort
 
-let printChanges (oldGenres: string list) (newGenres: string list) =
+let printChanges (oldGenres: string list) (newGenres: string NonEmptyList) =
     let newTotalCount = newGenres.Length
-    let addedCount = newGenres |> List.except oldGenres |> _.Length
+    let addedCount = newGenres |> NonEmptyList.except oldGenres |> _.Length
     let deletedCount = oldGenres |> List.except newGenres |> _.Length
     printfn "Prepared %s artist-genre entries total (%s new, %s deleted)."
         (String.formatInt newTotalCount)

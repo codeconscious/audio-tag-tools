@@ -49,12 +49,10 @@ let parseJsonToTags (json: string) : Result<LibraryTags list, string> =
     try Ok (JsonSerializer.Deserialize<LibraryTags list>(json))
     with exn -> Error exn.Message
 
-let parseJsonToNonEmptyTags (json: string) : Result<LibraryTags NonEmptyList option, string> =
-    try
-        json
-        |> parseJsonToTags
-        |>> List.toNonEmptyListOption
-    with exn -> Error exn.Message
+let parseJsonToNonEmptyTags (json: string) : Result<LibraryTags NonEmptyList, string> =
+    json
+    |> parseJsonToTags
+    >>= List.toNonEmptyListResult "No tags found in the tag library file."
 
 let parseFileTags (filePath: string) : Result<FileTags option, string> =
     try filePath |> FileTags.Create |> Option.ofObj |> Ok
