@@ -52,7 +52,7 @@ let parseJsonToTags (json: string) : Result<LibraryTags list, string> =
 let parseJsonToNonEmptyTags (json: string) : Result<LibraryTags NonEmptyList, string> =
     json
     |> parseJsonToTags
-    >>= List.toNonEmptyListResult "No tags found in the tag library file."
+    >>= List.toNonEmptyListResult "No tags were found to parse."
 
 let parseFileTags (filePath: string) : Result<FileTags option, string> =
     try filePath |> FileTags.Create |> Option.ofObj |> Ok
