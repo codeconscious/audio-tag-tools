@@ -99,7 +99,7 @@ let artistsWithMostGenres count tags =
     |> List.groupBy firstDistinctArtist
     |> List.map artistsWithTheirGenres
     |> List.map (fun (a, gs) -> a, uniqGenreCount gs, gs)
-    |> List.sortByDescending (fun (_, uniqGenreCount, _) -> uniqGenreCount)
+    |> List.sortByDescending Tuple.snd3
     |> List.take count
     |> List.map (fun (a, uniqGenreCount, gs) ->
         [ a
