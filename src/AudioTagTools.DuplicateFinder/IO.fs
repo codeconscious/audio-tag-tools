@@ -12,7 +12,7 @@ open System.IO
 
 let savePlaylist
     (settings: Settings)
-    (tags: LibraryTags list NonEmptyList option)
+    (tags: LibraryTags list list)
     : Result<unit, DupeFinderError> =
 
     let now = DateTime.Now.ToString timeStampFormat
@@ -39,14 +39,11 @@ let savePlaylist
 
         sb.AppendLine filePath
 
-    match tags with
-    | None -> Ok ()
-    | Some tags ->
-        tags
-        |> NonEmptyList.gather id
-        |> Seq.concat
-        |> Seq.fold appendFileEntry (StringBuilder "#EXTM3U\n")
-        |> string
-        |> File.writeText' file
-        |! FileWriteError
-        |. fun _ -> printfn $"Created playlist file \"{file}\"."
+    tags
+    |> List.collect id
+    // |> Seq.concat
+    |> List.fold appendFileEntry (StringBuilder "#EXTM3U\n")
+    |> string
+    |> File.writeText' file
+    |! FileWriteError
+    |. fun _ -> printfn $"Created playlist file \"{file}\"."

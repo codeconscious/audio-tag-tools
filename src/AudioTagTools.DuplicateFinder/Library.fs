@@ -19,16 +19,22 @@ let private run (args: string array) : Result<unit, DupeFinderError> =
 
         printSummary settings
 
-        let duplicates =
+        let! duplicates =
            libraryTags
            |> tap (printCount "Total file count:    ")
            |> discardExcluded settings
+           // >>= tap (printCount "Filtered file count: ")
+           // >>= findDuplicates settings
+           // >>= tap printDuplicates
+
+        let a =
+           duplicates
            |> tap (printCount "Filtered file count: ")
            |> findDuplicates settings
            |> tap printDuplicates
 
         return!
-            duplicates |> savePlaylist settings
+            a |> savePlaylist settings
     }
 
 let start args : Result<string, string> =

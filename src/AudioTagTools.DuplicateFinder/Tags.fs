@@ -11,13 +11,13 @@ open System
 open System.IO
 
 let parseToTags json =
-    json |> parseJsonToTags |! TagParseError
+    json |> parseJsonToNonEmptyTags |! TagParseError
 
-let printCount description (tags: LibraryTags list) =
+let printCount description (tags: LibraryTags NonEmptyList) =
     printfn $"%s{description}%s{String.formatInt tags.Length}"
 
 /// Filters out tags containing artists or titles specified in the exclusions in the settings.
-let discardExcluded (settings: Settings) allTags : LibraryTags list =
+let discardExcluded (settings: Settings) (allTags: LibraryTags NonEmptyList) : Result<LibraryTags NonEmptyList, DupeFinderError> =
     let isExcluded tags =
         let (|ArtistAndTitle|ArtistOnly|TitleOnly|Invalid|) (excl: Exclusion) =
             match excl.Artist, excl.Title with
@@ -39,7 +39,8 @@ let discardExcluded (settings: Settings) allTags : LibraryTags list =
         |> Array.exists check
 
     allTags
-    |> List.filter (not << isExcluded)
+    |> NonEmptyList.tryFilter (not << isExcluded)
+    |> Option.toResultWith NoFilesRemainAfterFiltering
 
 /// Returns a normalized string of two concatenated items:
 /// (1) The artist name that should be used for artist grouping when searching for duplicates.
@@ -72,16 +73,17 @@ let private groupName (settings: Settings) fileTags =
 
     $"{artist}{title}".ToLowerInvariant()
 
-let findDuplicates settings (tags: LibraryTags list) : LibraryTags list NonEmptyList option =
+let findDuplicates settings (tags: LibraryTags NonEmptyList) : LibraryTags list list =
     tags
+    |> NonEmptyList.toList
     |> List.filter hasArtistAndTitle
     |> List.groupBy (groupName settings)
     |> List.filter (snd >> List.hasMultiple)
     |> List.sortBy fst // Group name
     |> List.map (snd >> List.sortBy (mainArtists String.Empty))
-    |> List.toNonEmptyListOption
+    // |> List.toNonEmptyListOption
 
-let printDuplicates (groupedTracks: LibraryTags list NonEmptyList option) =
+let printDuplicates (groupedTracks: LibraryTags list list) =
     let printfGray = printfColor ConsoleColor.DarkGray
 
     let printGroup index (groupTracks: LibraryTags list) =
@@ -115,6 +117,4 @@ let printDuplicates (groupedTracks: LibraryTags list NonEmptyList option) =
         printHeader ()
         printDuplicates ()
 
-    match groupedTracks with
-    | None -> printfn "No duplicates found."
-    | Some group -> group |> NonEmptyList.iteri printGroup
+    groupedTracks |> List.iteri printGroup
