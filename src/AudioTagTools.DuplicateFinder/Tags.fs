@@ -102,7 +102,7 @@ let printDuplicates (groupedTracks: LibraryTags list list) =
             printf $"    • {artist}"
             printfGray " — "
             printf $"{title}"
-            printfGray $"  [{duration} {extNoPeriod} {bitRate} {fileSize}]{String.nl}"
+            printfGray $"  \[{duration} {extNoPeriod} {bitRate} {fileSize}\]{String.nl}"
 
         let printHeader () =
             groupTracks
