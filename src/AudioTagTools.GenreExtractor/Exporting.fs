@@ -30,10 +30,14 @@ let private allGenres (fileTags: LibraryTags NonEmptyList) : string list =
     |> List.collect (fun x -> x.Genres |> List.ofArray)
 
 let private mostCommon (items: string list) : string =
-    items
-    |> List.groupBy id
-    |> List.maxBy (snd >> List.length)
-    |> fst
+    match items with
+    | [] ->
+        String.Empty
+    | _ ->
+        items
+        |> List.groupBy id
+        |> List.maxBy (snd >> List.length)
+        |> fst
 
 let private mostCommonGenre = allGenres >> mostCommon
 
