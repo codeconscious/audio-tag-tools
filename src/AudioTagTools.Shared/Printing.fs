@@ -16,7 +16,7 @@ type TableData =
 // so it's easy to unintentionally output invisible or hard-to-read text.
 let printfColor color msg =
     Console.ForegroundColor <- color
-    printf $"%s{Markup.Escape msg}"
+    printf $"%s{msg}"
     Console.ResetColor()
 
 let printfnColor color msg =
