@@ -10,6 +10,7 @@ type GenreExtractorError =
     | FileWriteError of string
     | TagParseError of string
     | TagsMissing
+    | InsufficientGenreData
 
 let message = function
     | ArgCountError -> "Invalid arguments. Pass in (1) your tag library path and (2) the desired path for your exported genres file."
@@ -18,3 +19,4 @@ let message = function
     | FileWriteError msg -> $"I/O write failure: {msg}"
     | TagParseError msg -> $"Unable to parse the tag library file: {msg}"
     | TagsMissing -> "No tags found in the tag library file."
+    | InsufficientGenreData -> "Insufficient genre data."

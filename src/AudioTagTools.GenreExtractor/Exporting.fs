@@ -1,5 +1,6 @@
 module GenreExtractor.Exporting
 
+open Errors
 open Shared.TagLibrary
 open CCFSharpUtils
 open FSharpPlus.Data
@@ -26,8 +27,8 @@ let printTagCount (tags: LibraryTags NonEmptyList) =
 
 let private allGenres (fileTags: LibraryTags NonEmptyList) : string list =
     fileTags
-    |> NonEmptyList.toList
-    |> List.collect (fun x -> x.Genres |> List.ofArray)
+    |> NonEmptyList.tryCollect (fun t -> t.Genres |> Array.toList)
+    |> function None -> [] | Some gs -> gs |> NonEmptyList.toList
 
 let private mostCommon (items: string list) : string =
     match items with
@@ -44,16 +45,19 @@ let private mostCommonGenre = allGenres >> mostCommon
 let generateGenreData (separator: string) (allFileTags: LibraryTags NonEmptyList) =
     allFileTags
     |> NonEmptyList.groupBy mainArtist
-    |> NonEmptyList.choose (fun (artist, tags) ->
+    |> NonEmptyList.tryChoose (fun (artist, tags) ->
         let genre = mostCommonGenre tags
         if String.allHaveText [artist; genre]
         then Some $"{artist}{separator}{genre}"
         else None)
-    |> NonEmptyList.sort
+    |> Option.map NonEmptyList.sort
+    |> function
+       | Some gs -> Ok gs
+       | None -> Error InsufficientGenreData
 
 let printChanges (oldGenres: string list) (newGenres: string NonEmptyList) =
     let newTotalCount = newGenres.Length
-    let addedCount = newGenres |> NonEmptyList.except oldGenres |> _.Length
+    let addedCount = newGenres |> NonEmptyList.toList |> List.except oldGenres |> _.Length
     let deletedCount = oldGenres |> List.except newGenres |> _.Length
     printfn "Prepared %s artist-genre entries total (%s new, %s deleted)."
         (String.formatInt newTotalCount)

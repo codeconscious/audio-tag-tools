@@ -26,7 +26,7 @@ let private run args : Result<unit, GenreExtractorError> =
             |!  TagParseError
             |.  printTagCount
 
-        let newGenres = tags |> generateGenreData separator
+        let! newGenres = tags |> generateGenreData separator
 
         printChanges oldGenres newGenres
 
