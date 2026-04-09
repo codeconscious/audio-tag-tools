@@ -80,13 +80,17 @@ let private groupName (settings: Settings) fileTags =
 let findDuplicates settings (tags: LibraryTags NonEmptyList)
     : LibraryTags NonEmptyList NonEmptyList option =
 
+    let sortByMainArtists =
+        NonEmptyList.ofList
+        >> NonEmptyList.sortBy (mainArtists String.Empty)
+
     tags
     |> NonEmptyList.toList
     |> List.filter hasArtistAndTitle
     |> List.groupBy (groupName settings)
     |> List.filter (snd >> List.hasMultiple)
     |> List.sortBy fst // Group name
-    |> List.map (snd >> NonEmptyList.ofList >> NonEmptyList.sortBy (mainArtists String.Empty))
+    |> List.map (snd >> sortByMainArtists)
     |> List.toNonEmptyListOption
 
 let printDuplicates (groupedTracks: LibraryTags NonEmptyList NonEmptyList option) : unit =
