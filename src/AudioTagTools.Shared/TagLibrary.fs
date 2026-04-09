@@ -1,9 +1,11 @@
 module Shared.TagLibrary
 
-open CCFSharpUtils.Library
+open CCFSharpUtils
 open System
 open System.IO
 open System.Text.Json
+open FSharpPlus
+open FSharpPlus.Data
 
 type FileTags = TagLib.File
 
@@ -43,9 +45,14 @@ let blankTags (fileInfo: FileInfo) : LibraryTags =
       ImageCount = 0
       LastWriteTime = DateTimeOffset fileInfo.LastWriteTime }
 
-let parseToTags (json: string) : Result<LibraryTags array, string> =
-    try Ok (JsonSerializer.Deserialize<LibraryTags array>(json))
+let parseJsonToTags (json: string) : Result<LibraryTags list, string> =
+    try Ok (JsonSerializer.Deserialize<LibraryTags list>(json))
     with exn -> Error exn.Message
+
+let parseJsonToNonEmptyTags (json: string) : Result<LibraryTags NonEmptyList, string> =
+    json
+    |> parseJsonToTags
+    >>= List.toNonEmptyListResult "No tags were found to parse."
 
 let parseFileTags (filePath: string) : Result<FileTags option, string> =
     try filePath |> FileTags.Create |> Option.ofObj |> Ok
@@ -64,9 +71,10 @@ let ignorableAlbumArtists =
       "Multiple Artists"
       "\u003Cunknown\u003E" ]
 
-let allDistinctArtists (tags: LibraryTags) : string array =
-    Array.concat [| tags.Artists; tags.AlbumArtists |]
+let allDistinctArtists (tags: LibraryTags) : string list =
+    Array.concat [ tags.Artists; tags.AlbumArtists ]
     |> Array.distinct
+    |> List.ofArray
 
 let mainArtists (separator: string) (track: LibraryTags) : string =
     let hasNoIgnoredAlbumArtists artist =
@@ -82,7 +90,7 @@ let mainArtists (separator: string) (track: LibraryTags) : string =
     |> String.concat separator
 
 let firstDistinctArtist (tags: LibraryTags) : string =
-    tags |> allDistinctArtists |> Array.head
+    tags |> allDistinctArtists |> List.head
 
 let hasAnyArtist (tags: LibraryTags) : bool =
     Array.anyNotEmpty [| tags.Artists; tags.AlbumArtists |]

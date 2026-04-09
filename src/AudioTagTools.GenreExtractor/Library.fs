@@ -6,7 +6,7 @@ open Exporting
 open IO
 open Shared.TagLibrary
 open Shared.Constants
-open CCFSharpUtils.Library
+open CCFSharpUtils
 open FSharpPlus
 open FsToolkit.ErrorHandling
 
@@ -22,11 +22,11 @@ let private run args : Result<unit, GenreExtractorError> =
         let! tags =
             tagLibraryFile
             |>  File.readText'
-            >>= parseToTags
+            >>= parseJsonToNonEmptyTags
             |!  TagParseError
             |.  printTagCount
 
-        let newGenres = tags |> generateGenreData separator
+        let! newGenres = tags |> generateGenreData separator
 
         printChanges oldGenres newGenres
 
@@ -44,5 +44,5 @@ let private run args : Result<unit, GenreExtractorError> =
 
 let start args : Result<string, string> =
     match run args with
-    | Ok ()   -> Ok "Finished exporting genres successfully!"
+    | Ok ()   -> Ok "Finished exporting genres successfully."
     | Error e -> Error (message e)

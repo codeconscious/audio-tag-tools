@@ -5,7 +5,7 @@ open Errors
 open IO
 open Tags
 open Shared.Constants
-open CCFSharpUtils.Library
+open CCFSharpUtils
 open FsToolkit.ErrorHandling
 
 let private run (args: string array) : Result<unit, CacherError> =
@@ -24,11 +24,11 @@ let private run (args: string array) : Result<unit, CacherError> =
         do!
             newJson
             |> File.writeText' tagLibraryFile
-            |. printfn "Wrote file \"%O{tagLibraryFile}\"."
+            |. fun _ -> printfn $"Wrote new file \"%O{tagLibraryFile}\"."
             |! FileWriteError
     }
 
 let start (args: string array) : Result<string, string> =
     match run args with
-    | Ok ()   -> Ok "Finished caching successfully!"
+    | Ok ()   -> Ok "Finished caching successfully."
     | Error e -> Error (message e)

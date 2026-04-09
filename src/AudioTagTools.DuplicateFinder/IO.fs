@@ -1,37 +1,37 @@
 module DuplicateFinder.IO
 
 open Errors
+open FSharpPlus.Data
 open Settings
 open Shared.Constants
 open Shared.TagLibrary
-open CCFSharpUtils.Library
-open FSharpPlus.Data
+open CCFSharpUtils
 open System
 open System.Text
 open System.IO
 
 let savePlaylist
     (settings: Settings)
-    (tags: LibraryTags array NonEmptyList option)
+    (tags: LibraryTags NonEmptyList NonEmptyList option)
     : Result<unit, DupeFinderError> =
 
     let now = DateTime.Now.ToString timeStampFormat
     let fileName = $"Duplicates by AudioTagTools - {now}.m3u"
     let file = FileInfo <| Path.Combine(settings.Playlist.SaveDirectory, fileName)
 
-    let appendFileEntry (sb: StringBuilder) (t: LibraryTags) : StringBuilder =
-        let seconds = t.Duration.TotalSeconds
+    let appendFileEntry (sb: StringBuilder) (tags: LibraryTags) : StringBuilder =
+        let seconds = tags.Duration.TotalSeconds
         let artist =
-            t.Artists
-            |> Array.append t.AlbumArtists
+            tags.Artists
+            |> Array.append tags.AlbumArtists
             |> String.concat "; "
-        let artistWithTitle = $"{artist} - {t.Title}"
+        let artistWithTitle = $"{artist} - {tags.Title}"
         let extInf = $"#EXTINF:{seconds},{artistWithTitle}"
 
         sb.AppendLine extInf |> ignore
 
         let filePath =
-            let oldPath = Path.Combine(t.DirectoryName, t.FileName)
+            let oldPath = Path.Combine(tags.DirectoryName, tags.FileName)
             match settings.Playlist.SearchPath,
                   settings.Playlist.ReplacePath with
             | s, _ when s |> String.hasNoText -> oldPath
@@ -40,13 +40,15 @@ let savePlaylist
         sb.AppendLine filePath
 
     match tags with
-    | None -> Ok ()
-    | Some tags ->
-        tags
-        |> NonEmptyList.gather id
-        |> Seq.concat
-        |> Seq.fold appendFileEntry (StringBuilder "#EXTM3U\n")
+    | None ->
+        Ok ()
+    | Some tags' ->
+        tags'
+        |> NonEmptyList.toList
+        |> List.map NonEmptyList.toList
+        |> List.concat
+        |> List.fold appendFileEntry (StringBuilder "#EXTM3U\n")
         |> string
         |> File.writeText' file
-        |! FileWriteError
         |. fun _ -> printfn $"Created playlist file \"{file}\"."
+        |! FileWriteError

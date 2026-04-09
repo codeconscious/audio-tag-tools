@@ -5,7 +5,7 @@ open ArgValidation
 open Errors
 open Shared
 open Shared.TagLibrary
-open CCFSharpUtils.Library
+open CCFSharpUtils
 open Spectre.Console
 open FsToolkit.ErrorHandling
 open FsToolkit.ErrorHandling.Operator.Result
@@ -18,16 +18,16 @@ type QualityData =
 let private run (args: string array) : Result<unit, AnalysisError> =
     result {
         let! tagLibraryFile = validate args
-        let! tags = tagLibraryFile |> File.readText' >>= parseToTags |! TagParseError
+        let! tags = tagLibraryFile |> File.readText' >>= parseJsonToTags |! TagParseError
 
         printTable {
             Title = Some "General Data"
             Headers = None
             Rows =
-                [| [| "Track count"; String.formatInt tags.Length |]
-                   [| "Unique artists"; String.formatInt <| uniqueArtistCount tags |]
-                   [| "Average file size"; String.formatBytes <| averageFileSize tags  |]
-                   [| "Album art percentage"; $"%s{albumArtPercentage tags}" |] |]
+                [ [ "Track count"; String.formatInt tags.Length ]
+                  [ "Unique artists"; String.formatInt <| uniqueArtistCount tags ]
+                  [ "Average file size"; String.formatBytes <| averageFileSize tags  ]
+                  [ "Album art percentage"; $"%s{albumArtPercentage tags}" ] ]
             ColumnAlignments = [Justify.Left; Justify.Right]
             ShowRowSeparators = false
         }
@@ -75,7 +75,7 @@ let private run (args: string array) : Result<unit, AnalysisError> =
         printTable {
             Title = Some "Largest Files"
             Headers = Some ["File Size"; "Artist & Title"]
-            Rows = largestFiles 20 tags |> Array.map Array.rev
+            Rows = largestFiles 20 tags |> List.map List.rev
             ColumnAlignments = [Justify.Right; Justify.Left]
             ShowRowSeparators = false
         }
@@ -116,12 +116,12 @@ let private run (args: string array) : Result<unit, AnalysisError> =
             Title = Some "Longest File Names"
             Headers = Some ["Artist & Title"; "Filename"; "Length"]
             Rows = longestFileNames 5 tags
-            ColumnAlignments = [Justify.Left; Justify.Left; Justify.Right]
+            ColumnAlignments = [Justify.Left; Justify.Left; Justify.Center]
             ShowRowSeparators = true
         }
     }
 
 let start args : Result<string, string> =
     match run args with
-    | Ok ()   -> Ok "Finished analysis successfully!"
+    | Ok ()   -> Ok "Finished analysis successfully."
     | Error e -> Error (message e)

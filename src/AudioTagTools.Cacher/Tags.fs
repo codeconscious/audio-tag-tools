@@ -5,7 +5,7 @@ open FSharpPlus.Data
 open IO
 open Errors
 open Shared.TagLibrary
-open CCFSharpUtils.Library
+open CCFSharpUtils
 open FSharpPlus.Operators
 
 type LibraryTagMap = Map<string, LibraryTags>
@@ -24,14 +24,14 @@ let createTagLibraryMap (libraryFile: FileInfo) : Result<LibraryTagMap, CacherEr
     then
         libraryFile
         |>  File.readText'
-        >>= parseToTags
+        >>= parseJsonToTags
         |!  LibraryTagParseError
-        |>> (Array.map groupWithPath >> Map.ofArray)
+        |>> (List.map groupWithPath >> Map.ofList)
     else
         Ok Map.empty
 
-let private prepareTagsToWrite (tagLibraryMap: LibraryTagMap) (fileInfos: FileInfo seq)
-    : CategorizedTagsToCache seq =
+let private prepareTagsToWrite (tagLibraryMap: LibraryTagMap) (fileInfos: FileInfo NonEmptySeq)
+    : CategorizedTagsToCache NonEmptySeq =
 
     let copyCachedTags (libraryTags: LibraryTags) =
         { libraryTags with LastWriteTime = DateTimeOffset libraryTags.LastWriteTime.DateTime }
@@ -75,9 +75,9 @@ let private prepareTagsToWrite (tagLibraryMap: LibraryTagMap) (fileInfos: FileIn
         else { Type = NotPresent; Tags = generateNewTags audioFile }
 
     fileInfos
-    |> Seq.map (prepareTagsToCache tagLibraryMap)
+    |> NonEmptySeq.map (prepareTagsToCache tagLibraryMap)
 
-let private reportResults (categorizedTags: CategorizedTagsToCache seq) : CategorizedTagsToCache seq =
+let private reportResults (categorizedTags: CategorizedTagsToCache NonEmptySeq) : CategorizedTagsToCache NonEmptySeq =
     let categoryTotals =
         categorizedTags
         |> Seq.countBy _.Type
@@ -106,6 +106,6 @@ let generateJson (tagMap: LibraryTagMap) (fileInfos: FileInfo NonEmptySeq) : Res
     fileInfos
     |> prepareTagsToWrite tagMap
     |> reportResults
-    |> Seq.map _.Tags
+    |> NonEmptySeq.map _.Tags
     |> String.toJson
     |! JsonSerializationError

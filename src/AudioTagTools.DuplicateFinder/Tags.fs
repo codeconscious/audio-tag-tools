@@ -6,18 +6,22 @@ open Shared
 open Shared.TagLibrary
 open FSharpPlus
 open FSharpPlus.Data
-open CCFSharpUtils.Library
+open CCFSharpUtils
 open System
 open System.IO
 
 let parseToTags json =
-    json |> parseToTags |! TagParseError
+    json |> parseJsonToNonEmptyTags |! TagParseError
 
-let printCount description (tags: LibraryTags array) =
+let printCount description (tags: LibraryTags NonEmptyList) =
     printfn $"%s{description}%s{String.formatInt tags.Length}"
 
 /// Filters out tags containing artists or titles specified in the exclusions in the settings.
-let discardExcluded (settings: Settings) allTags : LibraryTags array =
+let discardExcluded
+    (settings: Settings)
+    (allTags: LibraryTags NonEmptyList)
+    : Result<LibraryTags NonEmptyList, DupeFinderError> =
+
     let isExcluded tags =
         let (|ArtistAndTitle|ArtistOnly|TitleOnly|Invalid|) (excl: Exclusion) =
             match excl.Artist, excl.Title with
@@ -39,7 +43,8 @@ let discardExcluded (settings: Settings) allTags : LibraryTags array =
         |> Array.exists check
 
     allTags
-    |> Array.filter (not << isExcluded)
+    |> NonEmptyList.tryFilter (not << isExcluded)
+    |> Option.toResultWith NoFilesRemainAfterFiltering
 
 /// Returns a normalized string of two concatenated items:
 /// (1) The artist name that should be used for artist grouping when searching for duplicates.
@@ -72,19 +77,26 @@ let private groupName (settings: Settings) fileTags =
 
     $"{artist}{title}".ToLowerInvariant()
 
-let findDuplicates settings (tags: LibraryTags array) : LibraryTags array NonEmptyList option =
-    tags
-    |> Array.filter hasArtistAndTitle
-    |> Array.groupBy (groupName settings)
-    |> Array.filter (snd >> Array.hasMultiple)
-    |> Array.sortBy fst // Group name
-    |> Array.map (snd >> Array.sortBy (mainArtists String.Empty))
-    |> Array.toNonEmptyListOption
+let findDuplicates settings (tags: LibraryTags NonEmptyList)
+    : LibraryTags NonEmptyList NonEmptyList option =
 
-let printDuplicates (groupedTracks: LibraryTags array NonEmptyList option) =
+    let sortByMainArtists =
+        NonEmptyList.ofList
+        >> NonEmptyList.sortBy (mainArtists String.Empty)
+
+    tags
+    |> NonEmptyList.toList
+    |> List.filter hasArtistAndTitle
+    |> List.groupBy (groupName settings)
+    |> List.filter (snd >> List.hasMultiple)
+    |> List.sortBy fst // Group name
+    |> List.map (snd >> sortByMainArtists)
+    |> List.toNonEmptyListOption
+
+let printDuplicates (groupedTracks: LibraryTags NonEmptyList NonEmptyList option) : unit =
     let printfGray = printfColor ConsoleColor.DarkGray
 
-    let printGroup index (groupTracks: LibraryTags array) =
+    let printGroup index (groupTracks: LibraryTags NonEmptyList) =
         let artistSummary (tags: LibraryTags) : string =
             if Array.isEmpty tags.Artists
             then String.Empty
@@ -100,17 +112,17 @@ let printDuplicates (groupedTracks: LibraryTags array NonEmptyList option) =
             printf $"    • {artist}"
             printfGray " — "
             printf $"{title}"
-            printfGray $"  [{duration} {extNoPeriod} {bitRate} {fileSize}]{String.nl}"
+            printfGray $"  <{duration} {extNoPeriod} {bitRate} {fileSize}>{String.nl}"
 
         let printHeader () =
             groupTracks
-            |> Array.head
+            |> NonEmptyList.head
             |> mainArtists ", "
             |> printfn "%d. %s" (index + 1) // Start numbering at 1, not 0.
 
         let printDuplicates () =
             groupTracks
-            |> Array.iter printFileSummary
+            |> NonEmptyList.iter printFileSummary
 
         printHeader ()
         printDuplicates ()
