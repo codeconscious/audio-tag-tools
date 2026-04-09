@@ -65,8 +65,7 @@ let topTitles count tags =
     |> List.map (fun (title, count) -> [ title; String.formatInt count ])
 
 let topGenres count tags =
-    // let genres = tags |> List.map _.Genres
-    let genres = tags |> List.map (fun xs -> xs.Genres |> List.ofArray)
+    let genres = tags |> List.map (fun xs -> xs.Genres |> Array.toList)
     let genreCount = genres.Length
 
     genres
@@ -89,7 +88,7 @@ let artistsWithMostGenres count tags =
         (a, tags
             |> List.map _.Genres
             |> Array.concat
-            |> Array.map _.Trim() |> List.ofArray)
+            |> Array.map _.Trim() |> Array.toList)
 
     let uniqGenreCount (genres: string list) =
         genres |> List.distinctBy _.ToLowerInvariant() |> _.Length
