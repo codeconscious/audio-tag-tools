@@ -1,6 +1,5 @@
 module Shared.TagLibrary
 
-open FSharpPlus
 open CCFSharpUtils.Library
 open System
 open System.IO
@@ -26,8 +25,6 @@ type LibraryTags =
       ImageCount: int
       LastWriteTime: DateTimeOffset }
 
-type MultipleLibraryTags = LibraryTags array
-
 let blankTags (fileInfo: FileInfo) : LibraryTags =
     { FileName = fileInfo.Name
       DirectoryName = fileInfo.DirectoryName
@@ -46,15 +43,12 @@ let blankTags (fileInfo: FileInfo) : LibraryTags =
       ImageCount = 0
       LastWriteTime = DateTimeOffset fileInfo.LastWriteTime }
 
-let parseToTags (json: string) : Result<MultipleLibraryTags, string> =
-    try Ok (JsonSerializer.Deserialize<MultipleLibraryTags>(json))
-    with e -> Error e.Message
+let parseToTags (json: string) : Result<LibraryTags array, string> =
+    try Ok (JsonSerializer.Deserialize<LibraryTags array>(json))
+    with exn -> Error exn.Message
 
 let parseFileTags (filePath: string) : Result<FileTags option, string> =
-    try
-        FileTags.Create filePath
-        |> Option.ofObj
-        |> Ok
+    try filePath |> FileTags.Create |> Option.ofObj |> Ok
     with exn -> Error exn.Message
 
 let path tags : string =

@@ -18,17 +18,17 @@ let private run (args: string array) : Result<unit, CacherError> =
         let _ =
             tagLibraryFile
             |> backUpFile
-            |. fun backupFile -> printfn "Backed up previous file to \"%s\"." backupFile.Name
+            |. printfn "Backed up previous file to \"%O\"."
             |! FileWriteError
 
         do!
             newJson
             |> File.writeText' tagLibraryFile
-            |. fun _ -> printfn "Wrote file \"%s\"." tagLibraryFile.FullName
+            |. printfn "Wrote file \"%O{tagLibraryFile}\"."
             |! FileWriteError
     }
 
 let start (args: string array) : Result<string, string> =
     match run args with
-    | Ok () -> Ok "Finished caching successfully!"
+    | Ok ()   -> Ok "Finished caching successfully!"
     | Error e -> Error (message e)

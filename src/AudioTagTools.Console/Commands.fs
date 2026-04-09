@@ -13,12 +13,11 @@ let (|ValidCommand|InvalidCommand|) requestedCommand =
     commandMap
     |> Map.tryFind requestedCommand
     |> function
-    | Some command -> ValidCommand command
-    | None -> InvalidCommand
+       | Some command -> ValidCommand command
+       | None -> InvalidCommand
 
 let instructions =
     commandMap
     |> Map.keys
     |> String.concat "\" or \""
     |> sprintf "Supply a supported command: \"%s\"."
-

@@ -5,20 +5,19 @@ open Settings
 open Shared
 open Shared.TagLibrary
 open FSharpPlus
+open FSharpPlus.Data
 open CCFSharpUtils.Library
 open System
 open System.IO
 
 let parseToTags json =
-    json
-    |> parseToTags
-    |! TagParseError
+    json |> parseToTags |! TagParseError
 
-let printCount description (tags: MultipleLibraryTags) =
+let printCount description (tags: LibraryTags array) =
     printfn $"%s{description}%s{String.formatInt tags.Length}"
 
 /// Filters out tags containing artists or titles specified in the exclusions in the settings.
-let discardExcluded (settings: Settings) allTags : MultipleLibraryTags =
+let discardExcluded (settings: Settings) allTags : LibraryTags array =
     let isExcluded tags =
         let (|ArtistAndTitle|ArtistOnly|TitleOnly|Invalid|) (excl: Exclusion) =
             match excl.Artist, excl.Title with
@@ -73,19 +72,19 @@ let private groupName (settings: Settings) fileTags =
 
     $"{artist}{title}".ToLowerInvariant()
 
-let findDuplicates settings (tags: MultipleLibraryTags) : MultipleLibraryTags array option =
+let findDuplicates settings (tags: LibraryTags array) : LibraryTags array NonEmptyList option =
     tags
     |> Array.filter hasArtistAndTitle
     |> Array.groupBy (groupName settings)
-    |> Array.filter (fun (_, tags) -> Array.hasMultiple tags)
+    |> Array.filter (snd >> Array.hasMultiple)
     |> Array.sortBy fst // Group name
-    |> Array.map (fun (_, tags) -> tags |> Array.sortBy (mainArtists String.Empty))
-    |> Array.toOption
+    |> Array.map (snd >> Array.sortBy (mainArtists String.Empty))
+    |> Array.toNonEmptyListOption
 
-let printDuplicates (groupedTracks: MultipleLibraryTags array option) =
+let printDuplicates (groupedTracks: LibraryTags array NonEmptyList option) =
     let printfGray = printfColor ConsoleColor.DarkGray
 
-    let printGroup index (groupTracks: MultipleLibraryTags) =
+    let printGroup index (groupTracks: LibraryTags array) =
         let artistSummary (tags: LibraryTags) : string =
             if Array.isEmpty tags.Artists
             then String.Empty
@@ -118,4 +117,4 @@ let printDuplicates (groupedTracks: MultipleLibraryTags array option) =
 
     match groupedTracks with
     | None -> printfn "No duplicates found."
-    | Some group -> group |> Array.iteri printGroup
+    | Some group -> group |> NonEmptyList.iteri printGroup

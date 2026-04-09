@@ -15,12 +15,12 @@ let private run (args: string array) : Result<unit, DupeFinderError> =
         let! settingsFile, tagLibraryFile = validate args
 
         let! settings = settingsFile |> File.readText' |! FileReadError >>= parseToSettings
-        let! tags = tagLibraryFile |> File.readText' |! FileReadError >>= parseToTags
+        let! libraryTags = tagLibraryFile |> File.readText' |! FileReadError >>= parseToTags
 
         printSummary settings
 
         let duplicates =
-           tags
+           libraryTags
            |> tap (printCount "Total file count:    ")
            |> discardExcluded settings
            |> tap (printCount "Filtered file count: ")
@@ -33,5 +33,5 @@ let private run (args: string array) : Result<unit, DupeFinderError> =
 
 let start args : Result<string, string> =
     match run args with
-    | Ok () -> Ok "Finished searching successfully."
+    | Ok ()   -> Ok "Finished searching successfully."
     | Error e -> Error (message e)
