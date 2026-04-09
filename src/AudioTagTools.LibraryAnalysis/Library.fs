@@ -116,7 +116,7 @@ let private run (args: string array) : Result<unit, AnalysisError> =
             Title = Some "Longest File Names"
             Headers = Some ["Artist & Title"; "Filename"; "Length"]
             Rows = longestFileNames 5 tags
-            ColumnAlignments = [Justify.Left; Justify.Left; Justify.Right]
+            ColumnAlignments = [Justify.Left; Justify.Left; Justify.Center]
             ShowRowSeparators = true
         }
     }
