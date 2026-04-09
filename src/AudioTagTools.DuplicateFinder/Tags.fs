@@ -77,7 +77,9 @@ let private groupName (settings: Settings) fileTags =
 
     $"{artist}{title}".ToLowerInvariant()
 
-let findDuplicates settings (tags: LibraryTags NonEmptyList) : LibraryTags list list =
+let findDuplicates settings (tags: LibraryTags NonEmptyList)
+    : LibraryTags list NonEmptyList option = // TODO: LibraryTags NonEmptyList NonEmptyList option?
+
     tags
     |> NonEmptyList.toList
     |> List.filter hasArtistAndTitle
@@ -85,9 +87,9 @@ let findDuplicates settings (tags: LibraryTags NonEmptyList) : LibraryTags list 
     |> List.filter (snd >> List.hasMultiple)
     |> List.sortBy fst // Group name
     |> List.map (snd >> List.sortBy (mainArtists String.Empty))
-    // |> List.toNonEmptyListOption
+    |> List.toNonEmptyListOption
 
-let printDuplicates (groupedTracks: LibraryTags list list) =
+let printDuplicates (groupedTracks: LibraryTags list NonEmptyList option) : unit =
     let printfGray = printfColor ConsoleColor.DarkGray
 
     let printGroup index (groupTracks: LibraryTags list) =
@@ -121,4 +123,6 @@ let printDuplicates (groupedTracks: LibraryTags list list) =
         printHeader ()
         printDuplicates ()
 
-    groupedTracks |> List.iteri printGroup
+    match groupedTracks with
+    | None -> printfn "No duplicates found."
+    | Some group -> group |> NonEmptyList.iteri printGroup

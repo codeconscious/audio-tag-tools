@@ -1,6 +1,7 @@
 module DuplicateFinder.IO
 
 open Errors
+open FSharpPlus.Data
 open Settings
 open Shared.Constants
 open Shared.TagLibrary
@@ -11,7 +12,7 @@ open System.IO
 
 let savePlaylist
     (settings: Settings)
-    (tags: LibraryTags list list)
+    (tags: LibraryTags list NonEmptyList option)
     : Result<unit, DupeFinderError> =
 
     let now = DateTime.Now.ToString timeStampFormat
@@ -38,10 +39,15 @@ let savePlaylist
 
         sb.AppendLine filePath
 
-    tags
-    |> List.collect id
-    |> List.fold appendFileEntry (StringBuilder "#EXTM3U\n")
-    |> string
-    |> File.writeText' file
-    |. fun _ -> printfn $"Created playlist file \"{file}\"."
-    |! FileWriteError
+    match tags with
+    | None ->
+        Ok ()
+    | Some tags' ->
+        tags'
+        |> NonEmptyList.toList
+        |> List.collect id
+        |> List.fold appendFileEntry (StringBuilder "#EXTM3U\n")
+        |> string
+        |> File.writeText' file
+        |. fun _ -> printfn $"Created playlist file \"{file}\"."
+        |! FileWriteError
