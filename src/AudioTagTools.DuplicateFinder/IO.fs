@@ -12,7 +12,7 @@ open System.IO
 
 let savePlaylist
     (settings: Settings)
-    (tags: LibraryTags list NonEmptyList option)
+    (tags: LibraryTags NonEmptyList NonEmptyList option)
     : Result<unit, DupeFinderError> =
 
     let now = DateTime.Now.ToString timeStampFormat
@@ -45,7 +45,8 @@ let savePlaylist
     | Some tags' ->
         tags'
         |> NonEmptyList.toList
-        |> List.collect id
+        |> List.map NonEmptyList.toList
+        |> List.concat
         |> List.fold appendFileEntry (StringBuilder "#EXTM3U\n")
         |> string
         |> File.writeText' file

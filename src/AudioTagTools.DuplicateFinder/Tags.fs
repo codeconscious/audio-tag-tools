@@ -78,7 +78,7 @@ let private groupName (settings: Settings) fileTags =
     $"{artist}{title}".ToLowerInvariant()
 
 let findDuplicates settings (tags: LibraryTags NonEmptyList)
-    : LibraryTags list NonEmptyList option = // TODO: LibraryTags NonEmptyList NonEmptyList option?
+    : LibraryTags NonEmptyList NonEmptyList option =
 
     tags
     |> NonEmptyList.toList
@@ -86,13 +86,13 @@ let findDuplicates settings (tags: LibraryTags NonEmptyList)
     |> List.groupBy (groupName settings)
     |> List.filter (snd >> List.hasMultiple)
     |> List.sortBy fst // Group name
-    |> List.map (snd >> List.sortBy (mainArtists String.Empty))
+    |> List.map (snd >> NonEmptyList.ofList >> NonEmptyList.sortBy (mainArtists String.Empty))
     |> List.toNonEmptyListOption
 
-let printDuplicates (groupedTracks: LibraryTags list NonEmptyList option) : unit =
+let printDuplicates (groupedTracks: LibraryTags NonEmptyList NonEmptyList option) : unit =
     let printfGray = printfColor ConsoleColor.DarkGray
 
-    let printGroup index (groupTracks: LibraryTags list) =
+    let printGroup index (groupTracks: LibraryTags NonEmptyList) =
         let artistSummary (tags: LibraryTags) : string =
             if Array.isEmpty tags.Artists
             then String.Empty
@@ -112,13 +112,13 @@ let printDuplicates (groupedTracks: LibraryTags list NonEmptyList option) : unit
 
         let printHeader () =
             groupTracks
-            |> List.head
+            |> NonEmptyList.head
             |> mainArtists ", "
             |> printfn "%d. %s" (index + 1) // Start numbering at 1, not 0.
 
         let printDuplicates () =
             groupTracks
-            |> List.iter printFileSummary
+            |> NonEmptyList.iter printFileSummary
 
         printHeader ()
         printDuplicates ()
