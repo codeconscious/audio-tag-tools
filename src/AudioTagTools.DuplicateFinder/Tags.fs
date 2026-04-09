@@ -17,7 +17,11 @@ let printCount description (tags: LibraryTags NonEmptyList) =
     printfn $"%s{description}%s{String.formatInt tags.Length}"
 
 /// Filters out tags containing artists or titles specified in the exclusions in the settings.
-let discardExcluded (settings: Settings) (allTags: LibraryTags NonEmptyList) : Result<LibraryTags NonEmptyList, DupeFinderError> =
+let discardExcluded
+    (settings: Settings)
+    (allTags: LibraryTags NonEmptyList)
+    : Result<LibraryTags NonEmptyList, DupeFinderError> =
+
     let isExcluded tags =
         let (|ArtistAndTitle|ArtistOnly|TitleOnly|Invalid|) (excl: Exclusion) =
             match excl.Artist, excl.Title with
