@@ -5,7 +5,6 @@ open Settings
 open Shared.Constants
 open Shared.TagLibrary
 open CCFSharpUtils
-open FSharpPlus.Data
 open System
 open System.Text
 open System.IO
@@ -19,19 +18,19 @@ let savePlaylist
     let fileName = $"Duplicates by AudioTagTools - {now}.m3u"
     let file = FileInfo <| Path.Combine(settings.Playlist.SaveDirectory, fileName)
 
-    let appendFileEntry (sb: StringBuilder) (t: LibraryTags) : StringBuilder =
-        let seconds = t.Duration.TotalSeconds
+    let appendFileEntry (sb: StringBuilder) (tags: LibraryTags) : StringBuilder =
+        let seconds = tags.Duration.TotalSeconds
         let artist =
-            t.Artists
-            |> Array.append t.AlbumArtists
+            tags.Artists
+            |> Array.append tags.AlbumArtists
             |> String.concat "; "
-        let artistWithTitle = $"{artist} - {t.Title}"
+        let artistWithTitle = $"{artist} - {tags.Title}"
         let extInf = $"#EXTINF:{seconds},{artistWithTitle}"
 
         sb.AppendLine extInf |> ignore
 
         let filePath =
-            let oldPath = Path.Combine(t.DirectoryName, t.FileName)
+            let oldPath = Path.Combine(tags.DirectoryName, tags.FileName)
             match settings.Playlist.SearchPath,
                   settings.Playlist.ReplacePath with
             | s, _ when s |> String.hasNoText -> oldPath
