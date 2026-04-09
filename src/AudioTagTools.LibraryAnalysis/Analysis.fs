@@ -158,6 +158,6 @@ let longestFileNames count tags =
     |> List.sortByDescending fst
     |> List.take count
     |> List.map (fun (count, t) ->
-        [ $"""{mainArtists "; " t}{String.nl}↪︎ {t.Title}"""
+        [ $"""{mainArtists "; " t}{String.nl}  {t.Title}"""
           t.FileName
           String.formatInt count ])
