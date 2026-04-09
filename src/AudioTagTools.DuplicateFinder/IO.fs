@@ -40,9 +40,8 @@ let savePlaylist
 
     tags
     |> List.collect id
-    // |> Seq.concat
     |> List.fold appendFileEntry (StringBuilder "#EXTM3U\n")
     |> string
     |> File.writeText' file
-    |! FileWriteError
     |. fun _ -> printfn $"Created playlist file \"{file}\"."
+    |! FileWriteError
