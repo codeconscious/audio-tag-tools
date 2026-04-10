@@ -10,17 +10,19 @@ open CCFSharpUtils
 open System
 open System.IO
 
+type nlist<'a> = NonEmptyList<'a>
+
 let parseToTags json =
     json |> parseJsonToNonEmptyTags |! TagParseError
 
-let printCount description (tags: LibraryTags NonEmptyList) =
+let printCount description (tags: LibraryTags nlist) =
     printfn $"%s{description}%s{String.formatInt tags.Length}"
 
 /// Filters out tags containing artists or titles specified in the exclusions in the settings.
 let discardExcluded
     (settings: Settings)
-    (allTags: LibraryTags NonEmptyList)
-    : Result<LibraryTags NonEmptyList, DupeFinderError> =
+    (allTags: LibraryTags nlist)
+    : Result<LibraryTags nlist, DupeFinderError> =
 
     let isExcluded tags =
         let (|ArtistAndTitle|ArtistOnly|TitleOnly|Invalid|) (excl: Exclusion) =
@@ -77,8 +79,7 @@ let private groupName (settings: Settings) fileTags =
 
     $"{artist}{title}".ToLowerInvariant()
 
-let findDuplicates settings (tags: LibraryTags NonEmptyList)
-    : LibraryTags NonEmptyList NonEmptyList option =
+let findDuplicates settings (tags: LibraryTags nlist) : LibraryTags nlist nlist option =
 
     tags
     |> NonEmptyList.toList
@@ -89,10 +90,10 @@ let findDuplicates settings (tags: LibraryTags NonEmptyList)
     |> map (snd >> sortBy (mainArtists String.Empty) >> NonEmptyList.ofList)
     |> List.toNonEmptyListOption
 
-let printDuplicates (groupedTracks: LibraryTags NonEmptyList NonEmptyList option) : unit =
+let printDuplicates (groupedTracks: LibraryTags nlist nlist option) : unit =
     let printfGray = printfColor ConsoleColor.DarkGray
 
-    let printGroup index (groupTracks: LibraryTags NonEmptyList) =
+    let printGroup index (groupTracks: LibraryTags nlist) =
         let artistSummary (tags: LibraryTags) : string =
             if Array.isEmpty tags.Artists
             then String.Empty
