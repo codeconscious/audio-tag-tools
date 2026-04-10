@@ -2,6 +2,7 @@ module LibraryAnalysis.Analysis
 
 open System.IO
 open Shared.TagLibrary
+open FSharpPlus.Operators
 open CCFSharpUtils
 
 let inline private mostPopulous count (grouper: 'a -> 'a) (items: 'a list) =
@@ -65,7 +66,6 @@ let topTitles count tags =
     |> List.map (fun (title, count) -> [ title; String.formatInt count ])
 
 let topGenres count tags =
-    // let genres = tags |> List.map _.Genres
     let genres = tags |> List.map (fun xs -> xs.Genres |> List.ofArray)
     let genreCount = genres.Length
 
@@ -99,7 +99,7 @@ let artistsWithMostGenres count tags =
     |> List.groupBy firstDistinctArtist
     |> List.map artistsWithTheirGenres
     |> List.map (fun (a, gs) -> a, uniqGenreCount gs, gs)
-    |> List.sortByDescending Tuple.snd3
+    |> List.sortByDescending item2
     |> List.take count
     |> List.map (fun (a, uniqGenreCount, gs) ->
         [ a
