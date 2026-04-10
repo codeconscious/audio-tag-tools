@@ -4,6 +4,7 @@ open Errors
 open Shared.TagLibrary
 open CCFSharpUtils
 open FSharpPlus.Data
+open FSharpPlus.Operators
 open System
 
 let private mainArtist (fileTags: LibraryTags) =
@@ -27,18 +28,13 @@ let printTagCount (tags: LibraryTags NonEmptyList) =
 
 let private allGenres (fileTags: LibraryTags NonEmptyList) : string list =
     fileTags
-    |> NonEmptyList.tryCollect (fun t -> t.Genres |> Array.toList)
-    |> function None -> [] | Some gs -> gs |> NonEmptyList.toList
+    |> NonEmptyList.tryCollect (fun t -> t.Genres |> toList)
+    |> function None -> [] | Some gs -> gs |> toList
 
-let private mostCommon (items: string list) : string =
-    match items with
-    | [] ->
-        String.Empty
-    | _ ->
-        items
-        |> List.groupBy id
-        |> List.maxBy (snd >> List.length)
-        |> fst
+let private mostCommon (xs: string list) : string =
+    match xs with
+    | [] -> String.Empty
+    | _  -> xs |> groupBy id |> maxBy (snd >> length) |> fst
 
 let private mostCommonGenre = allGenres >> mostCommon
 
