@@ -10,8 +10,6 @@ open CCFSharpUtils
 open System
 open System.IO
 
-type nlist<'a> = NonEmptyList<'a>
-
 let parseToTags json =
     json |> parseJsonToNonEmptyTags |! TagParseError
 

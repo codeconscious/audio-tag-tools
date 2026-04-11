@@ -16,8 +16,8 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="CCFSharpUtils" Version="0.2.1" />
-      <PackageReference Include="FSharp.Data" Version="8.1.5" />
+      <PackageReference Include="CCFSharpUtils" Version="0.2.2" />
+      <PackageReference Include="FSharp.Data" Version="8.1.7" />
       <PackageReference Update="FSharp.Core" Version="10.1.201" />
       <PackageReference Include="FSharpPlus" Version="1.9.1" />
     </ItemGroup>
