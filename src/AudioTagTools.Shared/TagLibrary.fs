@@ -5,7 +5,6 @@ open System
 open System.IO
 open System.Text.Json
 open FSharpPlus
-open FSharpPlus.Data
 
 type FileTags = TagLib.File
 
@@ -46,7 +45,7 @@ let blankTags (fileInfo: FileInfo) : LibraryTags =
       LastWriteTime = DateTimeOffset fileInfo.LastWriteTime }
 
 let parseJsonToTags (json: string) : Result<LibraryTags list, string> =
-    try Ok (JsonSerializer.Deserialize<LibraryTags list>(json))
+    try Ok (JsonSerializer.Deserialize<LibraryTags list> json)
     with exn -> Error exn.Message
 
 let parseJsonToNonEmptyTags (json: string) : Result<LibraryTags nlist, string> =
@@ -69,7 +68,7 @@ let ignorableAlbumArtists =
       "Various"
       "Various Artists"
       "Multiple Artists"
-      "\u003Cunknown\u003E" ]
+      "\u003Cunknown\u003E" ] // U+003C == less-than sign; \u003E == greater-than sign
 
 let allDistinctArtists (tags: LibraryTags) : string list =
     Array.concat [ tags.Artists; tags.AlbumArtists ]
