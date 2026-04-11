@@ -71,9 +71,7 @@ let private groupName (settings: Settings) fileTags =
         |> checkEquivalentArtists
         |> scrubText settings.ArtistReplacements
 
-    let title =
-        fileTags.Title
-        |> scrubText settings.TitleReplacements
+    let title = fileTags.Title |> scrubText settings.TitleReplacements
 
     $"{artist}{title}".ToLowerInvariant()
 

@@ -1,11 +1,11 @@
 module DuplicateFinder.IO
 
 open Errors
-open FSharpPlus.Data
 open Settings
 open Shared.Constants
 open Shared.TagLibrary
 open CCFSharpUtils
+open FSharpPlus.Data
 open System
 open System.IO
 
