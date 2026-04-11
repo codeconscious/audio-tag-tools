@@ -33,14 +33,13 @@ let discardExcluded
         let containsArtist a = [| tags.AlbumArtists; tags.Artists |] |> Array.anyContainsIgnoreCase a
         let titleStartsWith t = tags.Title |> String.startsWithIgnoreCase t
 
-        let check = function
+        let checkIfExcluded = function
             | ArtistAndTitle (a, t) -> containsArtist a && titleStartsWith t
             | ArtistOnly a -> containsArtist a
             | TitleOnly t -> titleStartsWith t
             | Invalid -> false
 
-        settings.Exclusions
-        |> Array.exists check
+        settings.Exclusions |> Array.exists checkIfExcluded
 
     allTags
     |> NonEmptyList.tryFilter (not << isExcluded)
