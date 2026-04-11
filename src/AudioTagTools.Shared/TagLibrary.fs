@@ -75,6 +75,9 @@ let allDistinctArtists (tags: LibraryTags) : string list =
     |> Array.distinct
     |> List.ofArray
 
+let firstDistinctArtist (tags: LibraryTags) : string =
+    tags |> allDistinctArtists |> List.head
+
 let mainArtists (separator: string) (track: LibraryTags) : string =
     let hasNoIgnoredAlbumArtists artist =
         ignorableAlbumArtists
@@ -87,9 +90,6 @@ let mainArtists (separator: string) (track: LibraryTags) : string =
     | t ->
         t.Artists
     |> String.concat separator
-
-let firstDistinctArtist (tags: LibraryTags) : string =
-    tags |> allDistinctArtists |> List.head
 
 let hasAnyArtist (tags: LibraryTags) : bool =
     Array.anyNotEmpty [| tags.Artists; tags.AlbumArtists |]
