@@ -7,7 +7,6 @@ open Shared.Constants
 open Shared.TagLibrary
 open CCFSharpUtils
 open System
-open System.Text
 open System.IO
 
 let savePlaylist
@@ -47,7 +46,7 @@ let savePlaylist
         |> NonEmptyList.toList
         |> List.map NonEmptyList.toList
         |> List.concat
-        |> List.fold appendFileEntry (SB "#EXTM3U\n")
+        |> List.fold appendFileEntry (SB $"#EXTM3U{String.nl}")
         |> string
         |> File.writeText' file
         |. fun _ -> printfn $"Created playlist file \"{file}\"."
