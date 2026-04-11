@@ -1,11 +1,11 @@
 module Cacher.Tags
 
 open System
-open FSharpPlus.Data
 open IO
 open Errors
 open Shared.TagLibrary
 open CCFSharpUtils
+open FSharpPlus.Data
 open FSharpPlus.Operators
 
 type LibraryTagMap = Map<string, LibraryTags>

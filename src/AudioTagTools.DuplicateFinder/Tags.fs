@@ -16,7 +16,7 @@ let parseToTags json =
 let printCount description (tags: LibraryTags nlist) =
     printfn $"%s{description}%s{String.formatInt tags.Length}"
 
-/// Filters out tags containing artists or titles specified in the exclusions in the settings.
+/// Filters out tags containing artists or titles specified in the exclusions.
 let discardExcluded
     (settings: Settings)
     (allTags: LibraryTags nlist)
