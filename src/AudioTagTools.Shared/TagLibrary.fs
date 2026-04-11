@@ -49,7 +49,7 @@ let parseJsonToTags (json: string) : Result<LibraryTags list, string> =
     try Ok (JsonSerializer.Deserialize<LibraryTags list>(json))
     with exn -> Error exn.Message
 
-let parseJsonToNonEmptyTags (json: string) : Result<LibraryTags NonEmptyList, string> =
+let parseJsonToNonEmptyTags (json: string) : Result<LibraryTags nlist, string> =
     json
     |> parseJsonToTags
     >>= List.toNonEmptyListResult "No tags were found to parse."

@@ -5,7 +5,7 @@ open FSharpPlus.Data
 
 type DupeFinderError =
     | ArgCountError
-    | ArgErrors of string NonEmptyList
+    | ArgErrors of string nlist
     | FileReadError of string
     | FileWriteError of string
     | SettingParseError of string

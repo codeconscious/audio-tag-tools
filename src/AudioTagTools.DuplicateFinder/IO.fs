@@ -12,14 +12,14 @@ open System.IO
 
 let savePlaylist
     (settings: Settings)
-    (tags: LibraryTags NonEmptyList NonEmptyList option)
+    (tags: LibraryTags nlist nlist option)
     : Result<unit, DupeFinderError> =
 
     let now = DateTime.Now.ToString timeStampFormat
     let fileName = $"Duplicates by AudioTagTools - {now}.m3u"
     let file = FileInfo <| Path.Combine(settings.Playlist.SaveDirectory, fileName)
 
-    let appendFileEntry (sb: StringBuilder) (tags: LibraryTags) : StringBuilder =
+    let appendFileEntry (sb: SB) (tags: LibraryTags) : SB =
         let seconds = tags.Duration.TotalSeconds
         let artist =
             tags.Artists
@@ -47,7 +47,7 @@ let savePlaylist
         |> NonEmptyList.toList
         |> List.map NonEmptyList.toList
         |> List.concat
-        |> List.fold appendFileEntry (StringBuilder "#EXTM3U\n")
+        |> List.fold appendFileEntry (SB "#EXTM3U\n")
         |> string
         |> File.writeText' file
         |. fun _ -> printfn $"Created playlist file \"{file}\"."

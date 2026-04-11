@@ -23,10 +23,10 @@ let printOldSummary (oldGenres: string list) : unit =
             (String.formatInt count)
             (String.pluralize "entry" "entries" count)
 
-let printTagCount (tags: LibraryTags NonEmptyList) =
+let printTagCount (tags: LibraryTags nlist) =
     printfn $"Parsed tags for {String.formatInt tags.Length} files from the tag library."
 
-let private allGenres (fileTags: LibraryTags NonEmptyList) : string list =
+let private allGenres (fileTags: LibraryTags nlist) : string list =
     fileTags
     |> NonEmptyList.tryCollect (fun t -> t.Genres |> toList)
     |> function None -> [] | Some gs -> gs |> toList
@@ -38,7 +38,7 @@ let private mostCommon (xs: string list) : string =
 
 let private mostCommonGenre = allGenres >> mostCommon
 
-let generateGenreData (separator: string) (allFileTags: LibraryTags NonEmptyList) =
+let generateGenreData (separator: string) (allFileTags: LibraryTags nlist) =
     allFileTags
     |> NonEmptyList.groupBy mainArtist
     |> NonEmptyList.tryChoose (fun (artist, tags) ->
@@ -51,7 +51,7 @@ let generateGenreData (separator: string) (allFileTags: LibraryTags NonEmptyList
        | Some gs -> Ok gs
        | None -> Error InsufficientGenreData
 
-let printChanges (oldGenres: string list) (newGenres: string NonEmptyList) =
+let printChanges (oldGenres: string list) (newGenres: string nlist) =
     let newTotalCount = newGenres.Length
     let addedCount = newGenres |> NonEmptyList.toList |> List.except oldGenres |> _.Length
     let deletedCount = oldGenres |> List.except newGenres |> _.Length
