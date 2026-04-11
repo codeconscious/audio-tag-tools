@@ -97,5 +97,5 @@ let hasAnyArtist (tags: LibraryTags) : bool =
 let hasTitle (tags: LibraryTags) : bool =
     String.hasText tags.Title
 
-let hasArtistAndTitle track : bool =
+let hasArtistAndTitle (track: LibraryTags) : bool =
     hasAnyArtist track && hasTitle track
