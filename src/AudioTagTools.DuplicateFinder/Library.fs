@@ -23,9 +23,9 @@ let private run (args: string array) : Result<unit, DupeFinderError> =
            libraryTags
            |> tap (printCount "Total file count:    ")
            |> discardExcluded settings
-           |> Result.tee (printCount "Filtered file count: ")
-           |> Result.map (findDuplicates settings)
-           |> Result.tee printDuplicates
+           |. printCount "Filtered file count: "
+           |>> findDuplicates settings
+           |. printDuplicates
 
         return!
             duplicates |> savePlaylist settings
