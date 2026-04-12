@@ -7,6 +7,7 @@ open IO
 open Shared.TagLibrary
 open Shared.Constants
 open CCFSharpUtils
+open CCFSharpUtils.Operators
 open FSharpPlus
 open FsToolkit.ErrorHandling
 

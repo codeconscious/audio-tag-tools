@@ -6,6 +6,7 @@ open Errors
 open Shared
 open Shared.TagLibrary
 open CCFSharpUtils
+open CCFSharpUtils.Operators
 open Spectre.Console
 open FsToolkit.ErrorHandling
 open FsToolkit.ErrorHandling.Operator.Result

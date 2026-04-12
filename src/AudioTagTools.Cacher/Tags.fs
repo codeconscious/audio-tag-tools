@@ -5,6 +5,7 @@ open IO
 open Errors
 open Shared.TagLibrary
 open CCFSharpUtils
+open CCFSharpUtils.Operators
 open FSharpPlus.Data
 open FSharpPlus.Operators
 

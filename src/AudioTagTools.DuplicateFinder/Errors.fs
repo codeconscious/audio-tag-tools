@@ -1,7 +1,6 @@
 module DuplicateFinder.Errors
 
 open CCFSharpUtils
-open FSharpPlus.Data
 
 type DupeFinderError =
     | ArgCountError

@@ -6,6 +6,7 @@ open IO
 open Tags
 open Shared.Constants
 open CCFSharpUtils
+open CCFSharpUtils.Operators
 open FsToolkit.ErrorHandling
 
 let private run (args: string array) : Result<unit, CacherError> =
