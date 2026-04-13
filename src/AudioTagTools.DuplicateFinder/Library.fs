@@ -10,7 +10,7 @@ open CCFSharpUtils.Operators
 open FSharpPlus
 open FsToolkit.ErrorHandling.Operator.Result
 
-let private run (args: string array) : Result<unit, DupeFinderError> =
+let private run args : Result<unit, DupeFinderError> =
     monad' {
         let! settingsFile, tagLibraryFile = validate args
 
