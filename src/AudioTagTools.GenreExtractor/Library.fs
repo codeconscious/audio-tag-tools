@@ -13,7 +13,7 @@ open FSharpPlus
 // The separator character should be rare and highly unlikely to appear in files' tags.
 let private separator = "＼"
 
-let private run args : Result<unit, CommandError> =
+let private run args : Result<unit, GenreExtractorError> =
     monad' {
         let! tagLibraryFile, genreFile = validate args
 

@@ -13,7 +13,7 @@ open System.IO
 let savePlaylist
     (settings: Settings)
     (maybeTags: LibraryTags nlist nlist option)
-    : Result<unit, CommandError> =
+    : Result<unit, DupeFinderError> =
 
     let now = DateTime.Now.ToString timeStampFormat
     let fileName = $"Duplicates by AudioTagTools - {now}.m3u"

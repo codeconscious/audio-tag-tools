@@ -6,7 +6,7 @@ open System.IO
 
 type FileTags = TagLib.File
 
-let getFileInfos (dirPath: DirectoryInfo) : Result<FileInfo nseq, CommandError> =
+let getFileInfos (dirPath: DirectoryInfo) : Result<FileInfo nseq, CacherError> =
     let isSupportedAudioFile (fileInfo: FileInfo) =
         // Supported file format extensions from https://github.com/mono/taglib-sharp,
         // plus some additional ones. Initial periods are needed.

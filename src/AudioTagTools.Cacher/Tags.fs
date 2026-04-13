@@ -104,7 +104,7 @@ let private reportResults categorizedTags : CategorizedTagsToCache nseq =
 
     categorizedTags
 
-let generateJson (tagMap: LibraryTagMap) (fileInfos: FileInfo nseq) : Result<string, CommandError> =
+let generateJson (tagMap: LibraryTagMap) (fileInfos: FileInfo nseq) : Result<string, CacherError> =
     fileInfos
     |> prepareTagsToWrite tagMap
     |> reportResults

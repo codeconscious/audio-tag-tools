@@ -3,7 +3,7 @@ module LibraryAnalysis.ArgValidation
 open Errors
 open System.IO
 
-let validate args : Result<FileInfo, CommandError> =
+let validate args : Result<FileInfo, AnalysisError> =
     match args with
     | [| tagLibraryArg |] ->
         if File.Exists tagLibraryArg
