@@ -52,7 +52,7 @@ let discardExcluded
 ///     name from that group will be prioritized over the track's artist name.
 /// (2) The track title.
 /// The string is intended to be used solely for track grouping.
-let private groupName (settings: Settings) fileTags =
+let private sanitizedTrackGroupingName (settings: Settings) fileTags =
     let scrubText subStrs =
         subStrs
         |> Array.append (String.whiteSpaceStrs |> Array.ofList)
@@ -76,11 +76,10 @@ let private groupName (settings: Settings) fileTags =
     $"{artist}{title}".ToLowerInvariant()
 
 let findDuplicates settings (tags: LibraryTags nlist) : LibraryTags nlist nlist option =
-
     tags
     |> NonEmptyList.toList
     |> filter hasArtistAndTitle
-    |> groupBy (groupName settings)
+    |> groupBy (sanitizedTrackGroupingName settings)
     |> filter (snd >> List.hasMultiple)
     |> sortBy fst // Group name
     |> map (snd >> sortBy (mainArtists String.Empty) >> NonEmptyList.ofList)
