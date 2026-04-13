@@ -77,13 +77,12 @@ let private sanitizedTrackGroupingName (settings: Settings) fileTags =
 
 let findDuplicates settings (tags: LibraryTags nlist) : LibraryTags nlist nlist option =
     tags
-    |> NonEmptyList.toList
-    |> filter hasArtistAndTitle
-    |> groupBy (sanitizedTrackGroupingName settings)
-    |> filter (snd >> List.hasMultiple)
-    |> sortBy fst // Group name
-    |> map (snd >> sortBy (mainArtists String.Empty) >> NonEmptyList.ofList)
-    |> List.toNonEmptyListOption
+    |> NonEmptyList.tryFilter hasArtistAndTitle
+    |> Option.map (NonEmptyList.groupBy (sanitizedTrackGroupingName settings))
+    |> Option.map (NonEmptyList.tryFilter (snd >> NonEmptyList.hasMultiple))
+    |> Option.flatten
+    |> Option.map (sortBy fst) // Group name
+    |> Option.map (NonEmptyList.map (snd >> sortBy (mainArtists String.Empty)))
 
 let printDuplicates (groupedTracks: LibraryTags nlist nlist option) : unit =
     let printfGray = printfColor ConsoleColor.DarkGray
