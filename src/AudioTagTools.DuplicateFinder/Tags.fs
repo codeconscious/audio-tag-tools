@@ -22,7 +22,7 @@ let printCount description (tags: LibraryTags nlist) =
 let discardExcluded
     (settings: Settings)
     (allTags: LibraryTags nlist)
-    : Result<LibraryTags nlist, DupeFinderError> =
+    : Result<LibraryTags nlist, CommandError> =
 
     let isExcluded tags =
         let (|ArtistAndTitle|ArtistOnly|TitleOnly|Invalid|) (excl: Exclusion) =

@@ -2,7 +2,7 @@ module DuplicateFinder.Errors
 
 open CCFSharpUtils
 
-type DupeFinderError =
+type CommandError =
     | ArgCountError
     | ArgErrors of string nlist
     | FileReadError of string

@@ -6,7 +6,7 @@ open CCFSharpUtils
 open CCFSharpUtils.Operators
 open System.IO
 
-let readGenres (genreFile: FileInfo) : Result<string list, GenreExtractorError> =
+let readGenres (genreFile: FileInfo) : Result<string list, CommandError> =
     if genreFile.Exists then
         genreFile
         |>  File.readLines'
@@ -14,4 +14,3 @@ let readGenres (genreFile: FileInfo) : Result<string list, GenreExtractorError> 
         |!  FileReadError
     else
         Ok List.empty
-
