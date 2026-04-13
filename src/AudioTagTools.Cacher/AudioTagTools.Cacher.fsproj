@@ -16,7 +16,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="CCFSharpUtils" Version="0.3.0.2" />
+      <PackageReference Include="CCFSharpUtils" Version="0.3.1" />
       <PackageReference Include="FSharp.Data" Version="8.1.7" />
       <PackageReference Include="FSharpPlus" Version="1.9.1" />
       <PackageReference Include="FsToolkit.ErrorHandling" Version="5.2.0" />
