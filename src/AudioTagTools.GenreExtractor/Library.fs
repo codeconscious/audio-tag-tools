@@ -9,13 +9,12 @@ open Shared.Constants
 open CCFSharpUtils
 open CCFSharpUtils.Operators
 open FSharpPlus
-open FsToolkit.ErrorHandling
 
 // The separator character should be rare and highly unlikely to appear in files' tags.
 let private separator = "＼"
 
 let private run args : Result<unit, GenreExtractorError> =
-    result {
+    monad' {
         let! tagLibraryFile, genreFile = validate args
 
         let! oldGenres = genreFile |> readGenres |. printOldSummary

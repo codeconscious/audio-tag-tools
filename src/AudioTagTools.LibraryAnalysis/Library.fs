@@ -8,7 +8,7 @@ open Shared.TagLibrary
 open CCFSharpUtils
 open CCFSharpUtils.Operators
 open Spectre.Console
-open FsToolkit.ErrorHandling
+open FSharpPlus
 open FsToolkit.ErrorHandling.Operator.Result
 
 type QualityData =
@@ -17,7 +17,7 @@ type QualityData =
       SampleRate: int }
 
 let private run (args: string array) : Result<unit, AnalysisError> =
-    result {
+    monad' {
         let! tagLibraryFile = validate args
         let! tags = tagLibraryFile |> File.readText' >>= parseJsonToTags |! TagParseError
 

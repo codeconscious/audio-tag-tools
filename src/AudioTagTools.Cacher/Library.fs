@@ -7,10 +7,10 @@ open Tags
 open Shared.Constants
 open CCFSharpUtils
 open CCFSharpUtils.Operators
-open FsToolkit.ErrorHandling
+open FSharpPlus
 
 let private run (args: string array) : Result<unit, CacherError> =
-    result {
+    monad' {
         let! mediaDir, tagLibraryFile = validate args
         let! fileInfos = getFileInfos mediaDir
         let! tagLibraryMap = createTagLibraryMap tagLibraryFile

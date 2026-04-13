@@ -7,12 +7,11 @@ open Tags
 open Settings
 open CCFSharpUtils
 open CCFSharpUtils.Operators
-open FSharpPlus.Operators
-open FsToolkit.ErrorHandling
+open FSharpPlus
 open FsToolkit.ErrorHandling.Operator.Result
 
 let private run (args: string array) : Result<unit, DupeFinderError> =
-    result {
+    monad' {
         let! settingsFile, tagLibraryFile = validate args
 
         let! settings    = settingsFile   |> File.readText' |! FileReadError >>= parseToSettings
