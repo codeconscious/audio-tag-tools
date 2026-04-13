@@ -16,7 +16,7 @@ type QualityData =
       Extension: string
       SampleRate: int }
 
-let private run args : Result<unit, AnalysisError> =
+let private run args : Result<unit, CommandError> =
     monad' {
         let! tagLibraryFile = validate args
         let! tags = tagLibraryFile |> File.readText' >>= parseJsonToTags |! TagParseError
