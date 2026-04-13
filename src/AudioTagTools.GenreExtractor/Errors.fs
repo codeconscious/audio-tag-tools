@@ -3,7 +3,7 @@ module GenreExtractor.Errors
 open CCFSharpUtils
 open FSharpPlus.Data
 
-type GenreExtractorError =
+type CommandError =
     | ArgCountError
     | ArgErrors of string nlist
     | FileReadError of string

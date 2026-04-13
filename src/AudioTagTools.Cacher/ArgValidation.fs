@@ -3,7 +3,7 @@ module Cacher.ArgValidation
 open Errors
 open System.IO
 
-let validate args : Result<(DirectoryInfo * FileInfo), CacherError> =
+let validate args : Result<(DirectoryInfo * FileInfo), CommandError> =
     match args with
     | [| mediaDirArg; tagLibArg |] ->
         if Directory.Exists mediaDirArg

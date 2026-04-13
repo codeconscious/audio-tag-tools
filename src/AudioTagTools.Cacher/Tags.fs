@@ -20,7 +20,7 @@ type CategorizedTagsToCache =
     { Type: LibraryComparisonResult
       Tags: LibraryTags }
 
-let createTagLibraryMap (libraryFile: FileInfo) : Result<LibraryTagMap, CacherError> =
+let createTagLibraryMap (libraryFile: FileInfo) : Result<LibraryTagMap, CommandError> =
     if libraryFile.Exists
     then
         libraryFile
@@ -104,7 +104,7 @@ let private reportResults categorizedTags : CategorizedTagsToCache nseq =
 
     categorizedTags
 
-let generateJson (tagMap: LibraryTagMap) (fileInfos: FileInfo nseq) : Result<string, CacherError> =
+let generateJson (tagMap: LibraryTagMap) (fileInfos: FileInfo nseq) : Result<string, CommandError> =
     fileInfos
     |> prepareTagsToWrite tagMap
     |> reportResults

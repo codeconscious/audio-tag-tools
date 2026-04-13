@@ -9,7 +9,7 @@ open CCFSharpUtils
 open CCFSharpUtils.Operators
 open FSharpPlus
 
-let private run args : Result<unit, CacherError> =
+let private run args : Result<unit, CommandError> =
     monad' {
         let! mediaDir, tagLibraryFile = validate args
         let! fileInfos = getFileInfos mediaDir
