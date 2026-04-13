@@ -12,7 +12,7 @@ open System.IO
 
 let savePlaylist
     (settings: Settings)
-    (tagOpt: LibraryTags nlist nlist option)
+    (maybeTags: LibraryTags nlist nlist option)
     : Result<unit, DupeFinderError> =
 
     let now = DateTime.Now.ToString timeStampFormat
@@ -39,7 +39,7 @@ let savePlaylist
 
         sb.AppendLine filePath
 
-    match tagOpt with
+    match maybeTags with
     | None ->
         Ok ()
     | Some tags ->
