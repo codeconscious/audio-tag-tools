@@ -5,6 +5,7 @@ open Settings
 open Shared
 open Shared.TagLibrary
 open FSharpPlus
+open FSharpPlus.Control
 open FSharpPlus.Data
 open CCFSharpUtils
 open CCFSharpUtils.Operators
@@ -75,14 +76,20 @@ let private sanitizedTrackGroupingName (settings: Settings) fileTags =
 
     $"{artist}{title}".ToLowerInvariant()
 
-let findDuplicates settings (tags: LibraryTags nlist) : LibraryTags nlist nlist option =
-    tags
-    |> NonEmptyList.tryFilter hasArtistAndTitle
-    |> Option.map (NonEmptyList.groupBy (sanitizedTrackGroupingName settings))
-    |> Option.map (NonEmptyList.tryFilter (snd >> NonEmptyList.hasMultiple))
-    |> Option.flatten
-    |> Option.map (sortBy fst) // Group name
-    |> Option.map (NonEmptyList.map (snd >> sortBy (mainArtists String.Empty)))
+let findDuplicates settings tags : LibraryTags nlist nlist option =
+    monad' {
+        let! filtered = tags |> NonEmptyList.tryFilter hasArtistAndTitle
+
+        let! groupedDupes =
+            filtered
+            |> NonEmptyList.groupBy (sanitizedTrackGroupingName settings)
+            |> NonEmptyList.tryFilter (snd >> NonEmptyList.hasMultiple)
+
+        return
+            groupedDupes
+            |> sortBy fst
+            |> NonEmptyList.map (snd >> sortBy (mainArtists String.Empty))
+    }
 
 let printDuplicates (groupedTracks: LibraryTags nlist nlist option) : unit =
     let printfGray = printfColor ConsoleColor.DarkGray
