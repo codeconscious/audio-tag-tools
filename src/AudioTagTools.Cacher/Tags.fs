@@ -78,9 +78,7 @@ let private prepareTagsToWrite tagLibraryMap (fileInfos: FileInfo nseq)
     fileInfos
     |> NonEmptySeq.map (prepareTagsToCache tagLibraryMap)
 
-let private reportResults
-    (categorizedTags: CategorizedTagsToCache nseq)
-    : CategorizedTagsToCache nseq =
+let private reportResults categorizedTags : CategorizedTagsToCache nseq =
 
     let categoryTotals =
         categorizedTags
