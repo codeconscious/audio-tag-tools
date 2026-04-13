@@ -5,7 +5,6 @@ open System
 open System.IO
 open System.Text.Json
 open FSharpPlus
-open FSharpPlus.Data
 
 type FileTags = TagLib.File
 
@@ -46,10 +45,10 @@ let blankTags (fileInfo: FileInfo) : LibraryTags =
       LastWriteTime = DateTimeOffset fileInfo.LastWriteTime }
 
 let parseJsonToTags (json: string) : Result<LibraryTags list, string> =
-    try Ok (JsonSerializer.Deserialize<LibraryTags list>(json))
+    try Ok (JsonSerializer.Deserialize<LibraryTags list> json)
     with exn -> Error exn.Message
 
-let parseJsonToNonEmptyTags (json: string) : Result<LibraryTags NonEmptyList, string> =
+let parseJsonToNonEmptyTags (json: string) : Result<LibraryTags nlist, string> =
     json
     |> parseJsonToTags
     >>= List.toNonEmptyListResult "No tags were found to parse."
@@ -69,12 +68,15 @@ let ignorableAlbumArtists =
       "Various"
       "Various Artists"
       "Multiple Artists"
-      "\u003Cunknown\u003E" ]
+      "\u003Cunknown\u003E" ] // U+003C == less-than sign; \u003E == greater-than sign
 
 let allDistinctArtists (tags: LibraryTags) : string list =
     Array.concat [ tags.Artists; tags.AlbumArtists ]
     |> Array.distinct
     |> List.ofArray
+
+let firstDistinctArtist (tags: LibraryTags) : string =
+    tags |> allDistinctArtists |> List.head
 
 let mainArtists (separator: string) (track: LibraryTags) : string =
     let hasNoIgnoredAlbumArtists artist =
@@ -89,14 +91,11 @@ let mainArtists (separator: string) (track: LibraryTags) : string =
         t.Artists
     |> String.concat separator
 
-let firstDistinctArtist (tags: LibraryTags) : string =
-    tags |> allDistinctArtists |> List.head
-
 let hasAnyArtist (tags: LibraryTags) : bool =
     Array.anyNotEmpty [| tags.Artists; tags.AlbumArtists |]
 
 let hasTitle (tags: LibraryTags) : bool =
     String.hasText tags.Title
 
-let hasArtistAndTitle track : bool =
+let hasArtistAndTitle (track: LibraryTags) : bool =
     hasAnyArtist track && hasTitle track

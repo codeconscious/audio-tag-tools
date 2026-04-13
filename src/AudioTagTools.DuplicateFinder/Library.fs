@@ -6,12 +6,12 @@ open IO
 open Tags
 open Settings
 open CCFSharpUtils
-open FSharpPlus.Operators
-open FsToolkit.ErrorHandling
+open CCFSharpUtils.Operators
+open FSharpPlus
 open FsToolkit.ErrorHandling.Operator.Result
 
-let private run (args: string array) : Result<unit, DupeFinderError> =
-    result {
+let private run args : Result<unit, DupeFinderError> =
+    monad' {
         let! settingsFile, tagLibraryFile = validate args
 
         let! settings    = settingsFile   |> File.readText' |! FileReadError >>= parseToSettings
@@ -23,9 +23,9 @@ let private run (args: string array) : Result<unit, DupeFinderError> =
            libraryTags
            |> tap (printCount "Total file count:    ")
            |> discardExcluded settings
-           |> Result.tee (printCount "Filtered file count: ")
-           |> Result.map (findDuplicates settings)
-           |> Result.tee printDuplicates
+           |. printCount "Filtered file count: "
+           |>> findDuplicates settings
+           |. printDuplicates
 
         return!
             duplicates |> savePlaylist settings

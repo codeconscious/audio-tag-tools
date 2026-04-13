@@ -5,22 +5,24 @@ open Settings
 open Shared
 open Shared.TagLibrary
 open FSharpPlus
+open FSharpPlus.Control
 open FSharpPlus.Data
 open CCFSharpUtils
+open CCFSharpUtils.Operators
 open System
 open System.IO
 
 let parseToTags json =
     json |> parseJsonToNonEmptyTags |! TagParseError
 
-let printCount description (tags: LibraryTags NonEmptyList) =
+let printCount description (tags: LibraryTags nlist) =
     printfn $"%s{description}%s{String.formatInt tags.Length}"
 
-/// Filters out tags containing artists or titles specified in the exclusions in the settings.
+/// Filters out tags containing artists or titles specified in the exclusions.
 let discardExcluded
     (settings: Settings)
-    (allTags: LibraryTags NonEmptyList)
-    : Result<LibraryTags NonEmptyList, DupeFinderError> =
+    (allTags: LibraryTags nlist)
+    : Result<LibraryTags nlist, DupeFinderError> =
 
     let isExcluded tags =
         let (|ArtistAndTitle|ArtistOnly|TitleOnly|Invalid|) (excl: Exclusion) =
@@ -33,14 +35,13 @@ let discardExcluded
         let containsArtist a = [| tags.AlbumArtists; tags.Artists |] |> Array.anyContainsIgnoreCase a
         let titleStartsWith t = tags.Title |> String.startsWithIgnoreCase t
 
-        let check = function
+        let checkIfExcluded = function
             | ArtistAndTitle (a, t) -> containsArtist a && titleStartsWith t
             | ArtistOnly a -> containsArtist a
             | TitleOnly t -> titleStartsWith t
             | Invalid -> false
 
-        settings.Exclusions
-        |> Array.exists check
+        settings.Exclusions |> Array.exists checkIfExcluded
 
     allTags
     |> NonEmptyList.tryFilter (not << isExcluded)
@@ -52,7 +53,7 @@ let discardExcluded
 ///     name from that group will be prioritized over the track's artist name.
 /// (2) The track title.
 /// The string is intended to be used solely for track grouping.
-let private groupName (settings: Settings) fileTags =
+let private sanitizedTrackGroupingName (settings: Settings) fileTags =
     let scrubText subStrs =
         subStrs
         |> Array.append (String.whiteSpaceStrs |> Array.ofList)
@@ -71,32 +72,29 @@ let private groupName (settings: Settings) fileTags =
         |> checkEquivalentArtists
         |> scrubText settings.ArtistReplacements
 
-    let title =
-        fileTags.Title
-        |> scrubText settings.TitleReplacements
+    let title = fileTags.Title |> scrubText settings.TitleReplacements
 
     $"{artist}{title}".ToLowerInvariant()
 
-let findDuplicates settings (tags: LibraryTags NonEmptyList)
-    : LibraryTags NonEmptyList NonEmptyList option =
+let findDuplicates settings tags : LibraryTags nlist nlist option =
+    monad' {
+        let! filtered = tags |> NonEmptyList.tryFilter hasArtistAndTitle
 
-    let sortByMainArtists =
-        NonEmptyList.ofList
-        >> NonEmptyList.sortBy (mainArtists String.Empty)
+        let! groupedDupes =
+            filtered
+            |> NonEmptyList.groupBy (sanitizedTrackGroupingName settings)
+            |> NonEmptyList.tryFilter (snd >> NonEmptyList.hasMultiple)
 
-    tags
-    |> NonEmptyList.toList
-    |> List.filter hasArtistAndTitle
-    |> List.groupBy (groupName settings)
-    |> List.filter (snd >> List.hasMultiple)
-    |> List.sortBy fst // Group name
-    |> List.map (snd >> sortByMainArtists)
-    |> List.toNonEmptyListOption
+        return
+            groupedDupes
+            |> sortBy fst
+            |> NonEmptyList.map (snd >> sortBy (mainArtists String.Empty))
+    }
 
-let printDuplicates (groupedTracks: LibraryTags NonEmptyList NonEmptyList option) : unit =
+let printDuplicates (groupedTracks: LibraryTags nlist nlist option) : unit =
     let printfGray = printfColor ConsoleColor.DarkGray
 
-    let printGroup index (groupTracks: LibraryTags NonEmptyList) =
+    let printGroup index (groupTracks: LibraryTags nlist) =
         let artistSummary (tags: LibraryTags) : string =
             if Array.isEmpty tags.Artists
             then String.Empty

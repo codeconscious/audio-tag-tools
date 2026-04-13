@@ -1,25 +1,25 @@
 module DuplicateFinder.IO
 
 open Errors
-open FSharpPlus.Data
 open Settings
 open Shared.Constants
 open Shared.TagLibrary
 open CCFSharpUtils
+open CCFSharpUtils.Operators
+open FSharpPlus.Data
 open System
-open System.Text
 open System.IO
 
 let savePlaylist
     (settings: Settings)
-    (tags: LibraryTags NonEmptyList NonEmptyList option)
+    (maybeTags: LibraryTags nlist nlist option)
     : Result<unit, DupeFinderError> =
 
     let now = DateTime.Now.ToString timeStampFormat
     let fileName = $"Duplicates by AudioTagTools - {now}.m3u"
     let file = FileInfo <| Path.Combine(settings.Playlist.SaveDirectory, fileName)
 
-    let appendFileEntry (sb: StringBuilder) (tags: LibraryTags) : StringBuilder =
+    let appendFileEntry (sb: SB) (tags: LibraryTags) : SB =
         let seconds = tags.Duration.TotalSeconds
         let artist =
             tags.Artists
@@ -39,15 +39,13 @@ let savePlaylist
 
         sb.AppendLine filePath
 
-    match tags with
+    match maybeTags with
     | None ->
         Ok ()
-    | Some tags' ->
-        tags'
-        |> NonEmptyList.toList
-        |> List.map NonEmptyList.toList
-        |> List.concat
-        |> List.fold appendFileEntry (StringBuilder "#EXTM3U\n")
+    | Some tags ->
+        tags
+        |> NonEmptyList.concat
+        |> NonEmptyList.fold appendFileEntry (SB $"#EXTM3U{String.nl}")
         |> string
         |> File.writeText' file
         |. fun _ -> printfn $"Created playlist file \"{file}\"."

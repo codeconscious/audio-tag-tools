@@ -1,11 +1,12 @@
 module Cacher.Tags
 
 open System
-open FSharpPlus.Data
 open IO
 open Errors
 open Shared.TagLibrary
 open CCFSharpUtils
+open CCFSharpUtils.Operators
+open FSharpPlus.Data
 open FSharpPlus.Operators
 
 type LibraryTagMap = Map<string, LibraryTags>
@@ -30,8 +31,8 @@ let createTagLibraryMap (libraryFile: FileInfo) : Result<LibraryTagMap, CacherEr
     else
         Ok Map.empty
 
-let private prepareTagsToWrite (tagLibraryMap: LibraryTagMap) (fileInfos: FileInfo NonEmptySeq)
-    : CategorizedTagsToCache NonEmptySeq =
+let private prepareTagsToWrite tagLibraryMap (fileInfos: FileInfo nseq)
+    : CategorizedTagsToCache nseq =
 
     let copyCachedTags (libraryTags: LibraryTags) =
         { libraryTags with LastWriteTime = DateTimeOffset libraryTags.LastWriteTime.DateTime }
@@ -77,7 +78,8 @@ let private prepareTagsToWrite (tagLibraryMap: LibraryTagMap) (fileInfos: FileIn
     fileInfos
     |> NonEmptySeq.map (prepareTagsToCache tagLibraryMap)
 
-let private reportResults (categorizedTags: CategorizedTagsToCache NonEmptySeq) : CategorizedTagsToCache NonEmptySeq =
+let private reportResults categorizedTags : CategorizedTagsToCache nseq =
+
     let categoryTotals =
         categorizedTags
         |> Seq.countBy _.Type
@@ -102,7 +104,7 @@ let private reportResults (categorizedTags: CategorizedTagsToCache NonEmptySeq) 
 
     categorizedTags
 
-let generateJson (tagMap: LibraryTagMap) (fileInfos: FileInfo NonEmptySeq) : Result<string, CacherError> =
+let generateJson (tagMap: LibraryTagMap) (fileInfos: FileInfo nseq) : Result<string, CacherError> =
     fileInfos
     |> prepareTagsToWrite tagMap
     |> reportResults

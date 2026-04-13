@@ -6,10 +6,11 @@ open IO
 open Tags
 open Shared.Constants
 open CCFSharpUtils
-open FsToolkit.ErrorHandling
+open CCFSharpUtils.Operators
+open FSharpPlus
 
-let private run (args: string array) : Result<unit, CacherError> =
-    result {
+let private run args : Result<unit, CacherError> =
+    monad' {
         let! mediaDir, tagLibraryFile = validate args
         let! fileInfos = getFileInfos mediaDir
         let! tagLibraryMap = createTagLibraryMap tagLibraryFile
@@ -28,7 +29,7 @@ let private run (args: string array) : Result<unit, CacherError> =
             |! FileWriteError
     }
 
-let start (args: string array) : Result<string, string> =
+let start args : Result<string, string> =
     match run args with
     | Ok ()   -> Ok "Finished caching successfully."
     | Error e -> Error (message e)

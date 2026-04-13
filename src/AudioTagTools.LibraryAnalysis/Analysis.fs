@@ -2,6 +2,7 @@ module LibraryAnalysis.Analysis
 
 open System.IO
 open Shared.TagLibrary
+open FSharpPlus.Operators
 open CCFSharpUtils
 
 let inline private mostPopulous count (grouper: 'a -> 'a) (items: 'a list) =
@@ -65,7 +66,7 @@ let topTitles count tags =
     |> List.map (fun (title, count) -> [ title; String.formatInt count ])
 
 let topGenres count tags =
-    let genres = tags |> List.map (fun xs -> xs.Genres |> Array.toList)
+    let genres = tags |> List.map (fun xs -> xs.Genres |> List.ofArray)
     let genreCount = genres.Length
 
     genres
@@ -88,7 +89,7 @@ let artistsWithMostGenres count tags =
         (a, tags
             |> List.map _.Genres
             |> Array.concat
-            |> Array.map _.Trim() |> Array.toList)
+            |> Array.map _.Trim() |> List.ofArray)
 
     let uniqGenreCount (genres: string list) =
         genres |> List.distinctBy _.ToLowerInvariant() |> _.Length
@@ -98,7 +99,7 @@ let artistsWithMostGenres count tags =
     |> List.groupBy firstDistinctArtist
     |> List.map artistsWithTheirGenres
     |> List.map (fun (a, gs) -> a, uniqGenreCount gs, gs)
-    |> List.sortByDescending Tuple.snd3
+    |> List.sortByDescending item2
     |> List.take count
     |> List.map (fun (a, uniqGenreCount, gs) ->
         [ a
@@ -158,6 +159,6 @@ let longestFileNames count tags =
     |> List.sortByDescending fst
     |> List.take count
     |> List.map (fun (count, t) ->
-        [ $"""{mainArtists "; " t}{String.nl}  {t.Title}"""
+        [ $"""{mainArtists "; " t}{String.nl}↪︎ {t.Title}"""
           t.FileName
           String.formatInt count ])
