@@ -9,7 +9,6 @@ open CCFSharpUtils
 open CCFSharpUtils.Operators
 open Spectre.Console
 open FSharpPlus
-open FsToolkit.ErrorHandling.Operator.Result
 
 type QualityData =
     { BitRate: int
@@ -19,16 +18,17 @@ type QualityData =
 let private run args : Result<unit, CommandError> =
     monad' {
         let! tagLibraryFile = validate args
-        let! tags = tagLibraryFile |> File.readText' >>= (Json >> parseJsonToTags) |! TagParseError
+        let! jsonTags = tagLibraryFile |> File.readText' |>> Json |! FileReadError
+        let! parsedTags = jsonTags |> parseJsonToTags |! TagParseError
 
         printTable {
             Title = Some "General Data"
             Headers = None
             Rows =
-                [ [ "Track count"; String.formatInt tags.Length ]
-                  [ "Unique artists"; String.formatInt <| uniqueArtistCount tags ]
-                  [ "Average file size"; String.formatBytes <| averageFileSize tags  ]
-                  [ "Album art percentage"; $"%s{albumArtPercentage tags}" ] ]
+                [ [ "Track count"; String.formatInt parsedTags.Length ]
+                  [ "Unique artists"; String.formatInt <| uniqueArtistCount parsedTags ]
+                  [ "Average file size"; String.formatBytes <| averageFileSize parsedTags  ]
+                  [ "Album art percentage"; $"%s{albumArtPercentage parsedTags}" ] ]
             ColumnAlignments = [Justify.Left; Justify.Right]
             ShowRowSeparators = false
         }
@@ -36,7 +36,7 @@ let private run args : Result<unit, CommandError> =
         printTable {
             Title = Some "Top Artists"
             Headers = Some ["Artist"; "Count"; "Ratio"]
-            Rows = topArtists 30 tags
+            Rows = topArtists 30 parsedTags
             ColumnAlignments = [Justify.Left; Justify.Right; Justify.Right]
             ShowRowSeparators = false
         }
@@ -44,7 +44,7 @@ let private run args : Result<unit, CommandError> =
         printTable {
             Title = Some "Top Album Names"
             Headers = Some ["Album"; "Count"; "Ratio"]
-            Rows = topAlbums 30 tags
+            Rows = topAlbums 30 parsedTags
             ColumnAlignments = [Justify.Left; Justify.Right; Justify.Right]
             ShowRowSeparators = false
         }
@@ -52,7 +52,7 @@ let private run args : Result<unit, CommandError> =
         printTable {
             Title = Some "Top Titles"
             Headers = Some ["Title"; "Count"]
-            Rows = topTitles 30 tags
+            Rows = topTitles 30 parsedTags
             ColumnAlignments = [Justify.Left; Justify.Right]
             ShowRowSeparators = false
         }
@@ -60,7 +60,7 @@ let private run args : Result<unit, CommandError> =
         printTable {
             Title = Some "Top Genres"
             Headers = Some ["Genre"; "Count"; "Ratio"]
-            Rows = topGenres 30 tags
+            Rows = topGenres 30 parsedTags
             ColumnAlignments = [Justify.Left; Justify.Right; Justify.Right]
             ShowRowSeparators = false
         }
@@ -68,7 +68,7 @@ let private run args : Result<unit, CommandError> =
         printTable {
             Title = Some "Artists With The Most Genres"
             Headers = Some ["Artist"; "Count"; "Genres"]
-            Rows = artistsWithMostGenres 20 tags
+            Rows = artistsWithMostGenres 20 parsedTags
             ColumnAlignments = [Justify.Left; Justify.Right; Justify.Left]
             ShowRowSeparators = false
         }
@@ -76,7 +76,7 @@ let private run args : Result<unit, CommandError> =
         printTable {
             Title = Some "Largest Files"
             Headers = Some ["File Size"; "Artist & Title"]
-            Rows = largestFiles 20 tags |> List.map List.rev
+            Rows = largestFiles 20 parsedTags |> List.map List.rev
             ColumnAlignments = [Justify.Right; Justify.Left]
             ShowRowSeparators = false
         }
@@ -84,7 +84,7 @@ let private run args : Result<unit, CommandError> =
         printTable {
             Title = Some "Top Formats"
             Headers = Some ["Extension"; "Count"]
-            Rows = topFormats 10 tags
+            Rows = topFormats 10 parsedTags
             ColumnAlignments = [Justify.Left; Justify.Right]
             ShowRowSeparators = false
         }
@@ -92,7 +92,7 @@ let private run args : Result<unit, CommandError> =
         printTable {
             Title = Some "Top Bitrates"
             Headers = Some ["Bitrate"; "Count"]
-            Rows = topBitRates 10 tags
+            Rows = topBitRates 10 parsedTags
             ColumnAlignments = [Justify.Right; Justify.Right]
             ShowRowSeparators = false
         }
@@ -100,7 +100,7 @@ let private run args : Result<unit, CommandError> =
         printTable {
             Title = Some "Top Sample Rates"
             Headers = Some ["Sample Rate"; "Count"]
-            Rows = topSampleRates 10 tags
+            Rows = topSampleRates 10 parsedTags
             ColumnAlignments = [Justify.Right; Justify.Right]
             ShowRowSeparators = false
         }
@@ -108,7 +108,7 @@ let private run args : Result<unit, CommandError> =
         printTable {
             Title = Some "Top Quality Combinations"
             Headers = Some ["Format"; "Bit Rate"; "Sample Rate"; "Count"]
-            Rows = topQualityData 10 tags
+            Rows = topQualityData 10 parsedTags
             ColumnAlignments = [Justify.Left; Justify.Right; Justify.Right; Justify.Right]
             ShowRowSeparators = false
         }
@@ -116,7 +116,7 @@ let private run args : Result<unit, CommandError> =
         printTable {
             Title = Some "Longest File Names"
             Headers = Some ["Artist & Title"; "Filename"; "Length"]
-            Rows = longestFileNames 5 tags
+            Rows = longestFileNames 5 parsedTags
             ColumnAlignments = [Justify.Left; Justify.Left; Justify.Center]
             ShowRowSeparators = true
         }
