@@ -13,15 +13,15 @@ open FsToolkit.ErrorHandling.Operator.Result
 
 let private run args : Result<unit, CommandError> =
     monad' {
-        let! settingsFile, tagLibraryFile = validate args
+        let! settingsFile, tagLibFile = validate args
 
-        let! settings    = settingsFile   |> File.readText' |! FileReadError >>= (Json >> parseToSettings)
-        let! libraryTags = tagLibraryFile |> File.readText' |! FileReadError >>= (Json >> parseToTags)
+        let! settings = settingsFile |> File.readText' |! FileReadError >>= (Json >> parseToSettings)
+        let! tags = tagLibFile |> File.readText' |! FileReadError >>= (Json >> parseToTags)
 
         printSummary settings
 
         let! duplicates =
-           libraryTags
+           tags
            |> tap (printCount "Total file count:    ")
            |> discardExcluded settings
            |. printCount "Filtered file count: "
