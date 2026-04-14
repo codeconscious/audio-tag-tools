@@ -5,7 +5,6 @@ open Settings
 open Shared
 open Shared.TagLibrary
 open FSharpPlus
-open FSharpPlus.Control
 open FSharpPlus.Data
 open CCFSharpUtils
 open CCFSharpUtils.Operators

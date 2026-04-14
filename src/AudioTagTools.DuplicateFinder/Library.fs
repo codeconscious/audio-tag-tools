@@ -5,6 +5,7 @@ open ArgValidation
 open IO
 open Tags
 open Settings
+open Shared.Types
 open CCFSharpUtils
 open CCFSharpUtils.Operators
 open FSharpPlus
@@ -14,8 +15,8 @@ let private run args : Result<unit, CommandError> =
     monad' {
         let! settingsFile, tagLibraryFile = validate args
 
-        let! settings    = settingsFile   |> File.readText' |! FileReadError >>= parseToSettings
-        let! libraryTags = tagLibraryFile |> File.readText' |! FileReadError >>= parseToTags
+        let! settings    = settingsFile   |> File.readText' |! FileReadError >>= (Json >> parseToSettings)
+        let! libraryTags = tagLibraryFile |> File.readText' |! FileReadError >>= (Json >> parseToTags)
 
         printSummary settings
 

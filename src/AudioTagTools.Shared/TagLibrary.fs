@@ -1,5 +1,6 @@
 module Shared.TagLibrary
 
+open Shared.Types
 open CCFSharpUtils
 open System
 open System.IO
@@ -44,11 +45,11 @@ let blankTags (fileInfo: FileInfo) : LibraryTags =
       ImageCount = 0
       LastWriteTime = DateTimeOffset fileInfo.LastWriteTime }
 
-let parseJsonToTags (json: string) : Result<LibraryTags list, string> =
-    try Ok (JsonSerializer.Deserialize<LibraryTags list> json)
+let parseJsonToTags (Json jsonText) : Result<LibraryTags list, string> =
+    try Ok (JsonSerializer.Deserialize<LibraryTags list> jsonText)
     with exn -> Error exn.Message
 
-let parseJsonToNonEmptyTags (json: string) : Result<LibraryTags nlist, string> =
+let parseJsonToNonEmptyTags json : Result<LibraryTags nlist, string> =
     json
     |> parseJsonToTags
     >>= List.toNonEmptyListResult "No tags were found to parse."

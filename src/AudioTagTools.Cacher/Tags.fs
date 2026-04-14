@@ -4,6 +4,7 @@ open System
 open IO
 open Errors
 open Shared.TagLibrary
+open Shared.Types
 open CCFSharpUtils
 open CCFSharpUtils.Operators
 open FSharpPlus.Data
@@ -25,7 +26,7 @@ let createTagLibraryMap (libraryFile: FileInfo) : Result<LibraryTagMap, CommandE
     then
         libraryFile
         |>  File.readText'
-        >>= parseJsonToTags
+        >>= (Json >> parseJsonToTags)
         |!  LibraryTagParseError
         |>> (List.map groupWithPath >> Map.ofList)
     else

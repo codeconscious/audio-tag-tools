@@ -5,6 +5,7 @@ open Errors
 open Exporting
 open IO
 open Shared.TagLibrary
+open Shared.Types
 open Shared.Constants
 open CCFSharpUtils
 open CCFSharpUtils.Operators
@@ -15,24 +16,17 @@ let private separator = "＼"
 
 let private run args : Result<unit, CommandError> =
     monad' {
-        let! tagLibraryFile, genreFile = validate args
+        let! tagLibFile, genreFile = validate args
 
         let! oldGenres = genreFile |> readGenres |. printOldSummary
-
-        let! tags =
-            tagLibraryFile
-            |>  File.readText'
-            >>= parseJsonToNonEmptyTags
-            |!  TagParseError
-            |.  printTagCount
-
-        let! newGenres = tags |> generateGenreData separator
+        let! jsonTags = tagLibFile |> File.readText' |>> Json |! FileReadError
+        let! parsedTags = jsonTags |> parseJsonToNonEmptyTags |. printTagCount |! TagParseError
+        let! newGenres = parsedTags |> generateGenreData separator
 
         printChanges oldGenres newGenres
 
         do!
-            genreFile
-            |>  backUpFile
+            backUpFile genreFile
             |>> printfn "Created backup file \"%O\"." // %O formats with ToString().
             |!  FileWriteError
 

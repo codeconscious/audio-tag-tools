@@ -1,5 +1,6 @@
 module DuplicateFinder.Settings
 
+open Shared.Types
 open Errors
 open FSharp.Data
 
@@ -39,8 +40,8 @@ type SettingsProvider = JsonProvider<settingsSample>
 type Settings = SettingsProvider.Root
 type Exclusion = SettingsProvider.Exclusion
 
-let parseToSettings (json: string) : Result<Settings, CommandError> =
-    try SettingsProvider.Parse json |> Ok
+let parseToSettings (Json jsonText) : Result<Settings, CommandError> =
+    try SettingsProvider.Parse jsonText |> Ok
     with e -> Error (SettingParseError e.Message)
 
 let printSummary (settings: Settings) =
