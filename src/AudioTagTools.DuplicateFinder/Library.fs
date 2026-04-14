@@ -22,7 +22,7 @@ let private run args : Result<unit, CommandError> =
 
         let! duplicates =
            tags
-           |> tap (printCount "Total file count:    ")
+           |- printCount "Total file count:    "
            |> discardExcluded settings
            |. printCount "Filtered file count: "
            |>> findDuplicates settings
