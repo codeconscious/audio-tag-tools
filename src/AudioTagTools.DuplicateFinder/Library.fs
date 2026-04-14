@@ -24,9 +24,9 @@ let private run args : Result<unit, CommandError> =
            tags
            |- printCount "Total file count:    "
            |> discardExcluded settings
-           |. printCount "Filtered file count: "
+           |-- printCount "Filtered file count: "
            |>> findDuplicates settings
-           |. printDuplicates
+           |-- printDuplicates
 
         return!
             duplicates |> savePlaylist settings

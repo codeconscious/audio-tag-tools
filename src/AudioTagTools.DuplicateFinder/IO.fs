@@ -48,5 +48,5 @@ let savePlaylist
         |> NonEmptyList.fold appendFileEntry (SB $"#EXTM3U{String.nl}")
         |> string
         |> File.writeText' file
-        |. fun _ -> printfn $"Created playlist file \"{file}\"."
+        |-- fun _ -> printfn $"Created playlist file \"{file}\"."
         |! FileWriteError

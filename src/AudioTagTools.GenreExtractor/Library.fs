@@ -18,9 +18,9 @@ let private run args : Result<unit, CommandError> =
     monad' {
         let! tagLibFile, genreFile = validate args
 
-        let! oldGenres = genreFile |> readGenres |. printOldSummary
+        let! oldGenres = genreFile |> readGenres |-- printOldSummary
         let! jsonTags = tagLibFile |> File.readText' |>> Json |! FileReadError
-        let! parsedTags = jsonTags |> parseJsonToNonEmptyTags |. printTagCount |! TagParseError
+        let! parsedTags = jsonTags |> parseJsonToNonEmptyTags |-- printTagCount |! TagParseError
         let! newGenres = parsedTags |> generateGenreData separator
 
         printChanges oldGenres newGenres
