@@ -27,7 +27,7 @@ let createTagLibraryMap (libraryFile: FileInfo) : Result<LibraryTagMap, CommandE
         libraryFile
         |>  File.readText'
         >>= (Json >> parseJsonToTags)
-        |!  LibraryTagParseError
+        |!! LibraryTagParseError
         |>> (List.map groupWithPath >> Map.ofList)
     else
         Ok Map.empty
@@ -111,4 +111,4 @@ let generateJson (tagMap: LibraryTagMap) (fileInfos: FileInfo nseq) : Result<str
     |> reportResults
     |> NonEmptySeq.map _.Tags
     |> String.toJson
-    |! JsonSerializationError
+    |!! JsonSerializationError

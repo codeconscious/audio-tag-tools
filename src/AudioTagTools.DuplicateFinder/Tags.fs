@@ -12,7 +12,7 @@ open System
 open System.IO
 
 let parseToTags json =
-    json |> parseJsonToNonEmptyTags |! TagParseError
+    json |> parseJsonToNonEmptyTags |!! TagParseError
 
 let printCount description (tags: LibraryTags nlist) =
     printfn $"%s{description}%s{String.formatInt tags.Length}"

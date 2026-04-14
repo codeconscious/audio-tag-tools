@@ -17,16 +17,15 @@ let private run args : Result<unit, CommandError> =
         let! newJson = fileInfos |> generateJson tagLibraryMap
 
         let _ =
-            tagLibraryFile
-            |> backUpFile
-            |. printfn "Backed up previous file to \"%O\"."
+            backUpFile tagLibraryFile
+            |- printfn "Backed up previous file to \"%O\"."
             |! FileWriteError
 
         do!
             newJson
             |> File.writeText' tagLibraryFile
-            |. fun _ -> printfn $"Wrote new file \"%O{tagLibraryFile}\"."
-            |! FileWriteError
+            |- fun _ -> printfn $"Wrote new file \"%O{tagLibraryFile}\"."
+            |!! FileWriteError
     }
 
 let start args : Result<string, string> =

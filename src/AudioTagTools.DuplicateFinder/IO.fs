@@ -49,4 +49,4 @@ let savePlaylist
         |> string
         |> File.writeText' file
         |-- fun _ -> printfn $"Created playlist file \"{file}\"."
-        |! FileWriteError
+        |!! FileWriteError

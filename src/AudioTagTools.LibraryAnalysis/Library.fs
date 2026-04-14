@@ -18,8 +18,8 @@ type QualityData =
 let private run args : Result<unit, CommandError> =
     monad' {
         let! tagLibraryFile = validate args
-        let! jsonTags = tagLibraryFile |> File.readText' |>> Json |! FileReadError
-        let! parsedTags = jsonTags |> parseJsonToTags |! TagParseError
+        let! jsonTags = tagLibraryFile |> File.readText' |>> Json |!! FileReadError
+        let! parsedTags = jsonTags |> parseJsonToTags |!! TagParseError
 
         printTable {
             Title = Some "General Data"

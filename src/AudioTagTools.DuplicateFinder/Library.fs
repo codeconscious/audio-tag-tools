@@ -15,8 +15,8 @@ let private run args : Result<unit, CommandError> =
     monad' {
         let! settingsFile, tagLibFile = validate args
 
-        let! settings = settingsFile |> File.readText' |! FileReadError >>= (Json >> parseToSettings)
-        let! tags = tagLibFile |> File.readText' |! FileReadError >>= (Json >> parseToTags)
+        let! settings = settingsFile |> File.readText' |!! FileReadError >>= (Json >> parseToSettings)
+        let! tags = tagLibFile |> File.readText' |!! FileReadError >>= (Json >> parseToTags)
 
         printSummary settings
 

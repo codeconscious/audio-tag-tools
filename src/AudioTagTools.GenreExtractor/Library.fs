@@ -19,8 +19,8 @@ let private run args : Result<unit, CommandError> =
         let! tagLibFile, genreFile = validate args
 
         let! oldGenres = genreFile |> readGenres |-- printOldSummary
-        let! jsonTags = tagLibFile |> File.readText' |>> Json |! FileReadError
-        let! parsedTags = jsonTags |> parseJsonToNonEmptyTags |-- printTagCount |! TagParseError
+        let! jsonTags = tagLibFile |> File.readText' |>> Json |!! FileReadError
+        let! parsedTags = jsonTags |> parseJsonToNonEmptyTags |-- printTagCount |!! TagParseError
         let! newGenres = parsedTags |> generateGenreData separator
 
         printChanges oldGenres newGenres
@@ -28,12 +28,12 @@ let private run args : Result<unit, CommandError> =
         do!
             backUpFile genreFile
             |>> printfn "Created backup file \"%O\"." // %O formats with ToString().
-            |!  FileWriteError
+            |!! FileWriteError
 
         return!
             newGenres
             |> File.writeLines' genreFile
-            |! FileWriteError
+            |!! FileWriteError
     }
 
 let start args : Result<string, string> =
