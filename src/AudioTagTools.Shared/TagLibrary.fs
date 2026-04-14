@@ -45,8 +45,8 @@ let blankTags (fileInfo: FileInfo) : LibraryTags =
       ImageCount = 0
       LastWriteTime = DateTimeOffset fileInfo.LastWriteTime }
 
-let parseJsonToTags (Json jsonText) : Result<LibraryTags list, string> =
-    try Ok (JsonSerializer.Deserialize<LibraryTags list> jsonText)
+let parseJsonToTags (Json json) : Result<LibraryTags list, string> =
+    try Ok (JsonSerializer.Deserialize<LibraryTags list> json)
     with exn -> Error exn.Message
 
 let parseJsonToNonEmptyTags json : Result<LibraryTags nlist, string> =
