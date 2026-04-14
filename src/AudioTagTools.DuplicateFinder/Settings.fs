@@ -42,7 +42,7 @@ type Exclusion = SettingsProvider.Exclusion
 
 let parseToSettings (Json json) : Result<Settings, CommandError> =
     try json |> SettingsProvider.Parse |> Ok
-    with e -> Error (SettingParseError e.Message)
+    with e -> Error (SettingsParseError e.Message)
 
 let printSummary (settings: Settings) =
     printfn "Settings:"
