@@ -40,8 +40,8 @@ type SettingsProvider = JsonProvider<settingsSample>
 type Settings = SettingsProvider.Root
 type Exclusion = SettingsProvider.Exclusion
 
-let parseToSettings (Json jsonText) : Result<Settings, CommandError> =
-    try SettingsProvider.Parse jsonText |> Ok
+let parseToSettings (Json json) : Result<Settings, CommandError> =
+    try json |> SettingsProvider.Parse |> Ok
     with e -> Error (SettingParseError e.Message)
 
 let printSummary (settings: Settings) =
