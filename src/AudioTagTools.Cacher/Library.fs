@@ -19,7 +19,7 @@ let private run args : Result<unit, CommandError> =
         let _ =
             backUpFile tagLibraryFile
             |- printfn "Backed up previous file to \"%O\"."
-            |! FileWriteError
+            |!! FileWriteError
 
         do!
             newJson
