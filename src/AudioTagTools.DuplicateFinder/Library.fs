@@ -16,7 +16,7 @@ let private run args : Result<unit, CommandError> =
         let! settingsFile, tagLibFile = validate args
 
         let! settings = settingsFile |> File.readText' |!! FileReadError >>= (Json >> parseToSettings)
-        let! tags = tagLibFile |> File.readText' |!! FileReadError >>= (Json >> parseToTags)
+        let! tags     = tagLibFile   |> File.readText' |!! FileReadError >>= (Json >> parseToTags)
 
         printSummary settings
 
