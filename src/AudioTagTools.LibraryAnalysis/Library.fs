@@ -10,11 +10,6 @@ open CCFSharpUtils.Operators
 open Spectre.Console
 open FSharpPlus
 
-type QualityData =
-    { BitRate: int
-      Extension: string
-      SampleRate: int }
-
 let private run args : Result<unit, CommandError> =
     monad' {
         let! tagLibraryFile = validate args
