@@ -71,32 +71,32 @@ let ignorableAlbumArtists =
       "Multiple Artists"
       "\u003Cunknown\u003E" ] // U+003C == less-than sign; \u003E == greater-than sign
 
-let allDistinctArtists (tags: LibraryTags) : string list =
+let allDistinctArtists tags : string list =
     Array.concat [ tags.Artists; tags.AlbumArtists ]
     |> Array.distinct
     |> List.ofArray
 
-let firstDistinctArtist (tags: LibraryTags) : string =
+let firstDistinctArtist tags : string =
     tags |> allDistinctArtists |> List.head
 
-let mainArtists (separator: string) (track: LibraryTags) : string =
+let mainArtists separator tags : string =
     let hasNoIgnoredAlbumArtists artist =
         ignorableAlbumArtists
         |> List.exists _.Equals(artist, StringComparison.InvariantCultureIgnoreCase)
         |> not
 
-    match track with
+    match tags with
     | t when Array.isNotEmpty t.AlbumArtists && hasNoIgnoredAlbumArtists t.AlbumArtists[0] ->
         t.AlbumArtists
     | t ->
         t.Artists
     |> String.concat separator
 
-let hasAnyArtist (tags: LibraryTags) : bool =
+let hasAnyArtist tags : bool =
     Array.anyNotEmpty [| tags.Artists; tags.AlbumArtists |]
 
-let hasTitle (tags: LibraryTags) : bool =
+let hasTitle tags : bool =
     String.hasText tags.Title
 
-let hasArtistAndTitle (track: LibraryTags) : bool =
-    hasAnyArtist track && hasTitle track
+let hasArtistAndTitle tags : bool =
+    hasAnyArtist tags && hasTitle tags
