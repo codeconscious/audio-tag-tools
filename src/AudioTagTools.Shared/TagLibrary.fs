@@ -54,8 +54,8 @@ let parseJsonToNonEmptyTags json : Result<LibraryTags nlist, string> =
     |> parseJsonToTags
     >>= List.toNonEmptyListResult "No tags were found to parse."
 
-let parseFileTags (filePath: string) : Result<FileTags option, string> =
-    try filePath |> FileTags.Create |> Option.ofObj |> Ok
+let parseFileTags (f: FileInfo) : Result<FileTags option, string> =
+    try f.FullName |> FileTags.Create |> Option.ofObj |> Ok
     with exn -> Error exn.Message
 
 let path tags : string =

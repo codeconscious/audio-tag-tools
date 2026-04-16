@@ -63,7 +63,7 @@ let private prepareTagsToWrite tagLibraryMap (fileInfos: FileInfo nseq)
                 LastWriteTime = DateTimeOffset fileInfo.LastWriteTime
             }
 
-       match parseFileTags fileInfo.FullName with
+       match parseFileTags fileInfo with
        | Ok (Some tags) -> tagsFromFile tags
        | _ -> blankTags fileInfo
 
