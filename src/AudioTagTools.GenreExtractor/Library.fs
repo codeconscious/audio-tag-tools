@@ -6,7 +6,7 @@ open Exporting
 open IO
 open Shared.TagLibrary
 open Shared.Types
-open Shared.Constants
+open Shared.IO
 open CCFSharpUtils
 open CCFSharpUtils.Operators
 open FSharpPlus

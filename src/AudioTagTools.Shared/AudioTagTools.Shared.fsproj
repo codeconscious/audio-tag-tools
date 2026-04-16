@@ -12,6 +12,7 @@
         <Compile Include="Types.fs" />
         <Compile Include="TagLibrary.fs" />
         <Compile Include="Printing.fs" />
+        <Compile Include="IO.fs" />
     </ItemGroup>
 
     <ItemGroup>
