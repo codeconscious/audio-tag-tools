@@ -19,9 +19,9 @@ let private run args : Result<unit, CommandError> =
         let! tagLibFile, genreFile = validate args
 
         let! oldGenres = genreFile |> readGenres |-- printOldSummary
-        let! jsonTags = tagLibFile |> File.readText' |>> Json |!! FileReadError
-        let! parsedTags = jsonTags |> parseJsonToNonEmptyTags |-- printTagCount |!! TagParseError
-        let! newGenres = parsedTags |> generateGenreData separator
+        let! tagJson = tagLibFile |> File.readText' |>> Json |!! FileReadError
+        let! tags = tagJson |> parseJsonToNonEmptyTags |-- printTagCount |!! TagParseError
+        let! newGenres = tags |> generateGenreData separator
 
         printChanges oldGenres newGenres
 
