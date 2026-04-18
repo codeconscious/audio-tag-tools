@@ -5,7 +5,6 @@ open Settings
 open Shared
 open Shared.TagLibrary
 open FSharpPlus
-open FSharpPlus.Control
 open FSharpPlus.Data
 open CCFSharpUtils
 open CCFSharpUtils.Operators
@@ -13,7 +12,7 @@ open System
 open System.IO
 
 let parseToTags json =
-    json |> parseJsonToNonEmptyTags |! TagParseError
+    json |> parseJsonToNonEmptyTags |!! TagParseError
 
 let printCount description (tags: LibraryTags nlist) =
     printfn $"%s{description}%s{String.formatInt tags.Length}"

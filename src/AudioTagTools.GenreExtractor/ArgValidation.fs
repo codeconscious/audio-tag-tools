@@ -14,6 +14,6 @@ let validate args : Result<(FileInfo * FileInfo), CommandError>=
             let! tagLib = tagLibArg |> File.toFileInfoV $"Tag library file \"{tagLibArg}\" does not exist."
             return (tagLib, FileInfo genreFileArg) }
         |> Validation.toResult
-        |! (NonEmptyList.ofList >> ArgErrors)
+        |!! (NonEmptyList.ofList >> ArgErrors)
     | _ ->
         Error ArgCountError

@@ -9,17 +9,12 @@ open CCFSharpUtils
 open CCFSharpUtils.Operators
 open Spectre.Console
 open FSharpPlus
-open FsToolkit.ErrorHandling.Operator.Result
-
-type QualityData =
-    { BitRate: int
-      Extension: string
-      SampleRate: int }
 
 let private run args : Result<unit, CommandError> =
     monad' {
         let! tagLibraryFile = validate args
-        let! tags = tagLibraryFile |> File.readText' >>= parseJsonToTags |! TagParseError
+        let! tagJson = tagLibraryFile |> File.readText' |>> Json |!! FileReadError
+        let! tags = tagJson |> parseJsonToTags |!! TagParseError
 
         printTable {
             Title = Some "General Data"

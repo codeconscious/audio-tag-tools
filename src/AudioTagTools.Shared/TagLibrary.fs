@@ -1,5 +1,6 @@
 module Shared.TagLibrary
 
+open Shared.Types
 open CCFSharpUtils
 open System
 open System.IO
@@ -44,17 +45,17 @@ let blankTags (fileInfo: FileInfo) : LibraryTags =
       ImageCount = 0
       LastWriteTime = DateTimeOffset fileInfo.LastWriteTime }
 
-let parseJsonToTags (json: string) : Result<LibraryTags list, string> =
+let parseJsonToTags (Json json) : Result<LibraryTags list, string> =
     try Ok (JsonSerializer.Deserialize<LibraryTags list> json)
     with exn -> Error exn.Message
 
-let parseJsonToNonEmptyTags (json: string) : Result<LibraryTags nlist, string> =
+let parseJsonToNonEmptyTags json : Result<LibraryTags nlist, string> =
     json
     |> parseJsonToTags
     >>= List.toNonEmptyListResult "No tags were found to parse."
 
-let parseFileTags (filePath: string) : Result<FileTags option, string> =
-    try filePath |> FileTags.Create |> Option.ofObj |> Ok
+let parseFileTags (f: FileInfo) : Result<FileTags option, string> =
+    try f.FullName |> FileTags.Create |> Option.ofObj |> Ok
     with exn -> Error exn.Message
 
 let path tags : string =
@@ -70,32 +71,32 @@ let ignorableAlbumArtists =
       "Multiple Artists"
       "\u003Cunknown\u003E" ] // U+003C == less-than sign; \u003E == greater-than sign
 
-let allDistinctArtists (tags: LibraryTags) : string list =
+let allDistinctArtists tags : string list =
     Array.concat [ tags.Artists; tags.AlbumArtists ]
     |> Array.distinct
     |> List.ofArray
 
-let firstDistinctArtist (tags: LibraryTags) : string =
+let firstDistinctArtist tags : string =
     tags |> allDistinctArtists |> List.head
 
-let mainArtists (separator: string) (track: LibraryTags) : string =
+let mainArtists separator tags : string =
     let hasNoIgnoredAlbumArtists artist =
         ignorableAlbumArtists
         |> List.exists _.Equals(artist, StringComparison.InvariantCultureIgnoreCase)
         |> not
 
-    match track with
+    match tags with
     | t when Array.isNotEmpty t.AlbumArtists && hasNoIgnoredAlbumArtists t.AlbumArtists[0] ->
         t.AlbumArtists
     | t ->
         t.Artists
     |> String.concat separator
 
-let hasAnyArtist (tags: LibraryTags) : bool =
+let hasAnyArtist tags : bool =
     Array.anyNotEmpty [| tags.Artists; tags.AlbumArtists |]
 
-let hasTitle (tags: LibraryTags) : bool =
+let hasTitle tags : bool =
     String.hasText tags.Title
 
-let hasArtistAndTitle (track: LibraryTags) : bool =
-    hasAnyArtist track && hasTitle track
+let hasArtistAndTitle tags : bool =
+    hasAnyArtist tags && hasTitle tags

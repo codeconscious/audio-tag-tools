@@ -4,6 +4,7 @@ open System
 open IO
 open Errors
 open Shared.TagLibrary
+open Shared.Types
 open CCFSharpUtils
 open CCFSharpUtils.Operators
 open FSharpPlus.Data
@@ -25,8 +26,8 @@ let createTagLibraryMap (libraryFile: FileInfo) : Result<LibraryTagMap, CommandE
     then
         libraryFile
         |>  File.readText'
-        >>= parseJsonToTags
-        |!  LibraryTagParseError
+        >>= (Json >> parseJsonToTags)
+        |!! LibraryTagParseError
         |>> (List.map groupWithPath >> Map.ofList)
     else
         Ok Map.empty
@@ -62,7 +63,7 @@ let private prepareTagsToWrite tagLibraryMap (fileInfos: FileInfo nseq)
                 LastWriteTime = DateTimeOffset fileInfo.LastWriteTime
             }
 
-       match parseFileTags fileInfo.FullName with
+       match parseFileTags fileInfo with
        | Ok (Some tags) -> tagsFromFile tags
        | _ -> blankTags fileInfo
 
@@ -110,4 +111,4 @@ let generateJson (tagMap: LibraryTagMap) (fileInfos: FileInfo nseq) : Result<str
     |> reportResults
     |> NonEmptySeq.map _.Tags
     |> String.toJson
-    |! JsonSerializationError
+    |!! JsonSerializationError

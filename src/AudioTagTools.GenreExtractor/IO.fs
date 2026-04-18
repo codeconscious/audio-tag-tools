@@ -9,8 +9,8 @@ open System.IO
 let readGenres (genreFile: FileInfo) : Result<string list, CommandError> =
     if genreFile.Exists then
         genreFile
-        |>  File.readLines'
+        |> File.readLines'
         |>> List.ofArray
-        |!  FileReadError
+        |!! FileReadError
     else
         Ok List.empty

@@ -4,10 +4,11 @@ open ArgValidation
 open Errors
 open IO
 open Tags
-open Shared.Constants
+open Shared.IO
 open CCFSharpUtils
 open CCFSharpUtils.Operators
 open FSharpPlus
+
 
 let private run args : Result<unit, CommandError> =
     monad' {
@@ -17,16 +18,15 @@ let private run args : Result<unit, CommandError> =
         let! newJson = fileInfos |> generateJson tagLibraryMap
 
         let _ =
-            tagLibraryFile
-            |> backUpFile
-            |. printfn "Backed up previous file to \"%O\"."
-            |! FileWriteError
+            backUpFile tagLibraryFile
+            |- printfn "Backed up previous file to \"%O\"."
+            |!! FileWriteError
 
         do!
             newJson
             |> File.writeText' tagLibraryFile
-            |. fun _ -> printfn $"Wrote new file \"%O{tagLibraryFile}\"."
-            |! FileWriteError
+            |- fun _ -> printfn $"Wrote new file \"%O{tagLibraryFile}\"."
+            |!! FileWriteError
     }
 
 let start args : Result<string, string> =

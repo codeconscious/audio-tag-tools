@@ -7,7 +7,7 @@ type CommandError =
     | ArgErrors of string nlist
     | FileReadError of string
     | FileWriteError of string
-    | SettingParseError of string
+    | SettingsParseError of string
     | TagParseError of string
     | NoFilesRemainAfterFiltering
 
@@ -16,6 +16,6 @@ let message = function
     | ArgErrors errs -> errs |> String.concatNL
     | FileReadError msg -> $"I/O read failure: {msg}"
     | FileWriteError msg -> $"I/O write failure: {msg}"
-    | SettingParseError msg -> $"Failure parsing settings file: {msg}"
+    | SettingsParseError msg -> $"Failure parsing settings file: {msg}"
     | TagParseError msg -> $"Failure parsing tag library file: {msg}"
     | NoFilesRemainAfterFiltering -> "No files to check remained after filtering."
