@@ -71,23 +71,25 @@ let ignorableAlbumArtists =
       "Various Artists"
       "Multiple Artists"
       "\u003Cunknown\u003E" ] // U+003C == less-than sign; \u003E == greater-than sign
+    |> List.map Artist
 
-let allDistinctArtists tags : string list =
+let allDistinctArtists tags : Artist list =
     Array.concat [ tags.Artists; tags.AlbumArtists ]
     |> Array.distinct
     |> List.ofArray
+    |> List.map Artist
 
-let firstDistinctArtist tags : string =
+let firstDistinctArtist tags : Artist =
     tags |> allDistinctArtists |> List.head
 
 let mainArtists separator tags : string =
     let hasNoIgnoredAlbumArtists artist =
         ignorableAlbumArtists
-        |> List.exists _.Equals(artist, StringComparison.InvariantCultureIgnoreCase)
+        |> List.exists _.Equals(artist) // StringComparison.InvariantCultureIgnoreCase
         |> not
 
     match tags with
-    | t when Array.isNotEmpty t.AlbumArtists && hasNoIgnoredAlbumArtists t.AlbumArtists[0] ->
+    | t when Array.isNotEmpty t.AlbumArtists && hasNoIgnoredAlbumArtists (Artist t.AlbumArtists[0]) ->
         t.AlbumArtists
     | t ->
         t.Artists

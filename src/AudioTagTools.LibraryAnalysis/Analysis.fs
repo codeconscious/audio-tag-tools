@@ -2,6 +2,7 @@ module LibraryAnalysis.Analysis
 
 open System.IO
 open Shared.TagLibrary
+open Shared.Types
 open FSharpPlus.Operators
 open CCFSharpUtils
 
@@ -43,7 +44,7 @@ let topArtists count tags =
 
     artists
     |> mostPopulous count id
-    |> List.map (fun (artist, count) ->
+    |> List.map (fun (Artist artist, count) ->
         [ artist
           String.formatInt count
           asPercentage count artistCount 3 ])
@@ -101,8 +102,8 @@ let artistsWithMostGenres count tags =
     |> List.map (fun (a, gs) -> a, uniqGenreCount gs, gs)
     |> List.sortByDescending item2
     |> List.take count
-    |> List.map (fun (a, uniqGenreCount, gs) ->
-        [ a
+    |> List.map (fun (Artist artist, uniqGenreCount, gs) ->
+        [ artist
           String.formatInt uniqGenreCount
           genreCounts gs ])
 
