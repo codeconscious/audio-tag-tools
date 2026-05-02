@@ -10,7 +10,7 @@ open CCFSharpUtils.Operators
 open FSharpPlus.Data
 open FSharpPlus.Operators
 
-type LibraryTagMap = Map<string, LibraryTags>
+type LibraryTagMap = Map<FilePath, LibraryTags>
 
 type LibraryComparisonResult =
     | Unchanged  // Library tags match file tags.

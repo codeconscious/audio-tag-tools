@@ -8,6 +8,7 @@ open System.Text.Json
 open FSharpPlus
 
 type FileTags = TagLib.File
+type FilePath = string
 
 type LibraryTags =
     { FileName: string
@@ -58,11 +59,11 @@ let parseFileTags (f: FileInfo) : Result<FileTags option, string> =
     try f.FullName |> FileTags.Create |> Option.ofObj |> Ok
     with exn -> Error exn.Message
 
-let path tags : string =
+let filePath tags : FilePath =
     Path.Combine [| tags.DirectoryName; tags.FileName |]
 
-let groupByPath tags : string * LibraryTags =
-    path tags, tags
+let groupByPath tags : FilePath * LibraryTags =
+    (filePath tags, tags)
 
 let ignorableAlbumArtists =
     [ String.Empty
