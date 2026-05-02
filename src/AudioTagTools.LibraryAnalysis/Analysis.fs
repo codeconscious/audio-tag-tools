@@ -32,7 +32,11 @@ let albumArtPercentage tags =
 
 let filteredArtists tags =
     tags
-    |> List.map (fun t -> t |> allDistinctArtists |> List.except ignorableAlbumArtists)
+    |> List.map (fun t ->
+        t
+        |> allDistinctArtists
+        |> List.map (fun (Artist artistName) -> artistName)
+        |> List.except ignorableAlbumArtistNames)
     |> List.concat
 
 let uniqueArtistCount tags =
@@ -44,7 +48,7 @@ let topArtists count tags =
 
     artists
     |> mostPopulous count id
-    |> List.map (fun (Artist artist, count) ->
+    |> List.map (fun (artist, count) ->
         [ artist
           String.formatInt count
           asPercentage count artistCount 3 ])

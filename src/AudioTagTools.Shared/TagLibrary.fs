@@ -65,13 +65,12 @@ let filePath tags : FilePath =
 let groupByPath tags : FilePath * LibraryTags =
     (filePath tags, tags)
 
-let ignorableAlbumArtists =
+let ignorableAlbumArtistNames =
     [ String.Empty
       "Various"
       "Various Artists"
       "Multiple Artists"
       "\u003Cunknown\u003E" ] // U+003C == less-than sign; \u003E == greater-than sign
-    |> List.map Artist
 
 let allDistinctArtists tags : Artist list =
     Array.concat [ tags.Artists; tags.AlbumArtists ]
@@ -83,9 +82,9 @@ let firstDistinctArtist tags : Artist =
     tags |> allDistinctArtists |> List.head
 
 let mainArtists separator tags : string =
-    let hasNoIgnoredAlbumArtists artist =
-        ignorableAlbumArtists
-        |> List.exists _.Equals(artist) // StringComparison.InvariantCultureIgnoreCase
+    let hasNoIgnoredAlbumArtists (Artist artist) =
+        ignorableAlbumArtistNames
+        |> List.exists _.Equals(artist, StringComparison.InvariantCultureIgnoreCase)
         |> not
 
     match tags with
