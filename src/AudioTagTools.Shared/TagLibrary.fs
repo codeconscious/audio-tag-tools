@@ -61,7 +61,7 @@ let parseFileTags (f: FileInfo) : Result<FileTags option, string> =
 let path tags : string =
     Path.Combine [| tags.DirectoryName; tags.FileName |]
 
-let groupWithPath tags : string * LibraryTags =
+let groupByPath tags : string * LibraryTags =
     path tags, tags
 
 let ignorableAlbumArtists =

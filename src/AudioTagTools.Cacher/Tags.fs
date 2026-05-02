@@ -25,10 +25,10 @@ let createTagLibraryMap (libraryFile: FileInfo) : Result<LibraryTagMap, CommandE
     if libraryFile.Exists
     then
         libraryFile
-        |>  File.readText'
+        |> File.readText'
         >>= (Json >> parseJsonToTags)
+        |>> (List.map groupByPath >> Map.ofList)
         |!! LibraryTagParseError
-        |>> (List.map groupWithPath >> Map.ofList)
     else
         Ok Map.empty
 
