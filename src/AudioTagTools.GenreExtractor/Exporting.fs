@@ -3,6 +3,8 @@ module GenreExtractor.Exporting
 open Errors
 open Shared.TagLibrary
 open CCFSharpUtils
+open CCFSharpUtils.Collections
+open CCFSharpUtils.Text
 open FSharpPlus.Data
 open FSharpPlus.Operators
 open System

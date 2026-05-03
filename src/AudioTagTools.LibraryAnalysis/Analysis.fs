@@ -5,6 +5,7 @@ open Shared.TagLibrary
 open Shared.Types
 open FSharpPlus.Operators
 open CCFSharpUtils
+open CCFSharpUtils.Text
 
 type RatioData = { Count: int; Total: int; DecimalPlaces: int }
 

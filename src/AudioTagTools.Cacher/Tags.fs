@@ -6,7 +6,10 @@ open Errors
 open Shared.TagLibrary
 open Shared.Types
 open CCFSharpUtils
+open CCFSharpUtils.Collections
+open CCFSharpUtils.IO
 open CCFSharpUtils.Operators
+open CCFSharpUtils.Text
 open FSharpPlus.Data
 open FSharpPlus.Operators
 

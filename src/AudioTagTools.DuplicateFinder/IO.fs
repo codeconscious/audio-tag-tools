@@ -5,7 +5,9 @@ open Settings
 open Shared.Constants
 open Shared.TagLibrary
 open CCFSharpUtils
+open CCFSharpUtils.IO
 open CCFSharpUtils.Operators
+open CCFSharpUtils.Text
 open FSharpPlus.Data
 open System
 open System.IO

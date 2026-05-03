@@ -1,7 +1,7 @@
 module GenreExtractor.Errors
 
 open CCFSharpUtils
-open FSharpPlus.Data
+open CCFSharpUtils.Text
 
 type CommandError =
     | ArgCountError

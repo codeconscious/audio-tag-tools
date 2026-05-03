@@ -1,6 +1,7 @@
 module DuplicateFinder.Errors
 
 open CCFSharpUtils
+open CCFSharpUtils.Text
 
 type CommandError =
     | ArgCountError

@@ -7,7 +7,9 @@ open Shared.TagLibrary
 open FSharpPlus
 open FSharpPlus.Data
 open CCFSharpUtils
+open CCFSharpUtils.Collections
 open CCFSharpUtils.Operators
+open CCFSharpUtils.Text
 open System
 open System.IO
 

@@ -5,7 +5,7 @@ open Errors
 open IO
 open Tags
 open Shared.IO
-open CCFSharpUtils
+open CCFSharpUtils.IO
 open CCFSharpUtils.Operators
 open FSharpPlus
 

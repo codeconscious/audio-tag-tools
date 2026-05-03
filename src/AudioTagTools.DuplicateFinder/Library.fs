@@ -6,7 +6,7 @@ open IO
 open Tags
 open Settings
 open Shared.Types
-open CCFSharpUtils
+open CCFSharpUtils.IO
 open CCFSharpUtils.Operators
 open FSharpPlus
 open FsToolkit.ErrorHandling.Operator.Result

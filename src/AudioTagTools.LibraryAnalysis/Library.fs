@@ -5,8 +5,9 @@ open ArgValidation
 open Errors
 open Shared
 open Shared.TagLibrary
-open CCFSharpUtils
+open CCFSharpUtils.IO
 open CCFSharpUtils.Operators
+open CCFSharpUtils.Text
 open Spectre.Console
 open FSharpPlus
 
