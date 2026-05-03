@@ -29,7 +29,7 @@ let averageFileSize tags =
 
 let albumArtPercentage tags =
     tags
-    |> List.choose (fun t -> if t.ImageCount > 0 then Some t.ImageCount else None)
+    |> List.choose (fun t -> Option.isPos t.ImageCount)
     |> List.length
     |> fun count -> asPercentage { Count = count; Total = tags.Length; DecimalPlaces = 2 }
 
