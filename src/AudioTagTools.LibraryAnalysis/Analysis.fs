@@ -6,6 +6,8 @@ open Shared.Types
 open FSharpPlus.Operators
 open CCFSharpUtils
 
+type RatioData = { Count: int; Total: int; DecimalPlaces: int }
+
 let inline private mostPopulous count (grouper: 'a -> 'a) (items: 'a list) =
     items
     |> List.groupBy grouper
@@ -15,9 +17,9 @@ let inline private mostPopulous count (grouper: 'a -> 'a) (items: 'a list) =
 
 let private asLower (x: string) = x.ToLowerInvariant()
 
-let private asPercentage count totalCount decimalPlaces =
-    float count / float totalCount
-    |> String.formatPercent decimalPlaces
+let private asPercentage ratioData =
+    float ratioData.Count / float ratioData.Total
+    |> String.formatPercent ratioData.DecimalPlaces
 
 let averageFileSize tags =
     let sizeTotal = tags |> List.map _.FileSize |> List.sum
@@ -28,7 +30,7 @@ let albumArtPercentage tags =
     tags
     |> List.choose (fun t -> if t.ImageCount > 0 then Some t.ImageCount else None)
     |> List.length
-    |> fun count -> asPercentage count tags.Length 2
+    |> fun count -> asPercentage { Count = count; Total = tags.Length; DecimalPlaces = 2 }
 
 let filteredArtists tags =
     tags
@@ -51,7 +53,7 @@ let topArtists count tags =
     |> List.map (fun (artist, count) ->
         [ artist
           String.formatInt count
-          asPercentage count artistCount 3 ])
+          asPercentage { Count = count; Total = artistCount; DecimalPlaces = 3 } ])
 
 let topAlbums count tags =
     let albums = tags |> List.map _.Album
@@ -62,7 +64,7 @@ let topAlbums count tags =
     |> List.map (fun (album, count) ->
         [ album
           String.formatInt count
-          asPercentage count albumCount 2 ])
+          asPercentage { Count = count; Total = albumCount; DecimalPlaces = 2 } ])
 
 let topTitles count tags =
     tags
@@ -80,7 +82,7 @@ let topGenres count tags =
     |> List.map (fun (genre, count) ->
         [ genre
           String.formatInt count
-          asPercentage count genreCount 2 ])
+          asPercentage { Count = count; Total = genreCount; DecimalPlaces = 2 } ])
 
 let artistsWithMostGenres count tags =
     let genreCounts (genres: string list) : string =
