@@ -34,8 +34,8 @@ let albumArtPercentage tags =
 
 let filteredArtists tags =
     tags
-    |> List.map (fun t ->
-        t
+    |> List.map (fun tags' ->
+        tags'
         |> allDistinctArtists
         |> List.map (fun (Artist artistName) -> artistName)
         |> List.except ignorableAlbumArtistNames)
