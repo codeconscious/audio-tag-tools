@@ -36,7 +36,7 @@ let savePlaylist
             let oldPath = Path.Combine(tags.DirectoryName, tags.FileName)
             match settings.Playlist.SearchPath,
                   settings.Playlist.ReplacePath with
-            | s, _ when s |> String.hasNoText -> oldPath
+            | s, _ when String.hasNoText s -> oldPath
             | s, r -> oldPath.Replace(s, r)
 
         sb.AppendLine filePath

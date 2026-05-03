@@ -95,7 +95,7 @@ let findDuplicates settings tags : LibraryTags nlist nlist option =
 let printDuplicates (groupedTracks: LibraryTags nlist nlist option) : unit =
     let printfGray = printfColor ConsoleColor.DarkGray
 
-    let printGroup index (groupTracks: LibraryTags nlist) =
+    let printGroup index (tracks: LibraryTags nlist) =
         let artistSummary (tags: LibraryTags) : string =
             if Array.isEmpty tags.Artists
             then String.Empty
@@ -114,13 +114,13 @@ let printDuplicates (groupedTracks: LibraryTags nlist nlist option) : unit =
             printfGray $"  <{duration} {extNoPeriod} {bitRate} {fileSize}>{String.nl}"
 
         let printHeader () =
-            groupTracks
+            tracks
             |> NonEmptyList.head
             |> mainArtists ", "
             |> printfn "%d. %s" (index + 1) // Start numbering at 1, not 0.
 
         let printDuplicates () =
-            groupTracks
+            tracks
             |> NonEmptyList.iter printFileSummary
 
         printHeader ()
