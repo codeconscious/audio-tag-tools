@@ -105,13 +105,13 @@ let artistsWithMostGenres count tags =
     |> List.filter hasAnyArtist
     |> List.groupBy firstDistinctArtist
     |> List.map artistsWithTheirGenres
-    |> List.map (fun (a, gs) -> a, uniqGenreCount gs, gs)
+    |> List.map (fun (artist, genres) -> artist, uniqGenreCount genres, genres)
     |> List.sortByDescending item2
     |> List.take count
-    |> List.map (fun (Artist artist, uniqGenreCount, gs) ->
+    |> List.map (fun (Artist artist, uniqGenreCount, genres) ->
         [ artist
           String.formatInt uniqGenreCount
-          genreCounts gs ])
+          genreCounts genres ])
 
 let largestFiles count tags =
     tags
