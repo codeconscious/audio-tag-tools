@@ -35,7 +35,7 @@ let createTagLibraryMap (libraryFile: FileInfo) : Result<LibraryTagMap, CommandE
     else
         Ok Map.empty
 
-let private prepareTagsToWrite tagLibraryMap (fileInfos: FileInfo nseq)
+let private prepareTagsToWrite tagLibraryMap fileInfos
     : CategorizedTagsToCache nseq =
 
     let copyCachedTags (libraryTags: LibraryTags) =
@@ -70,7 +70,7 @@ let private prepareTagsToWrite tagLibraryMap (fileInfos: FileInfo nseq)
        | Ok (Some tags) -> tagsFromFile tags
        | _ -> blankTags fileInfo
 
-    let prepareTagsToCache (tagLibraryMap: LibraryTagMap) (audioFile: FileInfo) : CategorizedTagsToCache =
+    let prepareTagsToCache tagLibraryMap (audioFile: FileInfo) : CategorizedTagsToCache =
         if tagLibraryMap |> Map.containsKey audioFile.FullName
         then
             let libraryTags = tagLibraryMap |> Map.find audioFile.FullName
@@ -108,7 +108,7 @@ let private reportResults categorizedTags : CategorizedTagsToCache nseq =
 
     categorizedTags
 
-let generateJson (tagMap: LibraryTagMap) (fileInfos: FileInfo nseq) : Result<string, CommandError> =
+let generateJson tagMap fileInfos : Result<string, CommandError> =
     fileInfos
     |> prepareTagsToWrite tagMap
     |> reportResults

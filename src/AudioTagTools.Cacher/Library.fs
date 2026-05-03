@@ -9,7 +9,6 @@ open CCFSharpUtils.IO
 open CCFSharpUtils.Operators
 open FSharpPlus
 
-
 let private run args : Result<unit, CommandError> =
     monad' {
         let! mediaDir, tagLibraryFile = validate args
