@@ -12,7 +12,7 @@ open Spectre.Console
 open FSharpPlus
 
 let private run args : Result<unit, CommandError> =
-    monad' {
+    monad {
         let! tagLibraryFile = validate args
         let! tagJson = tagLibraryFile |> File.readText' |>> Json |!! FileReadError
         let! tags = tagJson |> parseJsonToTags |!! TagParseError

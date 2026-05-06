@@ -78,7 +78,7 @@ let private sanitizedTrackGroupingName (settings: Settings) fileTags =
     $"{artist}{title}".ToLowerInvariant()
 
 let findDuplicates settings tags : LibraryTags nlist nlist option =
-    monad' {
+    monad {
         let! filtered = tags |> NonEmptyList.tryFilter hasArtistAndTitle
 
         let! groupedDupes =

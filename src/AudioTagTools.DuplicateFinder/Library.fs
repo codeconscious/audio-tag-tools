@@ -12,7 +12,7 @@ open FSharpPlus
 open FsToolkit.ErrorHandling.Operator.Result
 
 let private run args : Result<unit, CommandError> =
-    monad' {
+    monad {
         let! settingsFile, tagLibFile = validate args
 
         let! settings = settingsFile |> File.readText' |!! FileReadError >>= (Json >> parseToSettings)

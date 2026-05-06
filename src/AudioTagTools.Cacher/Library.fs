@@ -10,7 +10,7 @@ open CCFSharpUtils.Operators
 open FSharpPlus
 
 let private run args : Result<unit, CommandError> =
-    monad' {
+    monad {
         let! mediaDir, tagLibraryFile = validate args
         let! fileInfos = getFileInfos mediaDir
         let! tagLibraryMap = createTagLibraryMap tagLibraryFile
