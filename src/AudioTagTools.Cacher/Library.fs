@@ -18,13 +18,13 @@ let private run args : Result<unit, CommandError> =
 
         let _ =
             backUpFile tagLibraryFile
-            |- printfn "Backed up previous file to \"%O\"."
+            |-- printfn "Backed up previous file to \"%O\"."
             |!! FileWriteError
 
         do!
             newJson
             |> File.writeText' tagLibraryFile
-            |- fun _ -> printfn $"Wrote new file \"%O{tagLibraryFile}\"."
+            |-- fun _ -> printfn $"Wrote new file \"%O{tagLibraryFile}\"."
             |!! FileWriteError
     }
 
