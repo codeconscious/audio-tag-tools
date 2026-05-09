@@ -77,7 +77,7 @@ let private sanitizedTrackGroupingName (settings: Settings) fileTags =
 
     $"{artist}{title}".ToLowerInvariant()
 
-let findDuplicates settings tags : LibraryTags nlist nlist option =
+let findDuplicates settings tags : DuplicateTags option =
     monad {
         let! filtered = tags |> NonEmptyList.tryFilter hasArtistAndTitle
 
@@ -92,7 +92,7 @@ let findDuplicates settings tags : LibraryTags nlist nlist option =
             |> NonEmptyList.map (snd >> sortBy (mainArtists String.Empty))
     }
 
-let printDuplicates (groupedTracks: LibraryTags nlist nlist option) : unit =
+let printDuplicates (groupedTracks: DuplicateTags option) : unit =
     let printfGray = printfColor ConsoleColor.DarkGray
 
     let printGroup index (tracks: LibraryTags nlist) =

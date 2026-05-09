@@ -4,6 +4,7 @@ open Errors
 open Settings
 open Shared.Constants
 open Shared.TagLibrary
+open Shared.Types
 open CCFSharpUtils
 open CCFSharpUtils.IO
 open CCFSharpUtils.Operators
@@ -14,7 +15,7 @@ open System.IO
 
 let savePlaylist
     (settings: Settings)
-    (maybeTags: LibraryTags nlist nlist option)
+    (maybeTags: DuplicateTags option)
     : Result<unit, CommandError> =
 
     let now = DateTime.Now.ToString timeStampFormat

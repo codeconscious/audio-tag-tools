@@ -30,6 +30,8 @@ type LibraryTags =
       ImageCount: int
       LastWriteTime: DateTimeOffset }
 
+type DuplicateTags = LibraryTags nlist nlist
+
 let blankTags (fileInfo: FileInfo) : LibraryTags =
     { FileName = fileInfo.Name
       DirectoryName = fileInfo.DirectoryName
