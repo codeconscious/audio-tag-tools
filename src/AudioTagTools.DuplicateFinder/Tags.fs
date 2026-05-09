@@ -20,9 +20,7 @@ let printCount description (tags: LibraryTags nlist) =
     printfn $"%s{description}%s{String.formatInt tags.Length}"
 
 /// Filters out tags containing artists or titles specified in the exclusions.
-let discardExcluded
-    (settings: Settings)
-    (allTags: LibraryTags nlist)
+let discardExcluded (settings: Settings) (allTags: LibraryTags nlist)
     : Result<LibraryTags nlist, CommandError> =
 
     let isExcluded tags =
@@ -33,8 +31,11 @@ let discardExcluded
             | None,   Some t -> TitleOnly t
             | _ -> Invalid
 
-        let containsArtist a = [| tags.AlbumArtists; tags.Artists |] |> Array.anyContainsIgnoreCase a
-        let titleStartsWith t = tags.Title |> String.startsWithIgnoreCase t
+        let containsArtist artistName =
+            [| tags.AlbumArtists; tags.Artists |]
+            |> Array.anyContainsIgnoreCase artistName
+
+        let titleStartsWith title = tags.Title |> String.startsWithIgnoreCase title
 
         let checkIfExcluded = function
             | ArtistAndTitle (a, t) -> containsArtist a && titleStartsWith t
