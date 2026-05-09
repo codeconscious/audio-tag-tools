@@ -100,7 +100,7 @@ let private reportResults categorizedTags : CategorizedTagsToCache nseq =
         |> Seq.sum
         |> String.formatInt
 
-    printfn "Results:"
+    printfn "Results:" // TODO: Add deleted.
     printfn "• New:       %s" (countOf NotPresent)
     printfn "• Updated:   %s" (countOf OutOfDate)
     printfn "• Unchanged: %s" (countOf Unchanged)

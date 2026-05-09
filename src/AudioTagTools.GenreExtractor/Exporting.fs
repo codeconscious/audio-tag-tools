@@ -40,7 +40,7 @@ let private mostCommon (xs: string list) : string =
 
 let private mostCommonGenre = allGenres >> mostCommon
 
-let generateGenreData (separator: string) (allFileTags: LibraryTags nlist) =
+let generateGenreData separator allFileTags =
     allFileTags
     |> NonEmptyList.groupBy mainArtist
     |> NonEmptyList.tryChoose (fun (artist, tags) ->
@@ -51,7 +51,7 @@ let generateGenreData (separator: string) (allFileTags: LibraryTags nlist) =
     |> Option.map NonEmptyList.sort
     |> function
        | Some gs -> Ok gs
-       | None -> Error InsufficientGenreData
+       | None    -> Error InsufficientGenreData
 
 let printChanges (oldGenres: string list) (newGenres: string nlist) =
     let newTotalCount = newGenres.Length
