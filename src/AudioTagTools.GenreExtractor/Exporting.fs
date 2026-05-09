@@ -11,9 +11,11 @@ open System
 open Shared
 
 let private mainArtist (fileTags: LibraryTags) : Artist option =
+    let hasValidValue xs = Array.isNotEmpty xs && String.hasText xs[0]
+
     match fileTags with
-    | a when Array.isNotEmpty a.Artists -> Some (Artist a.Artists[0])
-    | a when Array.isNotEmpty a.AlbumArtists -> Some (Artist a.AlbumArtists[0])
+    | a when hasValidValue a.Artists -> Some (Artist a.Artists[0])
+    | a when hasValidValue a.AlbumArtists -> Some (Artist a.AlbumArtists[0])
     | _ -> None
 
 let printOldSummary (oldGenres: string list) : unit =
@@ -34,10 +36,10 @@ let private allGenres (fileTags: LibraryTags nlist) : string list =
     |> NonEmptyList.tryCollect (fun t -> t.Genres |> toList)
     |> function None -> [] | Some gs -> gs |> toList
 
-let private mostCommon (xs: string list) : string =
+let private mostCommon (xs: string list) : string option =
     match xs with
-    | [] -> String.Empty
-    | _  -> xs |> groupBy id |> maxBy (snd >> length) |> fst
+    | [] -> None
+    | _  -> Some (xs |> List.filter String.hasText |> groupBy id |> maxBy (snd >> length) |> fst)
 
 let private mostCommonGenre = allGenres >> mostCommon
 
@@ -50,10 +52,9 @@ let generateGenreData (separator: string) (allFileTags: LibraryTags nlist)
         match artistOpt with
         | None -> None
         | Some (Artist artistName) ->
-            let genre = mostCommonGenre groupedTags
-            if String.allHaveText [artistName; genre]
-            then Some $"{artistName}{separator}{genre}"
-            else None)
+            match mostCommonGenre groupedTags with
+            | None -> None
+            | Some genre -> Some $"{artistName}{separator}{genre}")
     |> Option.map NonEmptyList.sort
     |> Option.toResultWith InsufficientGenreData
 
