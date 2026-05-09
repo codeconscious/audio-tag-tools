@@ -5,15 +5,16 @@ open Shared.TagLibrary
 open CCFSharpUtils
 open CCFSharpUtils.Collections
 open CCFSharpUtils.Text
+open FSharpPlus
 open FSharpPlus.Data
-open FSharpPlus.Operators
 open System
+open Shared
 
-let private mainArtist (fileTags: LibraryTags) =
+let private mainArtist (fileTags: LibraryTags) : Artist option =
     match fileTags with
-    | a when Array.isNotEmpty a.Artists -> a.Artists[0]
-    | a when Array.isNotEmpty a.AlbumArtists -> a.AlbumArtists[0]
-    | _ -> String.Empty
+    | a when Array.isNotEmpty a.Artists -> Some (Artist a.Artists[0])
+    | a when Array.isNotEmpty a.AlbumArtists -> Some (Artist a.AlbumArtists[0])
+    | _ -> None
 
 let printOldSummary (oldGenres: string list) : unit =
     match oldGenres with
@@ -40,18 +41,21 @@ let private mostCommon (xs: string list) : string =
 
 let private mostCommonGenre = allGenres >> mostCommon
 
-let generateGenreData separator allFileTags =
+let generateGenreData (separator: string) (allFileTags: LibraryTags nlist)
+    : Result<string nlist, CommandError> =
+
     allFileTags
     |> NonEmptyList.groupBy mainArtist
-    |> NonEmptyList.tryChoose (fun (artist, tags) ->
-        let genre = mostCommonGenre tags
-        if String.allHaveText [artist; genre]
-        then Some $"{artist}{separator}{genre}"
-        else None)
+    |> NonEmptyList.tryChoose (fun (artistOpt, groupedTags) ->
+        match artistOpt with
+        | None -> None
+        | Some (Artist artistName) ->
+            let genre = mostCommonGenre groupedTags
+            if String.allHaveText [artistName; genre]
+            then Some $"{artistName}{separator}{genre}"
+            else None)
     |> Option.map NonEmptyList.sort
-    |> function
-       | Some gs -> Ok gs
-       | None    -> Error InsufficientGenreData
+    |> Option.toResultWith InsufficientGenreData
 
 let printChanges (oldGenres: string list) (newGenres: string nlist) =
     let newTotalCount = newGenres.Length
