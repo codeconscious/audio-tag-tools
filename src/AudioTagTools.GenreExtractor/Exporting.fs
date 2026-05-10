@@ -48,13 +48,10 @@ let generateGenreData (separator: string) (allFileTags: LibraryTags nlist)
 
     allFileTags
     |> NonEmptyList.groupBy mainArtist
-    |> NonEmptyList.tryChoose (fun (artistOpt, groupedTags) ->
+    |> NonEmptyList.tryChoose (fun (artistOpt, tagGroup) ->
         match artistOpt with
         | None -> None
-        | Some (Artist artistName) ->
-            match mostCommonGenre groupedTags with
-            | None -> None
-            | Some genre -> Some $"{artistName}{separator}{genre}")
+        | Some (Artist artist) -> tagGroup |> mostCommonGenre |> map (fun genre -> $"{artist}{separator}{genre}"))
     |> Option.map NonEmptyList.sort
     |> Option.toResultWith InsufficientGenreData
 
