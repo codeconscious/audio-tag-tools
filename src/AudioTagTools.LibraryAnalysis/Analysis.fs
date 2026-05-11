@@ -97,7 +97,8 @@ let artistsWithMostGenres count tags =
         (a, tags
             |> List.map _.Genres
             |> Array.concat
-            |> Array.map _.Trim() |> List.ofArray)
+            |> Array.map _.Trim()
+            |> List.ofArray)
 
     let uniqGenreCount (genres: string list) =
         genres |> List.distinctBy _.ToLowerInvariant() |> _.Length
