@@ -93,25 +93,25 @@ let artistsWithMostGenres count tags =
         |> List.map (fun (g, count) -> $"{g} ({count})")
         |> String.concat "; "
 
-    let artistsWithGenres (a, tags) : 'a * string list =
-        (a, tags
+    let extractArtistGenreInfo (a, tags) =
+        let genres: string list =
+            tags
             |> List.map _.Genres
             |> Array.concat
             |> Array.map _.Trim()
-            |> List.ofArray)
+            |> List.ofArray
 
-    let withUniqueGenreCounts (artist, genres) =
-        let uniqGenreCount (genres: string list) =
+        let uniqGenreCount (genres: string list) : int =
             genres
             |> List.distinctBy _.ToLowerInvariant()
             |> _.Length
 
-        artist, uniqGenreCount genres, genres
+        (a, uniqGenreCount genres, genres)
 
     tags
     |> List.filter hasAnyArtist
     |> List.groupBy firstDistinctArtist
-    |> List.map (artistsWithGenres >> withUniqueGenreCounts)
+    |> List.map extractArtistGenreInfo
     |> List.sortByDescending item2
     |> List.take count
     |> List.map (fun (Artist artist, uniqGenreCount, genres) ->
