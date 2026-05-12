@@ -55,9 +55,7 @@ let parseJsonToTags (Json json) : Result<LibraryTags list, string> =
     with exn -> Error exn.Message
 
 let parseJsonToNonEmptyTags json : Result<LibraryTags nlist, string> =
-    json
-    |> parseJsonToTags
-    >>= List.toNonEmptyListResult "No tags were found to parse."
+    parseJsonToTags json >>= List.toNonEmptyListResult "No tags were found to parse."
 
 let parseFileTags (f: FileInfo) : Result<FileTags option, string> =
     try f.FullName |> FileTags.Create |> Option.ofObj |> Ok
