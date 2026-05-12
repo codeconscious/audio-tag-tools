@@ -14,8 +14,8 @@ let private mainArtist (fileTags: LibraryTags) : Artist option =
     let hasValidValue xs = Array.isNotEmpty xs && String.hasText xs[0]
 
     match fileTags with
-    | a when hasValidValue a.Artists -> Some (Artist a.Artists[0])
-    | a when hasValidValue a.AlbumArtists -> Some (Artist a.AlbumArtists[0])
+    | a when a.Artists      |> hasValidValue -> Some (Artist a.Artists[0])
+    | a when a.AlbumArtists |> hasValidValue -> Some (Artist a.AlbumArtists[0])
     | _ -> None
 
 let printOldSummary (oldGenres: string list) : unit =
