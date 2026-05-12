@@ -1,5 +1,6 @@
 module LibraryAnalysis.Analysis
 
+open CCFSharpUtils.Collections
 open System.IO
 open Shared.TagLibrary
 open Shared.Types
@@ -95,7 +96,7 @@ let artistsWithMostGenres count tags =
 
     let extractArtistGenreInfo (a, tags) =
         let genres = tags |> List.map _.Genres |> Array.concat |> Array.map _.Trim() |> List.ofArray
-        let uniqGenreCount genres = genres |> List.distinctBy String.toLower |> _.Length
+        let uniqGenreCount genres = genres |> List.distinctIgnoreCase |> _.Length
         (a, uniqGenreCount genres, genres)
 
     tags
