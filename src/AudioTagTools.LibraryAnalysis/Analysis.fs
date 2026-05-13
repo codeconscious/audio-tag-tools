@@ -147,9 +147,9 @@ let topFormats count tags =
 let topQualityData count tags =
     tags
     |> List.map (fun t ->
-        {| BitRate = t.BitRate
+        {| BitRate    = t.BitRate
            SampleRate = t.SampleRate
-           Extension = uppercaseFileExtension t |})
+           Extension  = uppercaseFileExtension t |})
     |> mostPopulous count id
     |> List.map (fun (data, count) ->
         [ data.Extension
