@@ -17,8 +17,6 @@ let inline private mostPopulous count (grouper: 'a -> 'a) (items: 'a list) =
     |> List.sortByDescending snd
     |> List.truncate count
 
-let private asLower (x: string) = x.ToLowerInvariant()
-
 let private asPercentage ratioData =
     float ratioData.Count / float ratioData.Total
     |> String.formatPercent ratioData.DecimalPlaces
@@ -71,7 +69,7 @@ let topAlbums count tags =
 let topTitles count tags =
     tags
     |> List.map _.Title
-    |> mostPopulous count asLower
+    |> mostPopulous count String.toLower
     |> List.map (fun (title, count) -> [ title; String.formatInt count ])
 
 let topGenres count tags =
@@ -80,7 +78,7 @@ let topGenres count tags =
 
     genres
     |> List.collect id
-    |> mostPopulous count asLower
+    |> mostPopulous count String.toLower
     |> List.map (fun (genre, count) ->
         [ genre
           String.formatInt count
