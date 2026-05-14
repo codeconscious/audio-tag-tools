@@ -8,14 +8,15 @@ open Shared.TagLibrary
 open CCFSharpUtils.IO
 open CCFSharpUtils.Operators
 open CCFSharpUtils.Text
-open Spectre.Console
 open FSharpPlus
+open FSharpPlus.Data
+open Spectre.Console
 
 let private run args : Result<unit, CommandError> =
     monad {
         let! tagLibraryFile = validate args
         let! tagJson = tagLibraryFile |> File.readText' |>> Json |!! FileReadError
-        let! tags = tagJson |> parseJsonToTags |!! TagParseError
+        let! tags = tagJson |> parseJsonToNonEmptyTags |!! TagParseError
 
         printTable {
             Title = Some "General Data"
@@ -25,6 +26,8 @@ let private run args : Result<unit, CommandError> =
                   [ "Unique artists"; String.formatInt <| uniqueArtistCount tags ]
                   [ "Average file size"; String.formatBytes <| averageFileSize tags  ]
                   [ "Album art percentage"; $"%s{albumArtPercentage tags}" ] ]
+                |> NonEmptyList.ofList
+                |> Some
             ColumnAlignments = [Justify.Left; Justify.Right]
             ShowRowSeparators = false
         }
@@ -72,7 +75,7 @@ let private run args : Result<unit, CommandError> =
         printTable {
             Title = Some "Largest Files"
             Headers = Some ["File Size"; "Artist & Title"]
-            Rows = largestFiles 20 tags |> List.map List.rev
+            Rows = largestFiles 20 tags
             ColumnAlignments = [Justify.Right; Justify.Left]
             ShowRowSeparators = false
         }
