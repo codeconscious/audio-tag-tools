@@ -113,14 +113,14 @@ let artistsWithMostGenres count tags : TableRowData =
 
     tags
     |> NonEmptyList.tryFilter hasAnyArtist
-    |> Option.map (NonEmptyList.groupBy firstDistinctArtist)
-    |> Option.map (NonEmptyList.map extractArtistGenreInfo)
-    |> Option.map (NonEmptyList.sortByDescending item2)
-    |> Option.map (NonEmptyList.take count)
-    |> Option.map (NonEmptyList.map (fun (Artist artist, uniqGenreCount, genres) ->
-        [ artist
-          String.formatInt uniqGenreCount
-          genreCounts genres ]))
+    |> Option.map (NonEmptyList.groupBy firstDistinctArtist
+                >> NonEmptyList.map extractArtistGenreInfo
+                >> NonEmptyList.sortByDescending item2
+                >> NonEmptyList.take count
+                >> NonEmptyList.map (fun (Artist artist, uniqGenreCount, genres) ->
+                    [ artist
+                      String.formatInt uniqGenreCount
+                      genreCounts genres ]))
 
 let largestFiles count tags : TableRowData =
     tags
