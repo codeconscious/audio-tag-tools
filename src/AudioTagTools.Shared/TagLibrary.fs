@@ -72,7 +72,7 @@ let ignorableAlbumArtistNames =
       "Various"
       "Various Artists"
       "Multiple Artists"
-      "\u003Cunknown\u003E" ] // U+003C == less-than sign; \u003E == greater-than sign
+      "\u003Cunknown\u003E" ] // U+003C == `<` and \u003E == `>`
 
 let allDistinctArtists tags : Artist list =
     Array.concat [ tags.Artists; tags.AlbumArtists ]
