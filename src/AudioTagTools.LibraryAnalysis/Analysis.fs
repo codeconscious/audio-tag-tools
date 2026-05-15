@@ -87,17 +87,18 @@ let topTitles count tags : TableRowData =
 let topGenres count tags : TableRowData =
     let tagsWithGenres = tags |> NList.tryFilter (fun t -> Array.isNotEmpty t.Genres)
 
-    // TODO: Clean this up.
-    genres
-    |> NonEmptyList.toList
-    |> List.collect id
-    |> NonEmptyList.ofList
-    |> mostPopulous count String.toLower
-    |> NonEmptyList.map (fun (genre, count) ->
-        [ genre
-          String.formatInt count
-          asPercentage { Count = count; Total = genreCount; DecimalPlaces = 2 } ])
-    |> Some
+    match tagsWithGenres with
+    | None -> None
+    | Some tags' ->
+        let genres = tags' >>= fun xs -> xs.Genres |> NList.ofArray
+
+        genres
+        |> mostPopulous count String.toLower
+        |> NList.map (fun (genre, count) ->
+            [ genre
+              String.formatInt count
+              asPercentage { Count = count; Total = genres.Length; DecimalPlaces = 2 } ])
+        |> Some
 
 let artistsWithMostGenres count tags : TableRowData =
     let genreCounts (genres: string list) : string =
