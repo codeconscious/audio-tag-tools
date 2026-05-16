@@ -38,8 +38,7 @@ let filteredArtists tags =
 let uniqueArtistCount tags =
     tags
     |> filteredArtists
-    |> Option.map NList.distinct
-    |> Option.map _.Length
+    |> Option.map (NList.distinct >> NList.length)
     |> Option.defaultValue 0
 
 let averageFileSize tags =
