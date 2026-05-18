@@ -14,18 +14,18 @@ module NList = NonEmptyList
 type TableRowData = string list nlist option
 type RatioData = { Count: int; Total: int; DecimalPlaces: int }
 
-let inline private mostPopulous count (grouper: 'a -> 'a) (items: 'a nlist) =
+let inline private mostPopulous (count: int) (grouper: 'a -> 'a) (items: 'a nlist) : NonEmptyList<'a * int> =
     items
     |> NList.groupBy grouper
     |> NList.map (fun (_, group) -> (group[0], group.Length))
     |> NList.sortByDescending snd
     |> NList.truncate count
 
-let private asPercentage ratioData =
+let private asPercentage ratioData : string =
     float ratioData.Count / float ratioData.Total
     |> String.formatPercent ratioData.DecimalPlaces
 
-let filteredArtists tags =
+let filteredArtists tags : string nlist option =
     tags
     |> NList.map (fun tags' ->
         tags'
@@ -35,18 +35,18 @@ let filteredArtists tags =
     |> List.concat
     |> function [] -> None | artists -> Some (NList.ofList artists)
 
-let uniqueArtistCount tags =
+let uniqueArtistCount tags : int =
     tags
     |> filteredArtists
     |> Option.map (NList.distinct >> NList.length)
     |> Option.defaultValue 0
 
-let averageFileSize tags =
+let averageFileSize tags : int64 =
     let sizeTotal = tags |> NList.map _.FileSize |> NList.sum
     let fileCount = tags.Length
     sizeTotal / (int64 fileCount)
 
-let albumArtPercentage tags =
+let albumArtPercentage tags : string =
     tags
     |> NList.choose (fun t -> Option.isPos t.ImageCount)
     |> NList.length
