@@ -60,9 +60,9 @@ let topArtists count tags : TableRowData =
         artists
         |> mostPopulous count id
         |> NList.map (fun (artist, count) ->
-                [ artist
-                  String.formatInt count
-                  asPercentage { Count = count; Total = artistCount; DecimalPlaces = 3 } ]) )
+            [ artist
+              String.formatInt count
+              asPercentage { Count = count; Total = artistCount; DecimalPlaces = 3 } ]) )
 
 let topAlbums count tags : TableRowData =
     let albums = tags |> NList.map _.Album
