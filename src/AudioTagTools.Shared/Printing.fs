@@ -5,6 +5,7 @@ open CCFSharpUtils
 open CCFSharpUtils.Text
 open System
 open Spectre.Console
+open FSharpPlus
 open FSharpPlus.Data
 
 type TableData =
@@ -46,7 +47,7 @@ let printTable tableData =
         |> List.iteri (fun i alignment -> table.Columns[i].Alignment alignment |> ignore)
 
         rows
-        |> NonEmptyList.iter (fun rowItems -> rowItems |> List.map Markup.Escape |> Array.ofList |> table.AddRow |> ignore)
+        |> NonEmptyList.iter (fun rowItems -> rowItems |> map Markup.Escape |> Array.ofList |> table.AddRow |> ignore)
 
         match tableData.Title with
         | Some tableTitle ->
