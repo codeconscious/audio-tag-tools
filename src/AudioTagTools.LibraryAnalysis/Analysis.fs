@@ -111,11 +111,11 @@ let artistsWithMostGenres count tags : TableRowData =
 
     tags
     |> NList.tryFilter hasAnyArtist
-    |> Option.map (NList.groupBy firstDistinctArtist
-                >> NList.map extractArtistGenreInfo
-                >> NList.sortByDescending item2
-                >> NList.take count
-                >> NList.map (fun (Artist artist, uniqGenreCount, genres) ->
+    |> Option.map (NList.groupBy firstDistinctArtist >>
+                   NList.map extractArtistGenreInfo >>
+                   NList.sortByDescending item2 >>
+                   NList.take count >>
+                   NList.map (fun (Artist artist, uniqGenreCount, genres) ->
                     [ artist
                       String.formatInt uniqGenreCount
                       genreCounts genres ]))
