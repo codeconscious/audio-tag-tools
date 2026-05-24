@@ -5,13 +5,12 @@ open Errors
 open IO
 open Tags
 open Shared.IO
-open CCFSharpUtils
+open CCFSharpUtils.IO
 open CCFSharpUtils.Operators
 open FSharpPlus
 
-
 let private run args : Result<unit, CommandError> =
-    monad' {
+    monad {
         let! mediaDir, tagLibraryFile = validate args
         let! fileInfos = getFileInfos mediaDir
         let! tagLibraryMap = createTagLibraryMap tagLibraryFile
@@ -19,13 +18,13 @@ let private run args : Result<unit, CommandError> =
 
         let _ =
             backUpFile tagLibraryFile
-            |- printfn "Backed up previous file to \"%O\"."
+            |-- printfn "Backed up previous file to \"%O\"."
             |!! FileWriteError
 
         do!
             newJson
             |> File.writeText' tagLibraryFile
-            |- fun _ -> printfn $"Wrote new file \"%O{tagLibraryFile}\"."
+            |-- fun _ -> printfn $"Wrote new file \"%O{tagLibraryFile}\"."
             |!! FileWriteError
     }
 

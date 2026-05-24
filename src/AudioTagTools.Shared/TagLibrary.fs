@@ -2,12 +2,15 @@ module Shared.TagLibrary
 
 open Shared.Types
 open CCFSharpUtils
+open CCFSharpUtils.Collections
+open CCFSharpUtils.Text
 open System
 open System.IO
 open System.Text.Json
 open FSharpPlus
 
 type FileTags = TagLib.File
+type FilePath = string
 
 type LibraryTags =
     { FileName: string
@@ -26,6 +29,8 @@ type LibraryTags =
       FileSize: int64
       ImageCount: int
       LastWriteTime: DateTimeOffset }
+
+type DuplicateTags = LibraryTags nlist nlist
 
 let blankTags (fileInfo: FileInfo) : LibraryTags =
     { FileName = fileInfo.Name
@@ -50,43 +55,42 @@ let parseJsonToTags (Json json) : Result<LibraryTags list, string> =
     with exn -> Error exn.Message
 
 let parseJsonToNonEmptyTags json : Result<LibraryTags nlist, string> =
-    json
-    |> parseJsonToTags
-    >>= List.toNonEmptyListResult "No tags were found to parse."
+    parseJsonToTags json >>= List.toNonEmptyListResult "No tags were found to parse."
 
 let parseFileTags (f: FileInfo) : Result<FileTags option, string> =
     try f.FullName |> FileTags.Create |> Option.ofObj |> Ok
     with exn -> Error exn.Message
 
-let path tags : string =
+let filePath tags : FilePath =
     Path.Combine [| tags.DirectoryName; tags.FileName |]
 
-let groupWithPath tags : string * LibraryTags =
-    path tags, tags
+let groupByPath tags : FilePath * LibraryTags =
+    (filePath tags, tags)
 
-let ignorableAlbumArtists =
+let ignorableAlbumArtistNames =
     [ String.Empty
       "Various"
       "Various Artists"
       "Multiple Artists"
-      "\u003Cunknown\u003E" ] // U+003C == less-than sign; \u003E == greater-than sign
+      "\u003Cunknown\u003E" ] // U+003C == `<` and \u003E == `>`
 
-let allDistinctArtists tags : string list =
+let allDistinctArtists tags : Artist list =
     Array.concat [ tags.Artists; tags.AlbumArtists ]
     |> Array.distinct
     |> List.ofArray
+    |> List.map Artist
 
-let firstDistinctArtist tags : string =
+let firstDistinctArtist tags : Artist =
     tags |> allDistinctArtists |> List.head
 
 let mainArtists separator tags : string =
-    let hasNoIgnoredAlbumArtists artist =
-        ignorableAlbumArtists
+    let hasNoIgnoredAlbumArtists (Artist artist) =
+        ignorableAlbumArtistNames
         |> List.exists _.Equals(artist, StringComparison.InvariantCultureIgnoreCase)
         |> not
 
     match tags with
-    | t when Array.isNotEmpty t.AlbumArtists && hasNoIgnoredAlbumArtists t.AlbumArtists[0] ->
+    | t when Array.isNotEmpty t.AlbumArtists && hasNoIgnoredAlbumArtists (Artist t.AlbumArtists[0]) ->
         t.AlbumArtists
     | t ->
         t.Artists

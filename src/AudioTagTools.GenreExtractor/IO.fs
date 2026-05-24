@@ -2,7 +2,7 @@ module GenreExtractor.IO
 
 open Errors
 open FSharpPlus
-open CCFSharpUtils
+open CCFSharpUtils.IO
 open CCFSharpUtils.Operators
 open System.IO
 

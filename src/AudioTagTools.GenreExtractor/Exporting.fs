@@ -3,15 +3,20 @@ module GenreExtractor.Exporting
 open Errors
 open Shared.TagLibrary
 open CCFSharpUtils
+open CCFSharpUtils.Collections
+open CCFSharpUtils.Text
+open FSharpPlus
 open FSharpPlus.Data
-open FSharpPlus.Operators
 open System
+open Shared
 
-let private mainArtist (fileTags: LibraryTags) =
+let private mainArtist (fileTags: LibraryTags) : Artist option =
+    let hasValidValue xs = Array.isNotEmpty xs && String.hasText xs[0]
+
     match fileTags with
-    | a when Array.isNotEmpty a.Artists -> a.Artists[0]
-    | a when Array.isNotEmpty a.AlbumArtists -> a.AlbumArtists[0]
-    | _ -> String.Empty
+    | a when a.Artists      |> hasValidValue -> Some (Artist a.Artists[0])
+    | a when a.AlbumArtists |> hasValidValue -> Some (Artist a.AlbumArtists[0])
+    | _ -> None
 
 let printOldSummary (oldGenres: string list) : unit =
     match oldGenres with
@@ -31,25 +36,25 @@ let private allGenres (fileTags: LibraryTags nlist) : string list =
     |> NonEmptyList.tryCollect (fun t -> t.Genres |> toList)
     |> function None -> [] | Some gs -> gs |> toList
 
-let private mostCommon (xs: string list) : string =
+let private mostCommon (xs: string list) : string option =
     match xs with
-    | [] -> String.Empty
-    | _  -> xs |> groupBy id |> maxBy (snd >> length) |> fst
+    | [] -> None
+    | _  -> Some (xs |> List.filter String.hasText |> groupBy id |> maxBy (snd >> length) |> fst)
 
 let private mostCommonGenre = allGenres >> mostCommon
 
-let generateGenreData (separator: string) (allFileTags: LibraryTags nlist) =
+let generateGenreData (separator: string) (allFileTags: LibraryTags nlist)
+    : Result<string nlist, CommandError> =
+
     allFileTags
     |> NonEmptyList.groupBy mainArtist
-    |> NonEmptyList.tryChoose (fun (artist, tags) ->
-        let genre = mostCommonGenre tags
-        if String.allHaveText [artist; genre]
-        then Some $"{artist}{separator}{genre}"
-        else None)
+    |> NonEmptyList.tryChoose (fun (artistOpt, tagGroup) ->
+        match artistOpt with
+        | None -> None
+        | Some (Artist artist) ->
+            tagGroup |> mostCommonGenre |> map (fun genre -> $"{artist}{separator}{genre}"))
     |> Option.map NonEmptyList.sort
-    |> function
-       | Some gs -> Ok gs
-       | None -> Error InsufficientGenreData
+    |> Option.toResultWith InsufficientGenreData
 
 let printChanges (oldGenres: string list) (newGenres: string nlist) =
     let newTotalCount = newGenres.Length

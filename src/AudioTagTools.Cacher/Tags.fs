@@ -6,11 +6,14 @@ open Errors
 open Shared.TagLibrary
 open Shared.Types
 open CCFSharpUtils
+open CCFSharpUtils.Collections
+open CCFSharpUtils.IO
 open CCFSharpUtils.Operators
+open CCFSharpUtils.Text
 open FSharpPlus.Data
 open FSharpPlus.Operators
 
-type LibraryTagMap = Map<string, LibraryTags>
+type LibraryTagMap = Map<FilePath, LibraryTags>
 
 type LibraryComparisonResult =
     | Unchanged  // Library tags match file tags.
@@ -25,14 +28,14 @@ let createTagLibraryMap (libraryFile: FileInfo) : Result<LibraryTagMap, CommandE
     if libraryFile.Exists
     then
         libraryFile
-        |>  File.readText'
+        |> File.readText'
         >>= (Json >> parseJsonToTags)
+        |>> (List.map groupByPath >> Map.ofList)
         |!! LibraryTagParseError
-        |>> (List.map groupWithPath >> Map.ofList)
     else
         Ok Map.empty
 
-let private prepareTagsToWrite tagLibraryMap (fileInfos: FileInfo nseq)
+let private prepareTagsToWrite tagLibraryMap fileInfos
     : CategorizedTagsToCache nseq =
 
     let copyCachedTags (libraryTags: LibraryTags) =
@@ -67,7 +70,7 @@ let private prepareTagsToWrite tagLibraryMap (fileInfos: FileInfo nseq)
        | Ok (Some tags) -> tagsFromFile tags
        | _ -> blankTags fileInfo
 
-    let prepareTagsToCache (tagLibraryMap: LibraryTagMap) (audioFile: FileInfo) : CategorizedTagsToCache =
+    let prepareTagsToCache tagLibraryMap (audioFile: FileInfo) : CategorizedTagsToCache =
         if tagLibraryMap |> Map.containsKey audioFile.FullName
         then
             let libraryTags = tagLibraryMap |> Map.find audioFile.FullName
@@ -97,7 +100,7 @@ let private reportResults categorizedTags : CategorizedTagsToCache nseq =
         |> Seq.sum
         |> String.formatInt
 
-    printfn "Results:"
+    printfn "Results:" // TODO: Add deleted.
     printfn "• New:       %s" (countOf NotPresent)
     printfn "• Updated:   %s" (countOf OutOfDate)
     printfn "• Unchanged: %s" (countOf Unchanged)
@@ -105,7 +108,7 @@ let private reportResults categorizedTags : CategorizedTagsToCache nseq =
 
     categorizedTags
 
-let generateJson (tagMap: LibraryTagMap) (fileInfos: FileInfo nseq) : Result<string, CommandError> =
+let generateJson tagMap fileInfos : Result<string, CommandError> =
     fileInfos
     |> prepareTagsToWrite tagMap
     |> reportResults

@@ -7,7 +7,9 @@ open Shared.TagLibrary
 open FSharpPlus
 open FSharpPlus.Data
 open CCFSharpUtils
+open CCFSharpUtils.Collections
 open CCFSharpUtils.Operators
+open CCFSharpUtils.Text
 open System
 open System.IO
 
@@ -18,9 +20,7 @@ let printCount description (tags: LibraryTags nlist) =
     printfn $"%s{description}%s{String.formatInt tags.Length}"
 
 /// Filters out tags containing artists or titles specified in the exclusions.
-let discardExcluded
-    (settings: Settings)
-    (allTags: LibraryTags nlist)
+let discardExcluded (settings: Settings) (allTags: LibraryTags nlist)
     : Result<LibraryTags nlist, CommandError> =
 
     let isExcluded tags =
@@ -31,8 +31,11 @@ let discardExcluded
             | None,   Some t -> TitleOnly t
             | _ -> Invalid
 
-        let containsArtist a = [| tags.AlbumArtists; tags.Artists |] |> Array.anyContainsIgnoreCase a
-        let titleStartsWith t = tags.Title |> String.startsWithIgnoreCase t
+        let containsArtist artistName =
+            [| tags.AlbumArtists; tags.Artists |]
+            |> Array.anyContainsIgnoreCase artistName
+
+        let titleStartsWith title = tags.Title |> String.startsWithIgnoreCase title
 
         let checkIfExcluded = function
             | ArtistAndTitle (a, t) -> containsArtist a && titleStartsWith t
@@ -75,8 +78,8 @@ let private sanitizedTrackGroupingName (settings: Settings) fileTags =
 
     $"{artist}{title}".ToLowerInvariant()
 
-let findDuplicates settings tags : LibraryTags nlist nlist option =
-    monad' {
+let findDuplicates settings tags : DuplicateTags option =
+    monad {
         let! filtered = tags |> NonEmptyList.tryFilter hasArtistAndTitle
 
         let! groupedDupes =
@@ -90,10 +93,10 @@ let findDuplicates settings tags : LibraryTags nlist nlist option =
             |> NonEmptyList.map (snd >> sortBy (mainArtists String.Empty))
     }
 
-let printDuplicates (groupedTracks: LibraryTags nlist nlist option) : unit =
+let printDuplicates (groupedTracks: DuplicateTags option) : unit =
     let printfGray = printfColor ConsoleColor.DarkGray
 
-    let printGroup index (groupTracks: LibraryTags nlist) =
+    let printGroup index (tracks: LibraryTags nlist) =
         let artistSummary (tags: LibraryTags) : string =
             if Array.isEmpty tags.Artists
             then String.Empty
@@ -112,13 +115,13 @@ let printDuplicates (groupedTracks: LibraryTags nlist nlist option) : unit =
             printfGray $"  <{duration} {extNoPeriod} {bitRate} {fileSize}>{String.nl}"
 
         let printHeader () =
-            groupTracks
+            tracks
             |> NonEmptyList.head
             |> mainArtists ", "
             |> printfn "%d. %s" (index + 1) // Start numbering at 1, not 0.
 
         let printDuplicates () =
-            groupTracks
+            tracks
             |> NonEmptyList.iter printFileSummary
 
         printHeader ()

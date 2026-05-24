@@ -7,7 +7,7 @@ open IO
 open Shared.TagLibrary
 open Shared.Types
 open Shared.IO
-open CCFSharpUtils
+open CCFSharpUtils.IO
 open CCFSharpUtils.Operators
 open FSharpPlus
 
@@ -15,7 +15,7 @@ open FSharpPlus
 let private separator = "＼"
 
 let private run args : Result<unit, CommandError> =
-    monad' {
+    monad {
         let! tagLibFile, genreFile = validate args
 
         let! oldGenres = genreFile |> readGenres |-- printOldSummary
