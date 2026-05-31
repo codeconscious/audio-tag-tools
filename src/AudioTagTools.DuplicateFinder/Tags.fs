@@ -58,7 +58,9 @@ let discardExcluded (settings: Settings) (allTags: LibraryTags nlist)
 /// The string is intended to be used solely for track grouping.
 let private sanitizedTrackGroupingName (settings: Settings) fileTags =
     let scrubMatches patterns text : string =
-        Array.fold (fun acc p -> Regex.Replace(acc, p, String.Empty)) text patterns
+        if String.IsNullOrEmpty text || Array.isEmpty patterns
+        then text
+        else Array.fold (fun acc p -> Regex.Replace(acc, p, String.Empty)) text patterns
 
     let scrubText patterns =
         patterns
