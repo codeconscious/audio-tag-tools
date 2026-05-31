@@ -76,9 +76,9 @@ let private sanitizedTrackGroupingName (settings: Settings) fileTags =
         fileTags
         |> mainArtists String.Empty
         |> checkEquivalentArtists
-        |> scrubText settings.ArtistReplacements
+        |> scrubText settings.ArtistReplacementPatterns
 
-    let title = fileTags.Title |> scrubText settings.TitleReplacements
+    let title = fileTags.Title |> scrubText settings.TitleReplacementPatterns
 
     $"{artist}{title}".ToLowerInvariant()
 

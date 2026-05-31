@@ -104,13 +104,13 @@ Second, you must have a settings file containing exceptions—i.e., artists, tra
   "equivalentArtists": [
       ["artistName", "equivalentArtistName"]
   ],
-  "artistReplacements": [
+  "artistReplacementPatterns": [
     " ",
     "　",
     "The ",
     "ザ・"
   ],
-  "titleReplacements": [
+  "titleReplacementPatterns": [
     " ",
     "　",
     "(",
