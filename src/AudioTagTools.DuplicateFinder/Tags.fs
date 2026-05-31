@@ -12,6 +12,7 @@ open CCFSharpUtils.Operators
 open CCFSharpUtils.Text
 open System
 open System.IO
+open System.Text.RegularExpressions
 
 let parseToTags json =
     json |> parseJsonToNonEmptyTags |!! TagParseError
@@ -56,10 +57,13 @@ let discardExcluded (settings: Settings) (allTags: LibraryTags nlist)
 /// (2) The track title.
 /// The string is intended to be used solely for track grouping.
 let private sanitizedTrackGroupingName (settings: Settings) fileTags =
-    let scrubText subStrs =
-        subStrs
+    let scrubMatches patterns text : string =
+        Array.fold (fun acc p -> Regex.Replace(acc, p, String.Empty)) text patterns
+
+    let scrubText patterns =
+        patterns
         |> Array.append (String.whiteSpaceStrs |> Array.ofList)
-        |> String.stripSubstrings
+        |> scrubMatches
         >> String.stripPunctuation
         >> String.stripDiacritics
 
