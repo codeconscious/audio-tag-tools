@@ -27,10 +27,10 @@ let settingsSample = """
     "equivalentArtists": [
         ["artistName", "equivalentArtistName"]
     ],
-    "artistReplacements": [
+    "artistReplacementPatterns": [
         "text"
     ],
-    "titleReplacements": [
+    "titleReplacementPatterns": [
         "text"
     ]
 }
@@ -46,6 +46,6 @@ let parseToSettings (Json json) : Result<Settings, CommandError> =
 
 let printSummary (settings: Settings) =
     printfn "Settings:"
-    printfn $"  Exclusions:          %d{settings.Exclusions.Length}"
-    printfn $"  Artist Replacements: %d{settings.ArtistReplacements.Length}"
-    printfn $"  Title Replacements:  %d{settings.TitleReplacements.Length}"
+    printfn $"  Exclusions:                  %d{settings.Exclusions.Length}"
+    printfn $"  Artist Replacement Patterns: %d{settings.ArtistReplacementPatterns.Length}"
+    printfn $"  Title Replacement Patterns:  %d{settings.TitleReplacementPatterns.Length}"
