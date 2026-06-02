@@ -94,7 +94,7 @@ let findDuplicates settings tags : DuplicateTags option =
         return
             groupedDupes
             |> sortBy fst
-            |> NonEmptyList.map (snd >> sortBy (mainArtists String.Empty))
+            |> NonEmptyList.map (snd >> sortBy _.Title.Length)
     }
 
 let printDuplicates (groupedTracks: DuplicateTags option) : unit =
