@@ -20,15 +20,15 @@ let parseToTags json =
 let printCount description (tags: LibraryTags nlist) =
     printfn $"%s{description}%s{String.formatInt tags.Length}"
 
-/// Filters out tags containing artists or titles specified in the exclusionPatterns.
+/// Filters out tags containing artists or titles specified in the exclusion patterns.
 let discardExcluded (settings: Settings) (allTags: LibraryTags nlist)
     : Result<LibraryTags nlist, CommandError> =
 
     let matchOptions = RegexOptions.IgnoreCase
 
     let isExcluded tags =
-        let (|ArtistAndTitle|ArtistOnly|TitleOnly|Invalid|) (excl: ExclusionPattern) =
-            match excl.Artist, excl.Title with
+        let (|ArtistAndTitle|ArtistOnly|TitleOnly|Invalid|) (pattern: ExclusionPattern) =
+            match pattern.Artist, pattern.Title with
             | Some a, Some t -> ArtistAndTitle (a, t)
             | Some a, None   -> ArtistOnly a
             | None,   Some t -> TitleOnly t
