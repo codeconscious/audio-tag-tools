@@ -12,6 +12,7 @@ open CCFSharpUtils.Operators
 open CCFSharpUtils.Text
 open System
 open System.IO
+open System.Text.RegularExpressions
 
 let parseToTags json =
     json |> parseJsonToNonEmptyTags |!! TagParseError
@@ -23,6 +24,8 @@ let printCount description (tags: LibraryTags nlist) =
 let discardExcluded (settings: Settings) (allTags: LibraryTags nlist)
     : Result<LibraryTags nlist, CommandError> =
 
+    let matchOptions = RegexOptions.IgnoreCase
+
     let isExcluded tags =
         let (|ArtistAndTitle|ArtistOnly|TitleOnly|Invalid|) (excl: Exclusion) =
             match excl.Artist, excl.Title with
@@ -31,11 +34,12 @@ let discardExcluded (settings: Settings) (allTags: LibraryTags nlist)
             | None,   Some t -> TitleOnly t
             | _ -> Invalid
 
-        let containsArtist artistName =
+        let containsArtist artistPattern =
             [| tags.AlbumArtists; tags.Artists |]
-            |> Array.anyContainsIgnoreCase artistName
+            |> Array.concat
+            |> Array.exists (fun artist -> Regex.IsMatch(artist, artistPattern, matchOptions))
 
-        let titleStartsWith title = tags.Title |> String.startsWithIgnoreCase title
+        let titleStartsWith pattern = Regex.IsMatch(tags.Title, pattern, matchOptions)
 
         let checkIfExcluded = function
             | ArtistAndTitle (a, t) -> containsArtist a && titleStartsWith t
