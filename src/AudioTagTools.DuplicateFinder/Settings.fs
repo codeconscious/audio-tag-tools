@@ -12,7 +12,7 @@ let settingsSample = """
         "searchPath": "path",
         "replacePath": "path"
     },
-    "exclusions": [
+    "exclusionPatterns": [
         {
             "artist": "artist"
         },
@@ -38,7 +38,7 @@ let settingsSample = """
 
 type SettingsProvider = JsonProvider<settingsSample>
 type Settings = SettingsProvider.Root
-type Exclusion = SettingsProvider.Exclusion
+type ExclusionPattern = SettingsProvider.ExclusionPattern
 
 let parseToSettings (Json json) : Result<Settings, CommandError> =
     try json |> SettingsProvider.Parse |> Ok
@@ -46,6 +46,6 @@ let parseToSettings (Json json) : Result<Settings, CommandError> =
 
 let printSummary (settings: Settings) =
     printfn "Settings:"
-    printfn $"  Exclusions:                  %d{settings.Exclusions.Length}"
+    printfn $"  Exclusion Patterns:          %d{settings.ExclusionPatterns.Length}"
     printfn $"  Artist Replacement Patterns: %d{settings.ArtistReplacementPatterns.Length}"
     printfn $"  Title Replacement Patterns:  %d{settings.TitleReplacementPatterns.Length}"

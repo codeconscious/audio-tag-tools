@@ -89,16 +89,16 @@ Second, you must have a settings file containing exceptions—i.e., artists, tra
     "pathSearchFor": "/Users/me/Documents/Media/",
     "pathReplaceWith": ""
   },
-  "exclusions": [
+  "exclusionPatterns": [
     {
       "artist": "SAMPLE_ARTIST_NAME",
-      "title": "SAMPLE_TRACK_NAME"
+      "title": "SAMPLE_TRACK_NAME.*"
     },
     {
       "artist": "SAMPLE_ARTIST_NAME"
     },
     {
-      "title": "SAMPLE_TRACK_NAME"
+      "title": "SAMPLE_TRACK_NAME.*"
     }
   ],
   "equivalentArtists": [
@@ -142,7 +142,7 @@ To start, use the `find-duplicates` command like this:
 dotnet run -- find-duplicates ~/Documents/Audio/findDupeSettings.json ~/Documents/Audio/tagLibrary.json
 ```
 
-If any potential duplicates are found, they will be listed, grouped by artist. If you see false positives (i.e., tracks that were detected as duplicates, but are actually not), you can add entries to the exclusions in your settings to ignore them in the future.
+If any potential duplicates are found, they will be listed, grouped by artist. If you see false positives (i.e., tracks that were detected as duplicates, but are actually not), you can add entries to the exclusion patterns in your settings to ignore them in the future.
 
 
 ## 3. Exporting artist genres
