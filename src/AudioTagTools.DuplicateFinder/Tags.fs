@@ -56,10 +56,10 @@ let discardExcluded (settings: Settings) (allTags: LibraryTags nlist)
 /// (2) The track title.
 /// The string is intended to be used solely for track grouping.
 let private sanitizedTrackGroupingName (settings: Settings) fileTags =
-    let scrubText subStrs =
-        subStrs
+    let scrubText patterns =
+        patterns
         |> Array.append (String.whiteSpaceStrs |> Array.ofList)
-        |> String.stripSubstrings
+        |> Rgx.scrubMatches
         >> String.stripPunctuation
         >> String.stripDiacritics
 
@@ -72,9 +72,9 @@ let private sanitizedTrackGroupingName (settings: Settings) fileTags =
         fileTags
         |> mainArtists String.Empty
         |> checkEquivalentArtists
-        |> scrubText settings.ArtistReplacements
+        |> scrubText settings.ArtistReplacementPatterns
 
-    let title = fileTags.Title |> scrubText settings.TitleReplacements
+    let title = fileTags.Title |> scrubText settings.TitleReplacementPatterns
 
     $"{artist}{title}".ToLowerInvariant()
 
