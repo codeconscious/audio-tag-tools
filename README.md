@@ -2,11 +2,11 @@
 
 This small command line application performs four tasks:
 1. Cache metadata tags from audio files into a "library file"
-2. Report likely duplicate files based on their tags
+2. Report likely duplicate files based on their tags and personalized settings
 3. Export a list of artists with their most common genres
-4. Analyze library files and display various statistics
+4. Analyze library files to display various statistics
 
-I originally created this tool to practice with F# [JSON type providers](https://fsprojects.github.io/FSharp.Data/library/JsonProvider.html), but it resolves a couple of small pain points for me as well.
+I originally created this tool to practice with [F#](https://fsharp.org/) [JSON type providers](https://fsprojects.github.io/FSharp.Data/library/JsonProvider.html), but I've kept working on it as it resolves a couple of small pain points for me as well.
 
 
 # Requirements
@@ -77,7 +77,18 @@ The file will be in this JSON format:
 
 First, you must already have a tag library file containing your cached tag data. Check the section above if you don't have one yet.
 
-Second, you must have a settings file containing exceptions—i.e., artists, track titles, and strings that you wish to exclude from the search. Actual entries are optional, but the file must be exist in the specified format. I have provided a sample you can use below.
+Second, you must have a settings file containing the following:
+
+1. Paths
+   a. The directory in which to save the playlist of duplicates
+   b. The directory path substring to remove from the file paths, if any, to; otherwise, an empty string
+   c. The directory path substring, if any, that should be prepended onto file paths; otherwise, an empty string
+2. Exclusion patterns: regex patterns to match against the `title` and/or `artist` field for track that you wish not to be include
+3. Equivalent artists: Artists that should be considered identical — particularly useful for artists that release under multiple names
+4. Artist replacement regex patterns to be used to remove matching substrings during comparison
+5. Title replacement regex patterns to be used to remove matching substrings during comparison
+
+I have provided a sample you can use below.
 
 <details>
   <summary>Click to expand the sample and notes...</summary>
@@ -102,7 +113,7 @@ Second, you must have a settings file containing exceptions—i.e., artists, tra
     }
   ],
   "equivalentArtists": [
-      ["artistName", "equivalentArtistName"]
+      ["artistOldName", "artistNewName"]
   ],
   "artistReplacementPatterns": [
     " ",
