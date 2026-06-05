@@ -21,9 +21,7 @@ let printCount description (tags: LibraryTags nlist) =
     printfn $"%s{description}%s{String.formatInt tags.Length}"
 
 /// Filters out tags containing artists or titles specified in the exclusion patterns.
-let discardExcluded (settings: Settings) (allTags: LibraryTags nlist)
-    : Result<LibraryTags nlist, CommandError> =
-
+let discardExcluded (settings: Settings) (tagList: LibraryTags nlist) : Result<LibraryTags nlist, CommandError> =
     let matchOptions = RegexOptions.IgnoreCase
 
     let isExcluded tags =
@@ -49,7 +47,7 @@ let discardExcluded (settings: Settings) (allTags: LibraryTags nlist)
 
         settings.ExclusionPatterns |> Array.exists checkIfExcluded
 
-    allTags
+    tagList
     |> NonEmptyList.tryFilter (not << isExcluded)
     |> Option.toResultWith NoFilesRemainAfterFiltering
 
