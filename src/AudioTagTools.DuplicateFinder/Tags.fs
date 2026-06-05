@@ -62,7 +62,6 @@ let discardExcluded (settings: Settings) (allTags: LibraryTags nlist)
 let private sanitizedTrackGroupingName (settings: Settings) fileTags =
     let scrubText patterns =
         patterns
-        |> Array.append (String.whiteSpaceStrs |> Array.ofList)
         |> Rgx.scrubMatches
         >> String.stripPunctuation
         >> String.stripDiacritics
