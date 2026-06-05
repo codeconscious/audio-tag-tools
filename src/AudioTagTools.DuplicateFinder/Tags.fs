@@ -61,8 +61,8 @@ let discardExcluded (settings: Settings) (allTags: LibraryTags nlist)
 /// The string is intended to be used solely for track grouping.
 let private sanitizedTrackGroupingName (settings: Settings) fileTags =
     let scrubText patterns =
-        patterns
-        |> Rgx.scrubMatches
+        Rgx.scrubMatches patterns
+        >> String.stripWhiteSpace
         >> String.stripPunctuation
         >> String.stripDiacritics
 
