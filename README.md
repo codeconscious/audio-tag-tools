@@ -80,18 +80,26 @@ First, you must already have a tag library file containing your cached tag data.
 Second, you must have a settings file containing the following:
 
 1. Paths
-   a. The directory in which to save the playlist of duplicates
-   b. The directory path substring to remove from the file paths, if any, to; otherwise, an empty string
-   c. The directory path substring, if any, that should be prepended onto file paths; otherwise, an empty string
-2. Exclusion patterns: regex patterns to match against the `title` and/or `artist` field for track that you wish not to be include
-3. Equivalent artists: Artists that should be considered identical — particularly useful for artists that release under multiple names
-4. Artist replacement regex patterns to be used to remove matching substrings during comparison
-5. Title replacement regex patterns to be used to remove matching substrings during comparison
-
-I have provided a sample you can use below.
+   1. The directory in which to save the playlist of duplicates.
+   2. The directory path substring to remove from the file paths, if any, within the playlist of duplicates.
+   3. The directory path substring to prepend to file paths, if any, within the playlist of duplicates.
+   - The final two items function as a pair, allowing you to modify the paths of your files for when your main audio directory's location differs across devices.
+2. Exclusion patterns
+   - Regular expressions to identify tracks, by artist name and/or title, that you wish to ignore during comparison. These might be tracks with identical artists and track names that you know are actually disparate tracks. (A rare but mildly annoying occurrence.)
+3. Equivalent artist names
+   - Artists that should be considered identical during comparison. These are _not_ regular expressions.
+   - Particularly useful for artists that release under multiple names or both in and without bands.
+   - Example: `["Bon Jovi", "Jon Bon Jovi"]`
+4. Artist replacement regular expressions
+   - Removes matching substrings from artist names.
+   - Replacements are in memory for comparison purposes only. No file updates are made.
+   - Example: `["The "]`, which would ensure "The Four Tops" and "Four Tops" are considered identically.
+5. Title replacement regular expressions to be used to remove substrings for comparison
+   - Removes matching substrings from titles.
+   - Replacements are in memory for comparison purposes only. No file updates are made.
 
 <details>
-  <summary>Click to expand the sample and notes...</summary>
+  <summary>Click to expand a sample settings file.</summary>
 
 ```json
 {
@@ -102,8 +110,8 @@ I have provided a sample you can use below.
   },
   "exclusionPatterns": [
     {
-      "artist": "SAMPLE_ARTIST_NAME",
-      "title": "SAMPLE_TRACK_NAME.*"
+      "artist": "EXACT_ARTIST_NAME",
+      "title": "TRACK_NAME_REGEX_PATTERN.*"
     },
     {
       "artist": "SAMPLE_ARTIST_NAME"
@@ -113,28 +121,27 @@ I have provided a sample you can use below.
     }
   ],
   "equivalentArtists": [
-      ["artistOldName", "artistNewName"]
+      ["artistOldName", "artistNewName"],
+      ["artistName", "bandThatArtistIsIn"],
   ],
   "artistReplacementPatterns": [
-    " ",
-    "　",
-    "The ",
+    "The\\s",
     "ザ・"
   ],
   "titleReplacementPatterns": [
-        "−",
-		    "—",
-        "~",
-        "|",
-        "｜",
-        "～",
-        "=",
-        "＝",
-        "\\+",
-        "＋",
-        "✖",
-        "❌",
-        "feat(uring)?\\.?\\s?.+"
+    "feat(uring)?\\.?\\s?.+",
+    "−",
+    "—",
+    "~",
+    "～",
+    "|",
+    "｜",
+    "=",
+    "＝",
+    "\\+",
+    "＋",
+    "✖",
+    "❌",
   ]
 }
 ```
