@@ -2,11 +2,11 @@
 
 This small command line application performs four tasks:
 1. Cache metadata tags from audio files into a "library file"
-2. Report likely duplicate files based on their tags
+2. Report likely duplicate files based on their tags and personalized settings
 3. Export a list of artists with their most common genres
-4. Analyze library files and display various statistics
+4. Analyze library files to display various statistics
 
-I originally created this tool to practice with F# [JSON type providers](https://fsprojects.github.io/FSharp.Data/library/JsonProvider.html), but it resolves a couple of small pain points for me as well.
+I originally created this tool to practice with [F#](https://fsharp.org/) [JSON type providers](https://fsprojects.github.io/FSharp.Data/library/JsonProvider.html), but I've kept working on it as it resolves a couple of small pain points for me as well.
 
 
 # Requirements
@@ -77,10 +77,29 @@ The file will be in this JSON format:
 
 First, you must already have a tag library file containing your cached tag data. Check the section above if you don't have one yet.
 
-Second, you must have a settings file containing exceptions—i.e., artists, track titles, and strings that you wish to exclude from the search. Actual entries are optional, but the file must be exist in the specified format. I have provided a sample you can use below.
+Second, you must have a settings file containing the following:
+
+1. Paths
+   1. The directory in which to save the playlist of duplicates.
+   2. The directory path substring to _remove_ from each file path within the playlist file for duplicates. Leave blank if unneeded.
+   3. The directory path substring to _prepend_ to each file path within the playlist file for duplicates. Leave blank if unneeded.
+   - Note: The final two items function as a pair, allowing you to modify the paths of your files for when your main audio directory's location differs across devices.
+2. Exclusions
+   - Regular expressions to identify tracks, by artist name and/or title, that you wish to ignore during comparison. These might be tracks with identical artists and track names that you know are actually disparate tracks. (A rare but mildly annoying occurrence.)
+3. Equivalent artist names
+   - Artists that should be considered identical during comparison. These are _not_ regular expressions.
+   - Particularly useful for artists that release under multiple names or both in and without bands.
+   - Example: `["Bon Jovi", "Jon Bon Jovi"]`
+4. Artist replacements
+   - Regular expressions to remove matching substrings from artist names. Case-insensitive.
+   - Replacements are in memory for comparison purposes only. No file updates are made.
+   - Example: `["The "]`, which would ensure "The Four Tops" and "Four Tops" are considered identically.
+5. Title replacements
+   - Regular expressions to remove matching substrings from titles. Case-insensitive.
+   - Replacements are in memory for comparison purposes only. No file updates are made.
 
 <details>
-  <summary>Click to expand the sample and notes...</summary>
+  <summary>Click to expand a sample settings file.</summary>
 
 ```json
 {
@@ -89,50 +108,43 @@ Second, you must have a settings file containing exceptions—i.e., artists, tra
     "pathSearchFor": "/Users/me/Documents/Media/",
     "pathReplaceWith": ""
   },
-  "exclusions": [
+  "exclusionPatterns": [
     {
-      "artist": "SAMPLE_ARTIST_NAME",
-      "title": "SAMPLE_TRACK_NAME"
+      "artist": "EXACT_ARTIST_NAME",
+      "title": "TRACK_NAME_REGEX_PATTERN.*"
     },
     {
       "artist": "SAMPLE_ARTIST_NAME"
     },
     {
-      "title": "SAMPLE_TRACK_NAME"
+      "title": "SAMPLE_TRACK_NAME.*"
     }
   ],
   "equivalentArtists": [
-      ["artistName", "equivalentArtistName"]
+      ["artistOldName", "artistNewName"],
+      ["artistName", "bandThatArtistIsIn"],
   ],
   "artistReplacementPatterns": [
-    " ",
-    "　",
-    "The ",
+    "The\\s",
     "ザ・"
   ],
   "titleReplacementPatterns": [
-        "−",
-		    "—",
-        "~",
-        "|",
-        "｜",
-        "～",
-        "=",
-        "＝",
-        "\\+",
-        "＋",
-        "✖",
-        "❌",
-        "feat(uring)?\\.?\\s?.+"
+    "feat(uring)?\\.?\\s?.+",
+    "−",
+    "—",
+    "~",
+    "～",
+    "|",
+    "｜",
+    "=",
+    "＝",
+    "\\+",
+    "＋",
+    "✖",
+    "❌",
   ]
 }
 ```
-
-Notes:
-
-1. Use `pathSearchFor` and `pathReplaceWith` if you wish to modify the base path of your media files in the playlist file—for example, if you wish the load the playlist on a different device where the files reside under a different base path. Otherwise, they may be left blank.
-
-2. Use `equivalentArtists` to register lists of artists that should be considered identical for the purposes of duplicate-checking. Results will be reported using the first artist in each group.
 
 </details>
 
@@ -142,7 +154,7 @@ To start, use the `find-duplicates` command like this:
 dotnet run -- find-duplicates ~/Documents/Audio/findDupeSettings.json ~/Documents/Audio/tagLibrary.json
 ```
 
-If any potential duplicates are found, they will be listed, grouped by artist. If you see false positives (i.e., tracks that were detected as duplicates, but are actually not), you can add entries to the exclusions in your settings to ignore them in the future.
+If any potential duplicates are found, they will be listed, grouped by artist. If you see false positives (i.e., tracks that were detected as duplicates, but are actually not), you can add entries to the exclusion patterns in your settings to ignore them in the future.
 
 
 ## 3. Exporting artist genres

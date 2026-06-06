@@ -12,6 +12,7 @@ open CCFSharpUtils.Operators
 open CCFSharpUtils.Text
 open System
 open System.IO
+open System.Text.RegularExpressions
 
 let parseToTags json =
     json |> parseJsonToNonEmptyTags |!! TagParseError
@@ -19,23 +20,24 @@ let parseToTags json =
 let printCount description (tags: LibraryTags nlist) =
     printfn $"%s{description}%s{String.formatInt tags.Length}"
 
-/// Filters out tags containing artists or titles specified in the exclusions.
-let discardExcluded (settings: Settings) (allTags: LibraryTags nlist)
-    : Result<LibraryTags nlist, CommandError> =
+/// Filters out tags containing artists or titles specified in the exclusion patterns.
+let discardExcluded (settings: Settings) (tagList: LibraryTags nlist) : Result<LibraryTags nlist, CommandError> =
+    let matchOptions = RegexOptions.IgnoreCase
 
     let isExcluded tags =
-        let (|ArtistAndTitle|ArtistOnly|TitleOnly|Invalid|) (excl: Exclusion) =
-            match excl.Artist, excl.Title with
+        let (|ArtistAndTitle|ArtistOnly|TitleOnly|Invalid|) (pattern: ExclusionPattern) =
+            match pattern.Artist, pattern.Title with
             | Some a, Some t -> ArtistAndTitle (a, t)
             | Some a, None   -> ArtistOnly a
             | None,   Some t -> TitleOnly t
             | _ -> Invalid
 
-        let containsArtist artistName =
+        let containsArtist artistPattern =
             [| tags.AlbumArtists; tags.Artists |]
-            |> Array.anyContainsIgnoreCase artistName
+            |> Array.concat
+            |> Array.exists (fun artist -> Regex.IsMatch(artist, artistPattern, matchOptions))
 
-        let titleStartsWith title = tags.Title |> String.startsWithIgnoreCase title
+        let titleStartsWith pattern = Regex.IsMatch(tags.Title, pattern, matchOptions)
 
         let checkIfExcluded = function
             | ArtistAndTitle (a, t) -> containsArtist a && titleStartsWith t
@@ -43,9 +45,9 @@ let discardExcluded (settings: Settings) (allTags: LibraryTags nlist)
             | TitleOnly t -> titleStartsWith t
             | Invalid -> false
 
-        settings.Exclusions |> Array.exists checkIfExcluded
+        settings.ExclusionPatterns |> Array.exists checkIfExcluded
 
-    allTags
+    tagList
     |> NonEmptyList.tryFilter (not << isExcluded)
     |> Option.toResultWith NoFilesRemainAfterFiltering
 
@@ -57,9 +59,8 @@ let discardExcluded (settings: Settings) (allTags: LibraryTags nlist)
 /// The string is intended to be used solely for track grouping.
 let private sanitizedTrackGroupingName (settings: Settings) fileTags =
     let scrubText patterns =
-        patterns
-        |> Array.append (String.whiteSpaceStrs |> Array.ofList)
-        |> Rgx.scrubMatches
+        Rgx.scrubMatches patterns
+        >> String.stripWhiteSpace
         >> String.stripPunctuation
         >> String.stripDiacritics
 
@@ -90,7 +91,7 @@ let findDuplicates settings tags : DuplicateTags option =
         return
             groupedDupes
             |> sortBy fst
-            |> NonEmptyList.map (snd >> sortBy (mainArtists String.Empty))
+            |> NonEmptyList.map (snd >> sortBy _.Title.Length)
     }
 
 let printDuplicates (groupedTracks: DuplicateTags option) : unit =
