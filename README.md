@@ -81,21 +81,21 @@ Second, you must have a settings file containing the following:
 
 1. Paths
    1. The directory in which to save the playlist of duplicates.
-   2. The directory path substring to remove from the file paths, if any, within the playlist of duplicates.
-   3. The directory path substring to prepend to file paths, if any, within the playlist of duplicates.
-   - The final two items function as a pair, allowing you to modify the paths of your files for when your main audio directory's location differs across devices.
-2. Exclusion patterns
+   2. The directory path substring to _remove_ from each file path within the playlist file for duplicates. Leave blank if unneeded.
+   3. The directory path substring to _prepend_ to each file path within the playlist file for duplicates. Leave blank if unneeded.
+   - Note: The final two items function as a pair, allowing you to modify the paths of your files for when your main audio directory's location differs across devices.
+2. Exclusions
    - Regular expressions to identify tracks, by artist name and/or title, that you wish to ignore during comparison. These might be tracks with identical artists and track names that you know are actually disparate tracks. (A rare but mildly annoying occurrence.)
 3. Equivalent artist names
    - Artists that should be considered identical during comparison. These are _not_ regular expressions.
    - Particularly useful for artists that release under multiple names or both in and without bands.
    - Example: `["Bon Jovi", "Jon Bon Jovi"]`
-4. Artist replacement regular expressions
-   - Removes matching substrings from artist names.
+4. Artist replacements
+   - Regular expressions to remove matching substrings from artist names. Case-insensitive.
    - Replacements are in memory for comparison purposes only. No file updates are made.
    - Example: `["The "]`, which would ensure "The Four Tops" and "Four Tops" are considered identically.
-5. Title replacement regular expressions to be used to remove substrings for comparison
-   - Removes matching substrings from titles.
+5. Title replacements
+   - Regular expressions to remove matching substrings from titles. Case-insensitive.
    - Replacements are in memory for comparison purposes only. No file updates are made.
 
 <details>
@@ -145,12 +145,6 @@ Second, you must have a settings file containing the following:
   ]
 }
 ```
-
-Notes:
-
-1. Use `pathSearchFor` and `pathReplaceWith` if you wish to modify the base path of your media files in the playlist file—for example, if you wish the load the playlist on a different device where the files reside under a different base path. Otherwise, they may be left blank.
-
-2. Use `equivalentArtists` to register lists of artists that should be considered identical for the purposes of duplicate-checking. Results will be reported using the first artist in each group.
 
 </details>
 
