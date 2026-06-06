@@ -19,6 +19,7 @@ let savePlaylist (settings: Settings) (maybeTags: DuplicateTags option) : Result
         let fileName = $"Duplicates by AudioTagTools - {now} - {itemLabel}.m3u"
         FileInfo <| Path.Combine(settings.Playlist.SaveDirectory, fileName)
 
+    /// Appends 2 lines to `sb` for the `tags`: a metadata summary and full file path.
     let appendFileEntry (sb: SB) (tags: LibraryTags) : SB =
         let seconds = tags.Duration.TotalSeconds
         let artist = tags.Artists |> Array.append tags.AlbumArtists |> String.concat "; "
@@ -28,11 +29,11 @@ let savePlaylist (settings: Settings) (maybeTags: DuplicateTags option) : Result
         sb.AppendLine extInf |> ignore
 
         let filePath =
-            let oldPath = Path.Combine(tags.DirectoryName, tags.FileName)
+            let originalPath = Path.Combine(tags.DirectoryName, tags.FileName)
             match settings.Playlist.SearchPath,
                   settings.Playlist.ReplacePath with
-            | s, _ when String.hasNoText s -> oldPath
-            | s, r -> oldPath.Replace(s, r)
+            | s, _ when String.hasNoText s -> originalPath
+            | s, r -> originalPath.Replace(s, r)
 
         sb.AppendLine filePath
 
