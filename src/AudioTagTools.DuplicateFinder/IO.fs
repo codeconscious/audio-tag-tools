@@ -20,16 +20,16 @@ let savePlaylist (settings: Settings) (maybeTags: DuplicateTags option) : Result
         FileInfo <| Path.Combine(settings.Playlist.SaveDirectory, fileName)
 
     /// Appends 2 lines to `sb` for the `tags`: a metadata summary and full file path.
-    let appendFileEntry (sb: SB) (tags: LibraryTags) : SB =
-        let seconds = tags.Duration.TotalSeconds
-        let artist = tags.Artists |> Array.append tags.AlbumArtists |> String.concat "; "
-        let artistWithTitle = $"{artist} - {tags.Title}"
+    let appendFileData (sb: SB) (fileTags: LibraryTags) : SB =
+        let seconds = fileTags.Duration.TotalSeconds
+        let artist = fileTags.Artists |> Array.append fileTags.AlbumArtists |> String.concat "; "
+        let artistWithTitle = $"{artist} - {fileTags.Title}"
         let extInf = $"#EXTINF:{seconds},{artistWithTitle}"
 
         sb.AppendLine extInf |> ignore
 
         let filePath =
-            let originalPath = Path.Combine(tags.DirectoryName, tags.FileName)
+            let originalPath = Path.Combine(fileTags.DirectoryName, fileTags.FileName)
             match settings.Playlist.SearchPath,
                   settings.Playlist.ReplacePath with
             | s, _ when String.hasNoText s -> originalPath
@@ -41,11 +41,12 @@ let savePlaylist (settings: Settings) (maybeTags: DuplicateTags option) : Result
     | None ->
         Ok ()
     | Some duplicateGroups ->
-        let fileInfo = makeFileInfo duplicateGroups.Length
+        let fileHeader = $"#EXTM3U{String.nl}"
+        let newPlaylistFile = makeFileInfo duplicateGroups.Length
         duplicateGroups
         |> NonEmptyList.concat
-        |> NonEmptyList.fold appendFileEntry (SB $"#EXTM3U{String.nl}")
+        |> NonEmptyList.fold appendFileData (SB fileHeader)
         |> string
-        |> File.writeText' fileInfo
-        |-- fun _ -> printfn $"Created playlist file \"{fileInfo}\"."
+        |> File.writeText' newPlaylistFile
+        |-- fun _ -> printfn $"Created playlist file \"{newPlaylistFile}\"."
         |!! FileWriteError
