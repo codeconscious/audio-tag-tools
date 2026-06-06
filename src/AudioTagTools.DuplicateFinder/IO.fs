@@ -12,11 +12,7 @@ open FSharpPlus.Data
 open System
 open System.IO
 
-let savePlaylist
-    (settings: Settings)
-    (maybeTags: DuplicateTags option)
-    : Result<unit, CommandError> =
-
+let savePlaylist (settings: Settings) (maybeTags: DuplicateTags option) : Result<unit, CommandError> =
     let makeFileInfo count =
         let now = DateTime.Now.ToString timeStampFormat
         let itemLabel = String.pluralizeSWithCount "item" count
@@ -25,10 +21,7 @@ let savePlaylist
 
     let appendFileEntry (sb: SB) (tags: LibraryTags) : SB =
         let seconds = tags.Duration.TotalSeconds
-        let artist =
-            tags.Artists
-            |> Array.append tags.AlbumArtists
-            |> String.concat "; "
+        let artist = tags.Artists |> Array.append tags.AlbumArtists |> String.concat "; "
         let artistWithTitle = $"{artist} - {tags.Title}"
         let extInf = $"#EXTINF:{seconds},{artistWithTitle}"
 
