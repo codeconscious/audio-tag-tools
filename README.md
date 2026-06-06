@@ -82,7 +82,7 @@ Second, you must have a settings file containing the following:
 1. Paths
    1. The directory in which to save the playlist of duplicates.
    2. The directory path substring to _remove_ from each file path within the playlist file for duplicates. Leave blank if unneeded.
-   3. The directory path substring to _prepend_ to each file path within the playlist file for duplicates. Leave blank if unneeded.
+   3. The directory path substring to _prepend_ to each file path within the playlist file for duplicates. Will be ignored if the removal path above is blank.
    - Note: The final two items function as a pair, allowing you to modify the paths of your files for when your main audio directory's location differs across devices.
 2. Exclusions
    - Regular expressions to identify tracks, by artist name and/or title, that you wish to ignore during comparison. These might be tracks with identical artists and track names that you know are actually disparate tracks. (A rare but mildly annoying occurrence.)
