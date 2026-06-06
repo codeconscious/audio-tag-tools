@@ -4,7 +4,6 @@ open Errors
 open Settings
 open Shared.Constants
 open Shared.TagLibrary
-open Shared.Types
 open CCFSharpUtils
 open CCFSharpUtils.IO
 open CCFSharpUtils.Operators
@@ -18,9 +17,11 @@ let savePlaylist
     (maybeTags: DuplicateTags option)
     : Result<unit, CommandError> =
 
-    let now = DateTime.Now.ToString timeStampFormat
-    let fileName = $"Duplicates by AudioTagTools - {now}.m3u"
-    let file = FileInfo <| Path.Combine(settings.Playlist.SaveDirectory, fileName)
+    let makeFileInfo count =
+        let now = DateTime.Now.ToString timeStampFormat
+        let itemLabel = String.pluralizeSWithCount "item" count
+        let fileName = $"Duplicates by AudioTagTools - {now} - {itemLabel}.m3u"
+        FileInfo <| Path.Combine(settings.Playlist.SaveDirectory, fileName)
 
     let appendFileEntry (sb: SB) (tags: LibraryTags) : SB =
         let seconds = tags.Duration.TotalSeconds
@@ -45,11 +46,12 @@ let savePlaylist
     match maybeTags with
     | None ->
         Ok ()
-    | Some tags ->
-        tags
+    | Some duplicateGroups ->
+        let fileInfo = makeFileInfo duplicateGroups.Length
+        duplicateGroups
         |> NonEmptyList.concat
         |> NonEmptyList.fold appendFileEntry (SB $"#EXTM3U{String.nl}")
         |> string
-        |> File.writeText' file
-        |-- fun _ -> printfn $"Created playlist file \"{file}\"."
+        |> File.writeText' fileInfo
+        |-- fun _ -> printfn $"Created playlist file \"{fileInfo}\"."
         |!! FileWriteError
