@@ -14,6 +14,8 @@ open System
 open System.IO
 open System.Text.RegularExpressions
 
+module NList = NonEmptyList
+
 let parseToTags json =
     json |> parseJsonToNonEmptyTags |!! TagParseError
 
@@ -48,7 +50,7 @@ let discardExcluded (settings: Settings) (tagList: LibraryTags nlist) : Result<L
         settings.ExclusionPatterns |> Array.exists checkIfExcluded
 
     tagList
-    |> NonEmptyList.tryFilter (not << isExcluded)
+    |> NList.tryFilter (not << isExcluded)
     |> Option.toResultWith NoFilesRemainAfterFiltering
 
 /// Returns a normalized string of two concatenated items:
@@ -81,17 +83,17 @@ let private sanitizedTrackGroupingName (settings: Settings) fileTags =
 
 let findDuplicates settings tags : DuplicateTags option =
     monad {
-        let! filtered = tags |> NonEmptyList.tryFilter hasArtistAndTitle
+        let! filtered = tags |> NList.tryFilter hasArtistAndTitle
 
         let! groupedDupes =
             filtered
-            |> NonEmptyList.groupBy (sanitizedTrackGroupingName settings)
-            |> NonEmptyList.tryFilter (snd >> NonEmptyList.hasMultiple)
+            |> NList.groupBy (sanitizedTrackGroupingName settings)
+            |> NList.tryFilter (snd >> NList.hasMultiple)
 
         return
             groupedDupes
             |> sortBy fst
-            |> NonEmptyList.map (snd >> sortBy _.Title.Length)
+            |> NList.map (snd >> sortBy _.Title.Length)
     }
 
 let printDuplicates (groupedTracks: DuplicateTags option) : unit =
@@ -117,17 +119,17 @@ let printDuplicates (groupedTracks: DuplicateTags option) : unit =
 
         let printHeader () =
             tracks
-            |> NonEmptyList.head
+            |> NList.head
             |> mainArtists ", "
             |> printfn "%d. %s" (index + 1) // Start numbering at 1, not 0.
 
         let printDuplicates () =
             tracks
-            |> NonEmptyList.iter printFileSummary
+            |> NList.iter printFileSummary
 
         printHeader ()
         printDuplicates ()
 
     match groupedTracks with
     | None -> printfn "No duplicates found."
-    | Some group -> group |> NonEmptyList.iteri printGroup
+    | Some group -> group |> NList.iteri printGroup

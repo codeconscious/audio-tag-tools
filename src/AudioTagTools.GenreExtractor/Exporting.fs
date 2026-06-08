@@ -10,6 +10,8 @@ open FSharpPlus.Data
 open System
 open Shared
 
+module NList = NonEmptyList
+
 let private mainArtist (fileTags: LibraryTags) : Artist option =
     let hasValidValue xs = Array.isNotEmpty xs && String.hasText xs[0]
 
@@ -33,7 +35,7 @@ let printTagCount (tags: LibraryTags nlist) =
 
 let private allGenres (fileTags: LibraryTags nlist) : string list =
     fileTags
-    |> NonEmptyList.tryCollect (fun t -> t.Genres |> toList)
+    |> NList.tryCollect (fun t -> t.Genres |> toList)
     |> function None -> [] | Some gs -> gs |> toList
 
 let private mostCommon (xs: string list) : string option =
@@ -47,18 +49,18 @@ let generateGenreData (separator: string) (allFileTags: LibraryTags nlist)
     : Result<string nlist, CommandError> =
 
     allFileTags
-    |> NonEmptyList.groupBy mainArtist
-    |> NonEmptyList.tryChoose (fun (artistOpt, tagGroup) ->
+    |> NList.groupBy mainArtist
+    |> NList.tryChoose (fun (artistOpt, tagGroup) ->
         match artistOpt with
         | None -> None
         | Some (Artist artist) ->
             tagGroup |> mostCommonGenre |> map (fun genre -> $"{artist}{separator}{genre}"))
-    |> Option.map NonEmptyList.sort
+    |> Option.map NList.sort
     |> Option.toResultWith InsufficientGenreData
 
 let printChanges (oldGenres: string list) (newGenres: string nlist) =
     let newTotalCount = newGenres.Length
-    let addedCount = newGenres |> NonEmptyList.toList |> List.except oldGenres |> _.Length
+    let addedCount = newGenres |> NList.toList |> List.except oldGenres |> _.Length
     let deletedCount = oldGenres |> List.except newGenres |> _.Length
     printfn "Prepared %s artist-genre entries total (%s new, %s deleted)."
         (String.formatInt newTotalCount)
