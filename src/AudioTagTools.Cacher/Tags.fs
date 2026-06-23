@@ -16,9 +16,14 @@ open FSharpPlus.Operators
 type LibraryTagMap = Map<FilePath, LibraryTags>
 
 type LibraryComparisonResult =
-    | Unchanged  // Library tags match file tags.
-    | OutOfDate  // Library tags are older than file tags.
-    | NotPresent // No tags exist in library for file.
+    | FileUnchanged  // Library tags match file tags.
+    | FileUpdated  // Library tags are older than file tags.
+    | FileIsOlder
+    | FileToAdd // No tags exist in library for file.
+    | FileDeleted // Tags exist, but file is now missing.
+
+// type FileData = FilePath * LibraryTags option
+type DeletedItemCount = DeletedItemCount of int
 
 type CategorizedTagsToCache =
     { Type: LibraryComparisonResult
@@ -35,9 +40,7 @@ let createTagLibraryMap (libraryFile: FileInfo) : Result<LibraryTagMap, CommandE
     else
         Ok Map.empty
 
-let private prepareTagsToWrite tagLibraryMap fileInfos
-    : CategorizedTagsToCache nseq =
-
+let private prepareTagsToWrite tagLibraryMap fileInfos : CategorizedTagsToCache nseq =
     let copyCachedTags (libraryTags: LibraryTags) =
         { libraryTags with LastWriteTime = DateTimeOffset libraryTags.LastWriteTime.DateTime }
 
@@ -74,15 +77,30 @@ let private prepareTagsToWrite tagLibraryMap fileInfos
         if tagLibraryMap |> Map.containsKey audioFile.FullName
         then
             let libraryTags = tagLibraryMap |> Map.find audioFile.FullName
-            if libraryTags.LastWriteTime.DateTime < audioFile.LastWriteTime
-            then { Type = OutOfDate; Tags = generateNewTags audioFile }
-            else { Type = Unchanged; Tags = copyCachedTags libraryTags }
-        else { Type = NotPresent; Tags = generateNewTags audioFile }
+            match compareWith libraryTags.LastWriteTime.DateTime audioFile.LastWriteTime with
+            | GT -> { Type = FileUpdated; Tags = generateNewTags audioFile }
+            | EQ -> { Type = FileUnchanged; Tags = copyCachedTags libraryTags }
+            | LT -> { Type = FileIsOlder; Tags = generateNewTags audioFile }
+        else { Type = FileToAdd; Tags = generateNewTags audioFile }
 
     fileInfos
     |> NonEmptySeq.map (prepareTagsToCache tagLibraryMap)
 
-let private reportResults categorizedTags : CategorizedTagsToCache nseq =
+let private countDeletedFiles (tagLibraryMap: Map<string,LibraryTags>) (categorizedTags: CategorizedTagsToCache nseq) =
+    let libraryFilePaths =
+        categorizedTags
+        // |> NonEmptySeq.choose (fun x -> match x.Tags with Some t -> Some (filePath t) | None -> None)
+        |> NonEmptySeq.map (fun t -> filePath t.Tags)
+        |> NonEmptyList.ofNonEmptySeq
+
+    let libraryTagsWithNoFile =
+        tagLibraryMap
+        |> Map.filter (fun k _ -> not (libraryFilePaths |> NonEmptyList.contains k))
+
+    // {| CategorizedTags = libraryTagsWithNoFile; DeletedCount = libraryTagsWithNoFile.Count |}
+    (categorizedTags, DeletedItemCount libraryTagsWithNoFile.Count)
+
+let private reportResults (categorizedTags, DeletedItemCount deletedCount) : CategorizedTagsToCache nseq =
 
     let categoryTotals =
         categorizedTags
@@ -100,10 +118,12 @@ let private reportResults categorizedTags : CategorizedTagsToCache nseq =
         |> Seq.sum
         |> String.formatInt
 
-    printfn "Results:" // TODO: Add deleted.
-    printfn "• New:       %s" (countOf NotPresent)
-    printfn "• Updated:   %s" (countOf OutOfDate)
-    printfn "• Unchanged: %s" (countOf Unchanged)
+    printfn "Results:"
+    printfn "• New:       %s" (countOf FileToAdd)
+    printfn "• Updated:   %s" (countOf FileUpdated)
+    printfn "• Unchanged: %s" (countOf FileUnchanged)
+    printfn "• File Old*: %s" (countOf FileIsOlder) // TODO: Maybe combine?
+    printfn "• Deleted  : %s" (String.formatNumber deletedCount)
     printfn "• Total:     %s" grandTotal
 
     categorizedTags
@@ -111,6 +131,7 @@ let private reportResults categorizedTags : CategorizedTagsToCache nseq =
 let generateJson tagMap fileInfos : Result<string, CommandError> =
     fileInfos
     |> prepareTagsToWrite tagMap
+    |> countDeletedFiles tagMap
     |> reportResults
     |> NonEmptySeq.map _.Tags
     |> String.toJson
