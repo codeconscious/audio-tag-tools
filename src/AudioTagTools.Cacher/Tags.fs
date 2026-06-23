@@ -89,7 +89,6 @@ let private prepareTagsToWrite tagLibraryMap fileInfos : CategorizedTagsToCache 
 let private countDeletedFiles (tagLibraryMap: Map<string,LibraryTags>) (categorizedTags: CategorizedTagsToCache nseq) =
     let libraryFilePaths =
         categorizedTags
-        // |> NonEmptySeq.choose (fun x -> match x.Tags with Some t -> Some (filePath t) | None -> None)
         |> NonEmptySeq.map (fun t -> filePath t.Tags)
         |> NonEmptyList.ofNonEmptySeq
 
@@ -97,11 +96,9 @@ let private countDeletedFiles (tagLibraryMap: Map<string,LibraryTags>) (categori
         tagLibraryMap
         |> Map.filter (fun k _ -> not (libraryFilePaths |> NonEmptyList.contains k))
 
-    // {| CategorizedTags = libraryTagsWithNoFile; DeletedCount = libraryTagsWithNoFile.Count |}
     (categorizedTags, DeletedItemCount libraryTagsWithNoFile.Count)
 
 let private reportResults (categorizedTags, DeletedItemCount deletedCount) : CategorizedTagsToCache nseq =
-
     let categoryTotals =
         categorizedTags
         |> Seq.countBy _.Type
@@ -119,12 +116,12 @@ let private reportResults (categorizedTags, DeletedItemCount deletedCount) : Cat
         |> String.formatInt
 
     printfn "Results:"
-    printfn "• New:       %s" (countOf FileToAdd)
-    printfn "• Updated:   %s" (countOf FileUpdated)
-    printfn "• Unchanged: %s" (countOf FileUnchanged)
-    printfn "• File Old*: %s" (countOf FileIsOlder) // TODO: Maybe combine?
-    printfn "• Deleted  : %s" (String.formatNumber deletedCount)
-    printfn "• Total:     %s" grandTotal
+    printfn "• New:          %s" (countOf FileToAdd)
+    printfn "• Deleted:      %s" (String.formatNumber deletedCount)
+    printfn "• File Updated: %s" (countOf FileUpdated)
+    printfn "• Lib. Updated: %s" (countOf FileIsOlder) // TODO: Maybe combine?
+    printfn "• Unchanged:    %s" (countOf FileUnchanged)
+    printfn "• Total:        %s" grandTotal
 
     categorizedTags
 
