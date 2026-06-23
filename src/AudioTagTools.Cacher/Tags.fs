@@ -13,6 +13,9 @@ open CCFSharpUtils.Text
 open FSharpPlus.Data
 open FSharpPlus.Operators
 
+module NList = NonEmptyList
+module NSeq = NonEmptySeq
+
 type LibraryTagMap = Map<FilePath, LibraryTags>
 
 type LibraryComparisonResult =
@@ -84,36 +87,26 @@ let private prepareTagsToWrite tagLibraryMap fileInfos : CategorizedTagsToCache 
         else { Type = FileToAdd; Tags = generateNewTags audioFile }
 
     fileInfos
-    |> NonEmptySeq.map (prepareTagsToCache tagLibraryMap)
+    |> NSeq.map (prepareTagsToCache tagLibraryMap)
 
 let private countDeletedFiles (tagLibraryMap: Map<string,LibraryTags>) (categorizedTags: CategorizedTagsToCache nseq) =
-    let libraryFilePaths =
-        categorizedTags
-        |> NonEmptySeq.map (fun t -> filePath t.Tags)
-        |> NonEmptyList.ofNonEmptySeq
+    let libraryFilePaths = categorizedTags |> NSeq.map (fun t -> filePath t.Tags) |> NList.ofNonEmptySeq
 
     let libraryTagsWithNoFile =
         tagLibraryMap
-        |> Map.filter (fun k _ -> not (libraryFilePaths |> NonEmptyList.contains k))
+        |> Map.filter (fun k _ -> not (libraryFilePaths |> NList.contains k))
 
     (categorizedTags, DeletedItemCount libraryTagsWithNoFile.Count)
 
 let private reportResults (categorizedTags, DeletedItemCount deletedCount) : CategorizedTagsToCache nseq =
-    let categoryTotals =
-        categorizedTags
-        |> Seq.countBy _.Type
-        |> Map.ofSeq
+    let categoryTotals = categorizedTags |> NSeq.countBy _.Type |> Map.ofSeq
 
     let countOf comparisonResultType =
         categoryTotals
         |> Map.tryFindElse comparisonResultType 0
         |> String.formatInt
 
-    let grandTotal =
-        categoryTotals
-        |> Map.values
-        |> Seq.sum
-        |> String.formatInt
+    let grandTotal = categoryTotals |> Map.values |> Seq.sum |> String.formatInt
 
     printfn "Results:"
     printfn "• New:          %s" (countOf FileToAdd)
