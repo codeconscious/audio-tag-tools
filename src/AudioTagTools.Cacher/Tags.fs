@@ -25,8 +25,7 @@ type LibraryComparisonResult =
     | FileToAdd // No tags exist in library for file.
     | FileDeleted // Tags exist, but file is now missing.
 
-// type FileData = FilePath * LibraryTags option
-type DeletedItemCount = DeletedItemCount of int
+type DeletedItemCount = DeletedItemCount of uint
 
 type CategorizedTagsToCache =
     { Type: LibraryComparisonResult
@@ -89,14 +88,19 @@ let private prepareTagsToWrite tagLibraryMap fileInfos : CategorizedTagsToCache 
     fileInfos
     |> NSeq.map (prepareTagsToCache tagLibraryMap)
 
-let private countDeletedFiles (tagLibraryMap: Map<string,LibraryTags>) (categorizedTags: CategorizedTagsToCache nseq) =
-    let libraryFilePaths = categorizedTags |> NSeq.map (fun t -> filePath t.Tags) |> NList.ofNonEmptySeq
+let private countDeletedFiles tagLibraryMap categorizedTags =
+    let filePaths =
+        categorizedTags
+        |> NSeq.map (fun t -> filePath t.Tags)
+        |> NList.ofNonEmptySeq
 
-    let libraryTagsWithNoFile =
+    let orphanedLibraryTagCount =
         tagLibraryMap
-        |> Map.filter (fun k _ -> not (libraryFilePaths |> NList.contains k))
+        |> Map.filter (fun libraryPath _ -> not (filePaths |> NList.contains libraryPath))
+        |> _.Count
+        |> uint
 
-    (categorizedTags, DeletedItemCount libraryTagsWithNoFile.Count)
+    (categorizedTags, DeletedItemCount orphanedLibraryTagCount)
 
 let private reportResults (categorizedTags, DeletedItemCount deletedCount) : CategorizedTagsToCache nseq =
     let categoryTotals = categorizedTags |> NSeq.countBy _.Type |> Map.ofSeq
@@ -112,7 +116,7 @@ let private reportResults (categorizedTags, DeletedItemCount deletedCount) : Cat
     printfn "• New:          %s" (countOf FileToAdd)
     printfn "• Deleted:      %s" (String.formatNumber deletedCount)
     printfn "• File Updated: %s" (countOf FileUpdated)
-    printfn "• Lib. Updated: %s" (countOf FileIsOlder) // TODO: Maybe combine?
+    printfn "• Lib. Updated: %s" (countOf FileIsOlder) // TODO: Rare case. Maybe combine?
     printfn "• Unchanged:    %s" (countOf FileUnchanged)
     printfn "• Total:        %s" grandTotal
 
