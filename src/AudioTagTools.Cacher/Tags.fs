@@ -99,7 +99,7 @@ let private countDeletedFiles tagLibMap categorizedTags =
 
     (categorizedTags, DeletedFileCount orphanedLibTagCount)
 
-let private reportResults (categorizedTags, DeletedFileCount deletedCount) : CategorizedTagsToCache nseq =
+let private reportResults (categorizedTags, DeletedFileCount deletedCount) : unit =
     let categoryTotals = categorizedTags |> NSeq.countBy _.Type |> Map.ofSeq
 
     let countOf comparisonResultType =
@@ -116,13 +116,11 @@ let private reportResults (categorizedTags, DeletedFileCount deletedCount) : Cat
     printfn "• Unchanged:   %s" (countOf UpToDate)
     printfn "• Total:       %s" grandTotal
 
-    categorizedTags
-
 let generateJson tagMap fileInfos : Result<string, CommandError> =
     fileInfos
     |> prepareTagsToWrite tagMap
     |> countDeletedFiles tagMap
-    |> reportResults
-    |> map _.Tags
+    |- reportResults
+    |> (fst >> map _.Tags)
     |> String.toJson
     |!! JsonSerializationError
