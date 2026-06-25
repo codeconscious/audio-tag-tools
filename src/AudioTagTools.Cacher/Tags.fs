@@ -96,7 +96,7 @@ let private countDeletedFiles tagLibraryMap categorizedTags =
 
     let orphanedLibraryTagCount =
         tagLibraryMap
-        |> Map.filter (fun libraryPath _ -> not (filePaths |> NList.contains libraryPath))
+        |> Map.filter (fun libPath _ -> filePaths |> NList.contains libPath |> not)
         |> _.Count
         |> uint
 
