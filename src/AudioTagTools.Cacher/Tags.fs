@@ -123,6 +123,6 @@ let generateJson tagMap fileInfos : Result<string, CommandError> =
     |> prepareTagsToWrite tagMap
     |> countDeletedFiles tagMap
     |> reportResults
-    |> NonEmptySeq.map _.Tags
+    |> map _.Tags
     |> String.toJson
     |!! JsonSerializationError
