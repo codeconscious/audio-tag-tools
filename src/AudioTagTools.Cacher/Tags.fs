@@ -27,24 +27,23 @@ type LibraryComparisonResult =
 
 type DeletedItemCount = DeletedFileCount of uint
 
-type CategorizedTagsToCache =
+type TagsToCache =
     { Type: LibraryComparisonResult
       Tags: LibraryTags }
 
-let createTagLibraryMap (libraryFile: FileInfo) : Result<LibraryTagMap, CommandError> =
-    if libraryFile.Exists
+let createTagLibraryMap (libFile: FileInfo) : Result<LibraryTagMap, CommandError> =
+    if libFile.Exists
     then
-        libraryFile
-        |> File.readText'
+        File.readText' libFile
         >>= (Json >> parseJsonToTags)
         |>> (List.map groupByPath >> Map.ofList)
         |!! LibraryTagParseError
     else
         Ok Map.empty
 
-let private prepareTagsToWrite tagLibraryMap fileInfos : CategorizedTagsToCache nseq =
-    let copyCachedTags (libraryTags: LibraryTags) =
-        { libraryTags with LastWriteTime = DateTimeOffset libraryTags.LastWriteTime.DateTime }
+let private prepareTagsToCache tagLibMap fileInfos : TagsToCache nseq =
+    let copyCachedTags (libTags: LibraryTags) =
+        { libTags with LastWriteTime = DateTimeOffset libTags.LastWriteTime.DateTime }
 
     let generateNewTags (fileInfo: FileInfo) : LibraryTags =
        let tagsFromFile (fileTags: FileTags) =
@@ -75,18 +74,18 @@ let private prepareTagsToWrite tagLibraryMap fileInfos : CategorizedTagsToCache 
        | Ok (Some tags) -> tagsFromFile tags
        | _ -> blankTags fileInfo
 
-    let prepareTagsToCache tagLibraryMap (audioFile: FileInfo) : CategorizedTagsToCache =
-        if tagLibraryMap |> Map.containsKey audioFile.FullName
+    let prepareTagsToCache tagLibMap (audioFile: FileInfo) : TagsToCache =
+        if tagLibMap |> Map.containsKey audioFile.FullName
         then
-            let libraryTags = tagLibraryMap |> Map.find audioFile.FullName
-            match compareWith libraryTags.LastWriteTime.DateTime audioFile.LastWriteTime with
+            let libTags = tagLibMap |> Map.find audioFile.FullName
+            match compareWith libTags.LastWriteTime.DateTime audioFile.LastWriteTime with
             | GT -> { Type = LibraryOutOfDate; Tags = generateNewTags audioFile }
-            | EQ -> { Type = UpToDate; Tags = copyCachedTags libraryTags }
+            | EQ -> { Type = UpToDate; Tags = copyCachedTags libTags }
             | LT -> { Type = FileOutOfDate; Tags = generateNewTags audioFile }
         else { Type = NewFile; Tags = generateNewTags audioFile }
 
     fileInfos
-    |> NSeq.map (prepareTagsToCache tagLibraryMap)
+    |> NSeq.map (prepareTagsToCache tagLibMap)
 
 let private countDeletedFiles tagLibMap categorizedTags =
     let filePaths = categorizedTags |> NSeq.map (fun t -> filePath t.Tags) |> set
@@ -118,7 +117,7 @@ let private reportResults (categorizedTags, DeletedFileCount deletedCount) : uni
 
 let generateJson tagMap fileInfos : Result<string, CommandError> =
     fileInfos
-    |> prepareTagsToWrite tagMap
+    |> prepareTagsToCache tagMap
     |> countDeletedFiles tagMap
     |- reportResults
     |> (fst >> map _.Tags)
