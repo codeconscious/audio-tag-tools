@@ -88,19 +88,16 @@ let private prepareTagsToWrite tagLibraryMap fileInfos : CategorizedTagsToCache 
     fileInfos
     |> NSeq.map (prepareTagsToCache tagLibraryMap)
 
-let private countDeletedFiles tagLibraryMap categorizedTags =
-    let filePaths =
-        categorizedTags
-        |> NSeq.map (fun t -> filePath t.Tags)
-        |> NList.ofNonEmptySeq
+let private countDeletedFiles tagLibMap categorizedTags =
+    let filePaths = categorizedTags |> NSeq.map (fun t -> filePath t.Tags) |> set
 
-    let orphanedLibraryTagCount =
-        tagLibraryMap
-        |> Map.filter (fun libPath _ -> filePaths |> NList.contains libPath |> not)
+    let orphanedLibTagCount =
+        tagLibMap
+        |> Map.filter (fun libPath _ -> not (filePaths |> Set.contains libPath))
         |> _.Count
         |> uint
 
-    (categorizedTags, DeletedItemCount orphanedLibraryTagCount)
+    (categorizedTags, DeletedItemCount orphanedLibTagCount)
 
 let private reportResults (categorizedTags, DeletedItemCount deletedCount) : CategorizedTagsToCache nseq =
     let categoryTotals = categorizedTags |> NSeq.countBy _.Type |> Map.ofSeq
