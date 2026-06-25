@@ -25,7 +25,7 @@ type LibraryComparisonResult =
     | FileToAdd // No tags exist in library for file.
     | FileDeleted // Tags exist, but file is now missing.
 
-type DeletedItemCount = DeletedItemCount of uint
+type DeletedItemCount = DeletedFileCount of uint
 
 type CategorizedTagsToCache =
     { Type: LibraryComparisonResult
@@ -97,9 +97,9 @@ let private countDeletedFiles tagLibMap categorizedTags =
         |> _.Count
         |> uint
 
-    (categorizedTags, DeletedItemCount orphanedLibTagCount)
+    (categorizedTags, DeletedFileCount orphanedLibTagCount)
 
-let private reportResults (categorizedTags, DeletedItemCount deletedCount) : CategorizedTagsToCache nseq =
+let private reportResults (categorizedTags, DeletedFileCount deletedCount) : CategorizedTagsToCache nseq =
     let categoryTotals = categorizedTags |> NSeq.countBy _.Type |> Map.ofSeq
 
     let countOf comparisonResultType =
