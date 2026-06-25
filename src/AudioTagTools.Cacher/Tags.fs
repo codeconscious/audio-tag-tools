@@ -19,11 +19,11 @@ module NSeq = NonEmptySeq
 type LibraryTagMap = Map<FilePath, LibraryTags>
 
 type LibraryComparisonResult =
-    | FileUnchanged  // Library tags match file tags.
-    | FileUpdated  // Library tags are older than file tags.
-    | FileIsOlder
-    | FileToAdd // No tags exist in library for file.
-    | FileDeleted // Tags exist, but file is now missing.
+    | UpToDate // Library tags match file tags.
+    | LibraryOutOfDate // Library tags are older than file tags.
+    | FileOutOfDate // Library tags are newer than file tags.
+    | NewFile // No tags for file exist in library yet.
+    | FileDeleted // Library tags exist, but file is now missing.
 
 type DeletedItemCount = DeletedFileCount of uint
 
@@ -80,10 +80,10 @@ let private prepareTagsToWrite tagLibraryMap fileInfos : CategorizedTagsToCache 
         then
             let libraryTags = tagLibraryMap |> Map.find audioFile.FullName
             match compareWith libraryTags.LastWriteTime.DateTime audioFile.LastWriteTime with
-            | GT -> { Type = FileUpdated; Tags = generateNewTags audioFile }
-            | EQ -> { Type = FileUnchanged; Tags = copyCachedTags libraryTags }
-            | LT -> { Type = FileIsOlder; Tags = generateNewTags audioFile }
-        else { Type = FileToAdd; Tags = generateNewTags audioFile }
+            | GT -> { Type = LibraryOutOfDate; Tags = generateNewTags audioFile }
+            | EQ -> { Type = UpToDate; Tags = copyCachedTags libraryTags }
+            | LT -> { Type = FileOutOfDate; Tags = generateNewTags audioFile }
+        else { Type = NewFile; Tags = generateNewTags audioFile }
 
     fileInfos
     |> NSeq.map (prepareTagsToCache tagLibraryMap)
@@ -110,12 +110,11 @@ let private reportResults (categorizedTags, DeletedFileCount deletedCount) : Cat
     let grandTotal = categoryTotals |> Map.values |> Seq.sum |> String.formatInt
 
     printfn "Results:"
-    printfn "• New:          %s" (countOf FileToAdd)
-    printfn "• Deleted:      %s" (String.formatNumber deletedCount)
-    printfn "• File Updated: %s" (countOf FileUpdated)
-    printfn "• Lib. Updated: %s" (countOf FileIsOlder) // TODO: Rare case. Maybe combine?
-    printfn "• Unchanged:    %s" (countOf FileUnchanged)
-    printfn "• Total:        %s" grandTotal
+    printfn "• New:         %s" (countOf NewFile)
+    printfn "• Deleted:     %s" (String.formatNumber deletedCount)
+    printfn "• Out of sync: %s" (countOf LibraryOutOfDate + countOf FileOutOfDate)
+    printfn "• Unchanged:   %s" (countOf UpToDate)
+    printfn "• Total:       %s" grandTotal
 
     categorizedTags
 
