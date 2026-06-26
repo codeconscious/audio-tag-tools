@@ -101,9 +101,9 @@ let private countDeletedFiles tagLibMap categorizedTags =
 let private reportResults (categorizedTags, DeletedFileCount deletedCount) : unit =
     let categoryTotals = categorizedTags |> NSeq.countBy _.Type |> Map.ofSeq
 
-    let countOf comparisonResultType =
+    let countOf comparisonResult =
         categoryTotals
-        |> Map.tryFindElse comparisonResultType 0
+        |> Map.tryFindElse comparisonResult 0
         |> String.formatInt
 
     let grandTotal = categoryTotals |> Map.values |> Seq.sum |> String.formatInt
