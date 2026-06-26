@@ -106,7 +106,7 @@ let private reportResults (categorizedTags, DeletedFileCount deletedCount) : uni
         |> Map.tryFindElse comparisonResult 0
         |> String.formatInt
 
-    let grandTotal = categoryTotals |> Map.values |> Seq.sum |> String.formatInt
+    let grandTotal = categoryTotals |> Map.values |> sum |> String.formatInt
 
     printfn "Results:"
     printfn "• New:         %s" (countOf NewFile)
