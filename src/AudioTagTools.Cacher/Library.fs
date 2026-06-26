@@ -13,7 +13,7 @@ let private run args : Result<unit, CommandError> =
     monad {
         let! mediaDir, tagLibraryFile = validate args
         let! fileInfos = getFileInfos mediaDir
-        let! tagLibraryMap = createTagLibraryMap tagLibraryFile
+        let! tagLibraryMap = createTagLibMap tagLibraryFile
         let! newJson = fileInfos |> generateJson tagLibraryMap
 
         let _ =

@@ -31,7 +31,7 @@ type TagsToCache =
     { Type: LibraryComparisonResult
       Tags: LibraryTags }
 
-let createTagLibraryMap (libFile: FileInfo) : Result<LibraryTagMap, CommandError> =
+let createTagLibMap (libFile: FileInfo) : Result<LibraryTagMap, CommandError> =
     if libFile.Exists
     then
         File.readText' libFile
