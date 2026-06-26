@@ -16,7 +16,7 @@ open FSharpPlus.Operators
 module NList = NonEmptyList
 module NSeq = NonEmptySeq
 
-type LibraryTagMap = Map<FilePath, LibraryTags>
+type LibTagMap = Map<FilePath, LibraryTags>
 
 type LibraryComparisonResult =
     | UpToDate // Library tags match file tags.
@@ -31,7 +31,7 @@ type TagsToCache =
     { Type: LibraryComparisonResult
       Tags: LibraryTags }
 
-let createTagLibMap (libFile: FileInfo) : Result<LibraryTagMap, CommandError> =
+let createTagLibMap (libFile: FileInfo) : Result<LibTagMap, CommandError> =
     if libFile.Exists
     then
         File.readText' libFile
