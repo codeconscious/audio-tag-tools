@@ -72,15 +72,15 @@ let private prepareTagsToCache tagLibMap fileInfos : TagsToCache nseq =
 
        match parseFileTags fileInfo with
        | Ok (Some tags) -> tagsFromFile tags
-       | _ -> blankTags fileInfo
+       | _              -> blankTags fileInfo
 
     let prepareTagsToCache tagLibMap (audioFile: FileInfo) : TagsToCache =
         if tagLibMap |> Map.containsKey audioFile.FullName
         then
             let libTags = tagLibMap |> Map.find audioFile.FullName
             match compareWith libTags.LastWriteTime.DateTime audioFile.LastWriteTime with
-            | GT -> { Type = LibOutOfDate; Tags = generateNewTags audioFile }
             | EQ -> { Type = UpToDate; Tags = copyCachedTags libTags }
+            | GT -> { Type = LibOutOfDate; Tags = generateNewTags audioFile }
             | LT -> { Type = FileOutOfDate; Tags = generateNewTags audioFile }
         else { Type = NewFile; Tags = generateNewTags audioFile }
 
