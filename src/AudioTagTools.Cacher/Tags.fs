@@ -20,7 +20,7 @@ type LibraryTagMap = Map<FilePath, LibraryTags>
 
 type LibraryComparisonResult =
     | UpToDate // Library tags match file tags.
-    | LibraryOutOfDate // Library tags are older than file tags.
+    | LibOutOfDate // Library tags are older than file tags.
     | FileOutOfDate // Library tags are newer than file tags.
     | NewFile // No tags for file exist in library yet.
     | FileDeleted // Library tags exist, but file is now missing.
@@ -79,7 +79,7 @@ let private prepareTagsToCache tagLibMap fileInfos : TagsToCache nseq =
         then
             let libTags = tagLibMap |> Map.find audioFile.FullName
             match compareWith libTags.LastWriteTime.DateTime audioFile.LastWriteTime with
-            | GT -> { Type = LibraryOutOfDate; Tags = generateNewTags audioFile }
+            | GT -> { Type = LibOutOfDate; Tags = generateNewTags audioFile }
             | EQ -> { Type = UpToDate; Tags = copyCachedTags libTags }
             | LT -> { Type = FileOutOfDate; Tags = generateNewTags audioFile }
         else { Type = NewFile; Tags = generateNewTags audioFile }
@@ -111,7 +111,7 @@ let private reportResults (categorizedTags, DeletedFileCount deletedCount) : uni
     printfn "Results:"
     printfn "• New:         %s" (countOf NewFile)
     printfn "• Deleted:     %s" (String.formatNumber deletedCount)
-    printfn "• Out of sync: %s" (countOf LibraryOutOfDate + countOf FileOutOfDate)
+    printfn "• Out of sync: %s" (countOf LibOutOfDate + countOf FileOutOfDate)
     printfn "• Unchanged:   %s" (countOf UpToDate)
     printfn "• Total:       %s" grandTotal
 
