@@ -18,7 +18,7 @@ module NSeq = NonEmptySeq
 
 type LibTagMap = Map<FilePath, LibraryTags>
 
-type LibraryComparisonResult =
+type LibComparisonResult =
     | UpToDate // Library tags match file tags.
     | LibOutOfDate // Library tags are older than file tags.
     | FileOutOfDate // Library tags are newer than file tags.
@@ -28,7 +28,7 @@ type LibraryComparisonResult =
 type DeletedItemCount = DeletedFileCount of uint
 
 type TagsToCache =
-    { Type: LibraryComparisonResult
+    { Type: LibComparisonResult
       Tags: LibraryTags }
 
 let createTagLibMap (libFile: FileInfo) : Result<LibTagMap, CommandError> =
@@ -80,12 +80,11 @@ let private prepareTagsToCache tagLibMap fileInfos : TagsToCache nseq =
             let libTags = tagLibMap |> Map.find audioFile.FullName
             match compareWith libTags.LastWriteTime.DateTime audioFile.LastWriteTime with
             | EQ -> { Type = UpToDate; Tags = copyCachedTags libTags }
-            | GT -> { Type = LibOutOfDate; Tags = generateNewTags audioFile }
+            | GT -> { Type = LibOutOfDate;  Tags = generateNewTags audioFile }
             | LT -> { Type = FileOutOfDate; Tags = generateNewTags audioFile }
         else { Type = NewFile; Tags = generateNewTags audioFile }
 
-    fileInfos
-    |> NSeq.map (prepareTagsToCache tagLibMap)
+    fileInfos |> NSeq.map (prepareTagsToCache tagLibMap)
 
 let private countDeletedFiles tagLibMap categorizedTags =
     let filePaths = categorizedTags |> NSeq.map (fun t -> filePath t.Tags) |> set
