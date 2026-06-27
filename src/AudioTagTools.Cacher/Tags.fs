@@ -76,20 +76,20 @@ let private generateNewLibTags libMap audioFiles : NewLibTags nseq =
 
     audioFiles |> NSeq.map (prepareTagsToCache libMap)
 
-let private addDeletedFiles tagLibMap groupedNewLibTags : NewLibTags nseq =
+let private appendDeletedFiles tagLibMap groupedNewLibTags : NewLibTags nseq =
     let filePaths =
         groupedNewLibTags
         |> NSeq.choose (fun t -> t.Tags |> Option.map filePath)
         |> set
 
-    let orphanedLibFiles = // Only used for counts.
+    let orphanedLibTags = // Only used for counts.
         tagLibMap
         |> Map.filter (fun libPath _ -> not (filePaths |> Set.contains libPath))
         |> Map.values
         |> Seq.map (fun _ -> { Status = FileDeleted; Tags = None })
         |> NSeq.tryOfSeq
 
-    match orphanedLibFiles with
+    match orphanedLibTags with
     | Some t -> groupedNewLibTags |> NSeq.append t
     | None   -> groupedNewLibTags
 
@@ -121,7 +121,7 @@ let private printCounts groupedNewLibTags : unit =
 let generateJson tagMap audioFiles : Result<string, CommandError> =
     audioFiles
     |> generateNewLibTags tagMap
-    |> addDeletedFiles tagMap
+    |> appendDeletedFiles tagMap
     |- printCounts
     |> map _.Tags
     |> String.toJson
