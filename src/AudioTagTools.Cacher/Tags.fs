@@ -108,11 +108,11 @@ let private reportResults (categorizedTags, DeletedFileCount deletedCount) : uni
     let grandTotal = categoryTotals |> Map.values |> sum |> String.formatInt
 
     printfn "Results:"
-    printfn "• New:         %s" (countOf NewFile)
-    printfn "• Deleted:     %s" (String.formatNumber deletedCount)
-    printfn "• Out of sync: %s" (countOf LibOutOfDate + countOf FileOutOfDate)
-    printfn "• Unchanged:   %s" (countOf UpToDate)
-    printfn "• Total:       %s" grandTotal
+    printfn "+ New:         %s" (countOf NewFile)
+    printfn "+ Out of sync: %s" (countOf LibOutOfDate + countOf FileOutOfDate)
+    printfn "+ Unchanged:   %s" (countOf UpToDate)
+    printfn "- Deleted:     %s" (String.formatNumber deletedCount)
+    printfn "= New Total:   %s" grandTotal
 
 let generateJson tagMap fileInfos : Result<string, CommandError> =
     fileInfos
