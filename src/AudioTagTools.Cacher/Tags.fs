@@ -100,19 +100,16 @@ let private countDeletedFiles tagLibMap categorizedTags =
 let private reportResults (categorizedTags, DeletedFileCount deletedCount) : unit =
     let categoryTotals = categorizedTags |> NSeq.countBy _.Type |> Map.ofSeq
 
-    let countOf comparisonResult =
-        categoryTotals
-        |> Map.tryFindElse comparisonResult 0
-        |> String.formatInt
+    let countOf comparisonResult = categoryTotals |> Map.tryFindElse comparisonResult 0 |> String.formatInt
 
-    let grandTotal = categoryTotals |> Map.values |> sum |> String.formatInt
+    let grandTotal = categoryTotals |> Map.values |> sum
 
     printfn "Results:"
     printfn "+ New:         %s" (countOf NewFile)
     printfn "+ Out of sync: %s" (countOf LibOutOfDate + countOf FileOutOfDate)
     printfn "+ Unchanged:   %s" (countOf UpToDate)
     printfn "- Deleted:     %s" (String.formatNumber deletedCount)
-    printfn "= New Total:   %s" grandTotal
+    printfn "= New Total:   %s" (String.formatInt grandTotal)
 
 let generateJson tagMap fileInfos : Result<string, CommandError> =
     fileInfos
