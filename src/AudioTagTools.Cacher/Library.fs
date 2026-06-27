@@ -11,20 +11,20 @@ open FSharpPlus
 
 let private run args : Result<unit, CommandError> =
     monad {
-        let! mediaDir, tagLibraryFile = validate args
-        let! fileInfos = getFileInfos mediaDir
-        let! tagLibraryMap = createTagLibMap tagLibraryFile
-        let! newJson = fileInfos |> generateJson tagLibraryMap
+        let! mediaDir, tagLibFile = validate args
+        let! files = getFileInfos mediaDir
+        let! tagLibMap = createTagLibMap tagLibFile
+        let! newJson = files |> generateJson tagLibMap
 
         let _ =
-            backUpFile tagLibraryFile
+            backUpFile tagLibFile
             |-- printfn "Backed up previous file to \"%O\"."
             |!! FileWriteError
 
         do!
             newJson
-            |> File.writeText' tagLibraryFile
-            |-- fun _ -> printfn $"Wrote new file \"%O{tagLibraryFile}\"."
+            |> File.writeText' tagLibFile
+            |-- fun _ -> printfn $"Wrote new file \"%O{tagLibFile}\"."
             |!! FileWriteError
     }
 
