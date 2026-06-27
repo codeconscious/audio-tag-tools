@@ -98,11 +98,11 @@ let private printCounts (groupedNewLibTags, DeletedCount deletedCount) : unit =
     let newLibTagCount = categoryTotals |> Map.values |> sum |> String.formatInt
 
     printfn "Results:"
-    printfn "+ New:         %s" (countOf NewFile)
-    printfn "+ Out of sync: %s" (countOf OutOfSync)
-    printfn "+ Unchanged:   %s" (countOf UpToDate)
-    printfn "- Deleted:     %s" (String.formatNumber deletedCount)
-    printfn "= New Total:   %s" newLibTagCount
+    printfn "  New:         %s" (countOf NewFile)
+    printfn "  Deleted:     %s" (String.formatNumber deletedCount)
+    printfn "  Out of sync: %s" (countOf OutOfSync)
+    printfn "  Unchanged:   %s" (countOf UpToDate)
+    printfn "  New Total:   %s" newLibTagCount
 
 let generateJson tagMap audioFiles : Result<string, CommandError> =
     audioFiles
