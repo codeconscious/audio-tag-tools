@@ -16,20 +16,18 @@ open FSharpPlus.Operators
 module NList = NonEmptyList
 module NSeq = NonEmptySeq
 
-type LibTagMap = Map<FilePath, LibraryTags>
+type private LibTagMap = Map<FilePath, LibraryTags>
 
-type LibComparisonResult =
+type ComparisonResult =
     | UpToDate // Library tags match file tags.
     | LibOutOfDate // Library tags are older than file tags.
     | FileOutOfDate // Library tags are newer than file tags.
     | NewFile // No tags for file exist in library yet.
     | FileDeleted // Library tags exist, but file is now missing.
 
-type DeletedItemCount = DeletedFileCount of uint
-
 type TagsToCache =
-    { Type: LibComparisonResult
-      Tags: LibraryTags }
+    { ComparisonResult: ComparisonResult
+      Tags: LibraryTags option }
 
 let createTagLibMap (libFile: FileInfo) : Result<LibTagMap, CommandError> =
     if libFile.Exists
@@ -79,26 +77,32 @@ let private prepareTagsToCache tagLibMap fileInfos : TagsToCache nseq =
         then
             let libTags = tagLibMap |> Map.find audioFile.FullName
             match compareWith libTags.LastWriteTime.DateTime audioFile.LastWriteTime with
-            | EQ -> { Type = UpToDate; Tags = copyCachedTags libTags }
-            | GT -> { Type = LibOutOfDate;  Tags = generateNewTags audioFile }
-            | LT -> { Type = FileOutOfDate; Tags = generateNewTags audioFile }
-        else { Type = NewFile; Tags = generateNewTags audioFile }
+            | EQ -> { ComparisonResult = UpToDate; Tags = Some (copyCachedTags libTags) }
+            | GT -> { ComparisonResult = LibOutOfDate;  Tags = Some (generateNewTags audioFile) }
+            | LT -> { ComparisonResult = FileOutOfDate; Tags = Some (generateNewTags audioFile) }
+        else { ComparisonResult = NewFile; Tags = Some (generateNewTags audioFile) }
 
     fileInfos |> NSeq.map (prepareTagsToCache tagLibMap)
 
-let private countDeletedFiles tagLibMap categorizedTags =
-    let filePaths = categorizedTags |> NSeq.map (fun t -> filePath t.Tags) |> set
+let private addDeletedFiles tagLibMap categorizedTags =
+    let filePaths =
+        categorizedTags
+        |> NSeq.choose (fun t -> match t.Tags with Some t -> Some (filePath t) | None -> None)
+        |> set
 
-    let orphanedLibTagCount =
+    let orphanedLibTags =
         tagLibMap
         |> Map.filter (fun libPath _ -> not (filePaths |> Set.contains libPath))
-        |> _.Count
-        |> uint
+        |> Map.values
+        |> Seq.map (fun _ -> { ComparisonResult = FileDeleted; Tags = None })
+        |> NSeq.tryOfSeq
 
-    (categorizedTags, DeletedFileCount orphanedLibTagCount)
+    match orphanedLibTags with
+    | Some t -> categorizedTags |> NSeq.append t
+    | None   -> categorizedTags
 
-let private reportResults (categorizedTags, DeletedFileCount deletedCount) : unit =
-    let categoryTotals = categorizedTags |> NSeq.countBy _.Type |> Map.ofSeq
+let private reportResults categorizedTags : unit =
+    let categoryTotals = categorizedTags |> NSeq.countBy _.ComparisonResult |> Map.ofSeq
 
     let countOf category = categoryTotals |> Map.tryFindElse category 0 |> String.formatInt
 
@@ -108,14 +112,14 @@ let private reportResults (categorizedTags, DeletedFileCount deletedCount) : uni
     printfn "+ New:         %s" (countOf NewFile)
     printfn "+ Out of sync: %s" (countOf LibOutOfDate + countOf FileOutOfDate)
     printfn "+ Unchanged:   %s" (countOf UpToDate)
-    printfn "- Deleted:     %s" (String.formatNumber deletedCount)
+    printfn "- Deleted:     %s" (countOf FileDeleted)
     printfn "= New Total:   %s" (String.formatInt grandTotal)
 
 let generateJson tagMap fileInfos : Result<string, CommandError> =
     fileInfos
     |> prepareTagsToCache tagMap
-    |> countDeletedFiles tagMap
+    |> addDeletedFiles tagMap
     |- reportResults
-    |> (fst >> map _.Tags)
+    |> map _.Tags
     |> String.toJson
     |!! JsonSerializationError
