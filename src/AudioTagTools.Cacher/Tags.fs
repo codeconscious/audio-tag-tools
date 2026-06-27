@@ -18,7 +18,7 @@ module NSeq = NonEmptySeq
 
 type private LibPathTagMap = Map<FilePath, LibraryTags>
 
-type private ComparisonResult = UpToDate | LibOutOfDate | FileOutOfDate | NewFile | FileDeleted
+type private ComparisonResult = UpToDate | OutOfSync | NewFile | FileDeleted
 
 type private NewLibTags = { Status: ComparisonResult; Tags: LibraryTags option }
 
@@ -70,9 +70,8 @@ let private generateNewLibTags libMap audioFiles : NewLibTags nseq =
         then
             let libTags = tagLibMap |> Map.find audioFile.FullName
             match compareWith libTags.LastWriteTime.DateTime audioFile.LastWriteTime with
-            | EQ -> { Status = UpToDate;      Tags = Some (copyCachedTags libTags) }
-            | GT -> { Status = LibOutOfDate;  Tags = Some (generateNewTags audioFile) }
-            | LT -> { Status = FileOutOfDate; Tags = Some (generateNewTags audioFile) }
+            | EQ -> { Status = UpToDate;  Tags = Some (copyCachedTags libTags) }
+            | _  -> { Status = OutOfSync; Tags = Some (generateNewTags audioFile) }
         else { Status = NewFile; Tags = Some (generateNewTags audioFile) }
 
     audioFiles |> NSeq.map (prepareTagsToCache libMap)
@@ -105,14 +104,19 @@ let private printCounts groupedNewLibTags : unit =
         |> Map.tryFindElse category 0
         |> String.formatInt
 
-    let grandTotal = categoryTotals |> Map.values |> sum |> String.formatInt
+    let libTagCount =
+        categoryTotals
+        |> Map.filter (fun x _ -> not x.IsFileDeleted)
+        |> Map.values
+        |> sum
+        |> String.formatInt
 
     printfn "Results:"
     printfn "+ New:         %s" (countOf NewFile)
-    printfn "+ Out of sync: %s" (countOf LibOutOfDate + countOf FileOutOfDate)
+    printfn "+ Out of sync: %s" (countOf OutOfSync)
     printfn "+ Unchanged:   %s" (countOf UpToDate)
     printfn "- Deleted:     %s" (countOf FileDeleted)
-    printfn "= New Total:   %s" grandTotal
+    printfn "= New Total:   %s" libTagCount
 
 let generateJson tagMap audioFiles : Result<string, CommandError> =
     audioFiles
