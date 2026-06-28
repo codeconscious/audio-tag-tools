@@ -17,8 +17,11 @@ module NList = NonEmptyList
 module NSeq =  NonEmptySeq
 
 type private LibPathTagMap = Map<FilePath, LibraryTags>
+
 type private ComparisonResult = UpToDate | OutOfSync | NewFile
+
 type private NewLibTags = { Status: ComparisonResult; Tags: LibraryTags }
+
 type private DeletedCount = DeletedCount of uint
 
 let createTagLibMap (libFile: FileInfo) : Result<LibPathTagMap, CommandError> =
