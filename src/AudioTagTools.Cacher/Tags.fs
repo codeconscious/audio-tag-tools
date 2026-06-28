@@ -20,7 +20,7 @@ type private LibPathTagMap = Map<FilePath, LibraryTags>
 
 type private ComparisonResult = Unchanged | OutOfSync | NewFile
 
-type private NewLibTags = { Status: ComparisonResult; Tags: LibraryTags }
+type private CheckedLibTags = { Status: ComparisonResult; Tags: LibraryTags }
 
 type private DeletedCount = DeletedCount of uint
 
@@ -34,6 +34,7 @@ let createTagLibMap (libFile: FileInfo) : Result<LibPathTagMap, CommandError> =
     else
         Ok Map.empty
 
+/// Gives new library tags that are tagged with the current time.
 let private generateLibTags (file: FileInfo) (fileTags: FileTags) : LibraryTags =
     {
         FileName = file.Name
@@ -59,21 +60,21 @@ let private generateNewTags (audioFile: FileInfo) : LibraryTags =
     | Ok (Some tags) -> generateLibTags audioFile tags
     | _              -> emptyTags audioFile
 
-let private generateNewLibTags libMap audioFiles : NewLibTags nseq =
+let private checkAudioFiles libMap audioFiles : CheckedLibTags nseq =
     let copyLibTags tags =
         { tags with LastWriteTime = DateTimeOffset tags.LastWriteTime.DateTime }
 
-    let prepareTagsToCache tagLibMap (audioFile: FileInfo) : NewLibTags =
+    let prepareTagsToCache tagLibMap (audioFile: FileInfo) : CheckedLibTags =
         match tagLibMap |> Map.tryFind audioFile.FullName with
         | Some libTags ->
             match audioFile.LastWriteTime |> compareWith libTags.LastWriteTime.DateTime with
-            | EQ -> { Status = Unchanged;  Tags = copyLibTags libTags }
+            | EQ -> { Status = Unchanged; Tags = copyLibTags libTags }
             | _  -> { Status = OutOfSync; Tags = generateNewTags audioFile }
         | None ->   { Status = NewFile;   Tags = generateNewTags audioFile }
 
     audioFiles |> NSeq.map (prepareTagsToCache libMap)
 
-let private countDeletedFiles libMap categorizedTags : NewLibTags nseq * DeletedCount =
+let private countDeletedFiles libMap categorizedTags : CheckedLibTags nseq * DeletedCount =
     let filePaths = categorizedTags |> NSeq.map (fun t -> filePath t.Tags) |> set
 
     let deletedCount =
@@ -99,7 +100,7 @@ let private printCounts (categorizedTags, DeletedCount deletedCount) : unit =
 
 let generateJson tagMap audioFiles : Result<string, CommandError> =
     audioFiles
-    |> generateNewLibTags tagMap
+    |> checkAudioFiles tagMap
     |> countDeletedFiles tagMap
     |- printCounts
     |> (fst >> map _.Tags)
