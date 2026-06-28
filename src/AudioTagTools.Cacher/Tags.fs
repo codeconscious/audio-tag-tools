@@ -65,13 +65,12 @@ let private generateNewLibTags libMap audioFiles : NewLibTags nseq =
        | _              -> blankTags file
 
     let prepareTagsToCache tagLibMap (audioFile: FileInfo) : NewLibTags =
-        if tagLibMap |> Map.containsKey audioFile.FullName
-        then
-            let libTags = tagLibMap |> Map.find audioFile.FullName
-            match compareWith libTags.LastWriteTime.DateTime audioFile.LastWriteTime with
+        match tagLibMap |> Map.tryFind audioFile.FullName with
+        | Some libTags ->
+            match audioFile.LastWriteTime |> compareWith libTags.LastWriteTime.DateTime with
             | EQ -> { Status = UpToDate;  Tags = copyCachedTags libTags }
             | _  -> { Status = OutOfSync; Tags = generateNewTags audioFile }
-        else { Status = NewFile; Tags = generateNewTags audioFile }
+        | None ->   { Status = NewFile;   Tags = generateNewTags audioFile }
 
     audioFiles |> NSeq.map (prepareTagsToCache libMap)
 
