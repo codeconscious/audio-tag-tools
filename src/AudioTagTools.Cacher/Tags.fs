@@ -18,7 +18,7 @@ module NSeq =  NonEmptySeq
 
 type private LibPathTagMap = Map<FilePath, LibraryTags>
 
-type private ComparisonResult = UpToDate | OutOfSync | NewFile
+type private ComparisonResult = Unchanged | OutOfSync | NewFile
 
 type private NewLibTags = { Status: ComparisonResult; Tags: LibraryTags }
 
@@ -67,7 +67,7 @@ let private generateNewLibTags libMap audioFiles : NewLibTags nseq =
         match tagLibMap |> Map.tryFind audioFile.FullName with
         | Some libTags ->
             match audioFile.LastWriteTime |> compareWith libTags.LastWriteTime.DateTime with
-            | EQ -> { Status = UpToDate;  Tags = copyLibTags libTags }
+            | EQ -> { Status = Unchanged;  Tags = copyLibTags libTags }
             | _  -> { Status = OutOfSync; Tags = generateNewTags audioFile }
         | None ->   { Status = NewFile;   Tags = generateNewTags audioFile }
 
@@ -94,7 +94,7 @@ let private printCounts (categorizedTags, DeletedCount deletedCount) : unit =
     printfn "  Deleted:     %s" (String.formatNumber deletedCount)
     printfn "  New:         %s" (countOf NewFile)
     printfn "  Out of sync: %s" (countOf OutOfSync)
-    printfn "  Unchanged:   %s" (countOf UpToDate)
+    printfn "  Unchanged:   %s" (countOf Unchanged)
     printfn "  New Total:   %s" newItemCount
 
 let generateJson tagMap audioFiles : Result<string, CommandError> =
