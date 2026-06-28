@@ -75,34 +75,29 @@ let private generateNewLibTags libMap audioFiles : NewLibTags nseq =
 
     audioFiles |> NSeq.map (prepareTagsToCache libMap)
 
-let private countDeletedFiles libMap groupedNewLibTags : NewLibTags nseq * DeletedCount =
-    let filePaths =
-        groupedNewLibTags
-        |> NSeq.map (fun t -> filePath t.Tags)
-        |> set
+let private countDeletedFiles libMap categorizedTags : NewLibTags nseq * DeletedCount =
+    let filePaths = categorizedTags |> NSeq.map (fun t -> filePath t.Tags) |> set
 
-    let deletedLibFileCount =
+    let deletedCount =
         libMap
         |> Map.filter (fun libPath _ -> not (filePaths |> Set.contains libPath))
-        |> Map.values
-        |> _.Count
-        |> uint
+        |> Map.values |> _.Count |> uint
 
-    (groupedNewLibTags, DeletedCount deletedLibFileCount)
+    (categorizedTags, DeletedCount deletedCount)
 
-let private printCounts (groupedNewLibTags, DeletedCount deletedCount) : unit =
-    let categoryTotals = groupedNewLibTags |> NSeq.countBy _.Status |> Map.ofSeq
+let private printCounts (categorizedTags, DeletedCount deletedCount) : unit =
+    let categoryTotals = categorizedTags |> NSeq.countBy _.Status |> Map.ofSeq
+
+    let newItemCount = categoryTotals |> Map.values |> sum |> String.formatInt
 
     let countOf category = categoryTotals |> Map.tryFindElse category 0 |> String.formatInt
 
-    let newLibTagCount = categoryTotals |> Map.values |> sum |> String.formatInt
-
     printfn "Results:"
-    printfn "  New:         %s" (countOf NewFile)
     printfn "  Deleted:     %s" (String.formatNumber deletedCount)
+    printfn "  New:         %s" (countOf NewFile)
     printfn "  Out of sync: %s" (countOf OutOfSync)
     printfn "  Unchanged:   %s" (countOf UpToDate)
-    printfn "  New Total:   %s" newLibTagCount
+    printfn "  New Total:   %s" newItemCount
 
 let generateJson tagMap audioFiles : Result<string, CommandError> =
     audioFiles
