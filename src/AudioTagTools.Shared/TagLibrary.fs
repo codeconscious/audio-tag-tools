@@ -32,7 +32,7 @@ type LibraryTags =
 
 type DuplicateTags = LibraryTags nlist nlist
 
-let blankTags (fileInfo: FileInfo) : LibraryTags =
+let emptyTags (fileInfo: FileInfo) : LibraryTags =
     { FileName = fileInfo.Name
       DirectoryName = fileInfo.DirectoryName
       Artists = [| String.Empty |]
@@ -57,8 +57,10 @@ let parseJsonToTags (Json json) : Result<LibraryTags list, string> =
 let parseJsonToNonEmptyTags json : Result<LibraryTags nlist, string> =
     parseJsonToTags json >>= List.toNonEmptyListResult "No tags were found to parse."
 
-let parseFileTags (f: FileInfo) : Result<FileTags option, string> =
-    try f.FullName |> FileTags.Create |> Option.ofObj |> Ok
+/// Creates an instance representing a file's tags. The file itself might or might not already contain tags.
+/// If it does, the tags are wrapped in Some. Otherwise (i.e., if the tags are null), then None is given.
+let parseFileTags (file: FileInfo) : Result<FileTags option, string> =
+    try file.FullName |> FileTags.Create |> Option.ofObj |> Ok
     with exn -> Error exn.Message
 
 let filePath tags : FilePath =
