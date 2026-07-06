@@ -30,8 +30,8 @@ let savePlaylist (settings: Settings) (maybeTags: DuplicateTags option) : Result
 
         let filePath =
             let originalPath = Path.Combine(fileTags.DirectoryName, fileTags.FileName)
-            match settings.Playlist.SearchPath,
-                  settings.Playlist.ReplacePath with
+            match settings.Playlist.PathSearchFor,
+                  settings.Playlist.PathReplaceWith with
             | s, _ when String.hasNoText s -> originalPath
             | s, r -> originalPath.Replace(s, r)
 
