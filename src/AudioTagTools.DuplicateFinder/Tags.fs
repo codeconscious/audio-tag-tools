@@ -97,10 +97,10 @@ let findDuplicates settings tags : DuplicateTags option =
             |> NList.map (snd >> sortBy _.Title.Length)
     }
 
-let printDuplicates (groupedTracks: DuplicateTags option) : unit =
+let printDuplicates groupedTracksOpt : unit =
     let printfGray = printfColor ConsoleColor.DarkGray
 
-    let printGroup index (tracks: LibraryTags nlist) =
+    let printGroup index (tracks: LibraryTags nlist) : unit =
         let artistSummary (tags: LibraryTags) : string =
             if Array.isEmpty tags.Artists
             then String.Empty
@@ -125,12 +125,11 @@ let printDuplicates (groupedTracks: DuplicateTags option) : unit =
             |> printfn "%d. %s" (index + 1) // Start numbering at 1, not 0.
 
         let printDuplicates () =
-            tracks
-            |> NList.iter printFileSummary
+            tracks |> NList.iter printFileSummary
 
         printHeader ()
         printDuplicates ()
 
-    match groupedTracks with
-    | None -> printfn "No duplicates found."
+    match groupedTracksOpt with
     | Some group -> group |> NList.iteri printGroup
+    | None -> printfn "No duplicates found."
