@@ -57,8 +57,9 @@ let parseJsonToTags (Json json) : Result<LibraryTags list, string> =
 let parseJsonToNonEmptyTags json : Result<LibraryTags nlist, string> =
     parseJsonToTags json >>= List.toNonEmptyListResult "No tags were found to parse."
 
-/// Creates an instance representing a file's tags. The file itself might or might not already contain tags.
-/// If it does, the tags are wrapped in Some. Otherwise (i.e., if the tags are null), then None is given.
+/// Creates an instance representing a file's tags. The file itself might
+/// or might not already contain tags. If it does, the tags are wrapped in Some.
+/// Otherwise (i.e., if the tags are null), then None is given.
 let parseFileTags (file: FileInfo) : Result<FileTags option, string> =
     try file.FullName |> FileTags.Create |> Option.ofObj |> Ok
     with exn -> Error exn.Message
@@ -82,8 +83,8 @@ let allDistinctArtists tags : Artist list =
     |> List.ofArray
     |> List.map Artist
 
-let firstDistinctArtist tags : Artist =
-    tags |> allDistinctArtists |> List.head
+let firstDistinctArtist tags : Artist option =
+    tags |> allDistinctArtists |> List.tryHead
 
 let mainArtists separator tags : string =
     let hasNoIgnoredAlbumArtists (Artist artist) =
@@ -92,7 +93,8 @@ let mainArtists separator tags : string =
         |> not
 
     match tags with
-    | t when Array.isNotEmpty t.AlbumArtists && hasNoIgnoredAlbumArtists (Artist t.AlbumArtists[0]) ->
+    | t when Array.isNotEmpty t.AlbumArtists
+             && hasNoIgnoredAlbumArtists (Artist t.AlbumArtists[0]) ->
         t.AlbumArtists
     | t ->
         t.Artists

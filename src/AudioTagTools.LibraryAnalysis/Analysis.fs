@@ -115,10 +115,12 @@ let artistsWithMostGenres count tags : TableRowData =
                    NList.map extractArtistGenreInfo >>
                    NList.sortByDescending item2 >>
                    NList.take count >>
-                   NList.map (fun (Artist artist, uniqGenreCount, genres) ->
-                    [ artist
-                      String.formatInt uniqGenreCount
-                      genreCounts genres ]))
+                   NList.choose (function
+                       | (Some (Artist artist), uniqGenreCount, genres) ->
+                           Some [ artist
+                                  String.formatInt uniqGenreCount
+                                  genreCounts genres ]
+                       | _ -> None))
 
 let largestFiles count tags : TableRowData =
     tags
