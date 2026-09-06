@@ -98,7 +98,7 @@ let topGenres count tags : TableRowData =
               asPercentage { Count = count; Total = genres.Length; DecimalPlaces = 2 } ]))
 
 let artistsWithMostGenres count tags : TableRowData =
-    let genreCounts (genres: string list) : string =
+    let countsByGenre (genres: string list) : string =
         genres
         |> List.countBy id
         |> List.sortBy fst
@@ -130,13 +130,13 @@ let artistsWithMostGenres count tags : TableRowData =
             |> NList.sortByDescending _.GenreCount
             |> NList.tryTake count
 
-        return takenTags
-            |> NList.choose (fun x ->
-                match x.Artist with
-                | Some (Artist artist) -> Some [ artist
-                                                 x.GenreCount |> String.formatInt
-                                                 x.Genres |> genreCounts ]
-                | _ -> None)
+        return
+            takenTags
+            |> NList.map (fun tags ->
+                   let (Artist artist) = tags.Artist
+                   [ artist
+                     String.formatInt tags.GenreCount
+                     countsByGenre tags.Genres ])
     }
 
 let largestFiles count tags : TableRowData =
