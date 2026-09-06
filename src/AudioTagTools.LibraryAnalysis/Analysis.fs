@@ -5,6 +5,7 @@ open Shared.Types
 open CCFSharpUtils
 open CCFSharpUtils.Collections
 open CCFSharpUtils.Text
+open FSharpPlus
 open FSharpPlus.Data
 open FSharpPlus.Operators
 open System.IO
@@ -105,22 +106,38 @@ let artistsWithMostGenres count tags : TableRowData =
         |> String.concat "; "
 
     let extractArtistGenreInfo (a, tags) =
-        let genres = tags |> NList.map _.Genres |> Array.concat |> Array.map _.Trim() |> List.ofArray
-        let uniqGenreCount genres = genres |> List.distinctIgnoreCase |> _.Length
-        (a, uniqGenreCount genres, genres)
+        let genres =
+            tags
+            |> NList.map _.Genres
+            |> Array.concat
+            |> Array.map _.Trim()
+            |> List.ofArray
 
-    tags
-    |> NList.tryFilter hasAnyArtist
-    |> Option.map (NList.groupBy firstDistinctArtist >>
-                   NList.map extractArtistGenreInfo >>
-                   NList.sortByDescending item2 >>
-                   NList.take count >>
-                   NList.choose (function
-                       | (Some (Artist artist), uniqGenreCount, genres) ->
-                           Some [ artist
-                                  String.formatInt uniqGenreCount
-                                  genreCounts genres ]
-                       | _ -> None))
+        let uniqGenreCount genres =
+            genres |> List.distinctIgnoreCase |> _.Length
+
+        {| Artist = a
+           GenreCount = uniqGenreCount genres
+           Genres = genres |}
+
+    monad {
+        let! tagsWithArtists = tags |> NList.tryFilter hasAnyArtist
+
+        let! takenTags =
+            tagsWithArtists
+            |> NList.groupBy firstDistinctArtist
+            |> NList.map extractArtistGenreInfo
+            |> NList.sortByDescending _.GenreCount
+            |> NList.tryTake count
+
+        return takenTags
+            |> NList.choose (fun x ->
+                match x.Artist with
+                | Some (Artist artist) -> Some [ artist
+                                                 x.GenreCount |> String.formatInt
+                                                 x.Genres |> genreCounts ]
+                | _ -> None)
+    }
 
 let largestFiles count tags : TableRowData =
     tags
