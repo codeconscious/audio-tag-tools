@@ -7,7 +7,6 @@ open CCFSharpUtils.Collections
 open CCFSharpUtils.Text
 open FSharpPlus
 open FSharpPlus.Data
-open FSharpPlus.Operators
 open System.IO
 
 module NList = NonEmptyList
@@ -15,7 +14,12 @@ module NList = NonEmptyList
 type TableRowData = string list nlist option
 type RatioData = { Count: int; Total: int; DecimalPlaces: int }
 
-let inline private mostPopulous (count: int) (grouper: 'a -> 'a) (items: 'a nlist) : NonEmptyList<'a * int> =
+let inline private mostPopulous
+    (count: int)
+    (grouper: 'a -> 'a)
+    (items: 'a nlist)
+    : NonEmptyList<'a * int> =
+
     items
     |> NList.groupBy grouper
     |> NList.map (fun (_, group) -> (group[0], group.Length))
@@ -144,17 +148,17 @@ let largestFiles count tags : TableRowData =
     |> NList.sortByDescending _.FileSize
     |> NList.truncate count
     |> NList.map (fun file ->
-        let artist = String.concat ", " file.Artists
-        [ $"{artist} / {file.Title}"
+        let artists = String.concat ", " file.Artists
+        [ $"{artists} / {file.Title}"
           String.formatBytes file.FileSize ])
     |> Some
 
-let uppercaseFileExtension tagFile =
+let private uppercaseFileExt tagFile =
     ((Path.GetExtension tagFile.FileName)[1..]).ToUpperInvariant()
 
 let topFormats count tags : TableRowData =
     tags
-    |> NList.map uppercaseFileExtension
+    |> NList.map uppercaseFileExt
     |> mostPopulous count id
     |> NList.map (fun (ext, count) -> [ $"{ext}"; String.formatInt count ])
     |> Some
@@ -182,7 +186,7 @@ let topQualityData count tags : TableRowData =
     |> NList.map (fun t ->
         {| BitRate    = t.BitRate
            SampleRate = t.SampleRate
-           Extension  = uppercaseFileExtension t |})
+           Extension  = uppercaseFileExt t |})
     |> mostPopulous count id
     |> NList.map (fun (data, count) ->
         [ data.Extension
