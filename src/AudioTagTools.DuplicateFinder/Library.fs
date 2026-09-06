@@ -16,20 +16,19 @@ let private run args : Result<unit, CommandError> =
         let! settingsFile, tagLibFile = validate args
 
         let! settings = settingsFile |> File.readText' |!! FileReadError >>= (Json >> parseToSettings)
-        let! tags     = tagLibFile   |> File.readText' |!! FileReadError >>= (Json >> parseToTags)
+        let! libTags  = tagLibFile   |> File.readText' |!! FileReadError >>= (Json >> parseToTags)
 
         printSummary settings
 
         let! duplicates =
-           tags
+           libTags
            |- printCount "Total file count:    "
-           |> discardExcluded settings
+           |> discardExcluded settings.ExclusionPatterns
            |-- printCount "Filtered file count: "
            |>> findDuplicates settings
            |-- printDuplicates
 
-        return!
-            duplicates |> savePlaylist settings
+        return! duplicates |> savePlaylist settings
     }
 
 let start args : Result<string, string> =

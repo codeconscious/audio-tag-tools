@@ -23,13 +23,14 @@ let printCount description (tags: LibraryTags nlist) =
     printfn $"%s{description}%s{String.formatInt tags.Length}"
 
 /// Filters out tags containing artists or titles specified in the exclusion patterns.
-let discardExcluded (settings: Settings) (tagList: LibraryTags nlist) : Result<LibraryTags nlist, CommandError> =
-    let matchOptions = RegexOptions.IgnoreCase
+let discardExcluded exclusionPatterns libTagList : Result<LibraryTags nlist, CommandError> =
+
+    let rgxOptions = RegexOptions.IgnoreCase
 
     let isExcluded tags =
-        let (|ArtistAndTitle|ArtistOnly|TitleOnly|Invalid|) (pattern: ExclusionPattern) =
+        let (|ArtistTitlePair|ArtistOnly|TitleOnly|Invalid|) (pattern: ExclusionPattern) =
             match pattern.Artist, pattern.Title with
-            | Some a, Some t -> ArtistAndTitle (a, t)
+            | Some a, Some t -> ArtistTitlePair (a, t)
             | Some a, None   -> ArtistOnly a
             | None,   Some t -> TitleOnly t
             | _ -> Invalid
@@ -37,19 +38,19 @@ let discardExcluded (settings: Settings) (tagList: LibraryTags nlist) : Result<L
         let containsArtist artistPattern =
             [| tags.AlbumArtists; tags.Artists |]
             |> Array.concat
-            |> Array.exists (fun artist -> Regex.IsMatch(artist, artistPattern, matchOptions))
+            |> Array.exists (fun artist -> Regex.IsMatch(artist, artistPattern, rgxOptions))
 
-        let titleStartsWith pattern = Regex.IsMatch(tags.Title, pattern, matchOptions)
+        let titleStartsWith pattern = Regex.IsMatch(tags.Title, pattern, rgxOptions)
 
         let checkIfExcluded = function
-            | ArtistAndTitle (a, t) -> containsArtist a && titleStartsWith t
+            | ArtistTitlePair (a, t) -> containsArtist a && titleStartsWith t
             | ArtistOnly a -> containsArtist a
             | TitleOnly t -> titleStartsWith t
             | Invalid -> false
 
-        settings.ExclusionPatterns |> Array.exists checkIfExcluded
+        exclusionPatterns |> Array.exists checkIfExcluded
 
-    tagList
+    libTagList
     |> NList.tryFilter (not << isExcluded)
     |> Option.toResultWith NoFilesRemainAfterFiltering
 
