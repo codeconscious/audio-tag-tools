@@ -77,14 +77,14 @@ let ignorableAlbumArtistNames =
       "Multiple Artists"
       "\u003Cunknown\u003E" ] // U+003C == `<` and \u003E == `>`
 
-let allDistinctArtists tags : Artist list =
+let allUniqueArtists tags : Artist list =
     Array.concat [ tags.Artists; tags.AlbumArtists ]
     |> Array.distinct
     |> List.ofArray
     |> List.map Artist
 
-let tryFirstDistinctArtist tags : Artist option =
-    tags |> allDistinctArtists |> List.tryHead
+let tryFirstUniqueArtist tags : Artist option =
+    tags |> allUniqueArtists |> List.tryHead
 
 let mainArtists separator tags : string =
     let hasNoIgnoredAlbumArtists (Artist artist) =

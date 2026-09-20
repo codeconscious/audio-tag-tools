@@ -34,7 +34,7 @@ let filteredArtists tags : string nlist option =
     tags
     |> NList.map (fun tags' ->
         tags'
-        |> allDistinctArtists
+        |> allUniqueArtists
         |> List.map (fun (Artist artistName) -> artistName)
         |> List.except ignorableAlbumArtistNames)
     |> List.concat
@@ -129,7 +129,7 @@ let artistsWithMostGenres count tags : TableRowData =
 
         let! takenTags =
             tagsWithArtists
-            |> NList.groupBy (tryFirstDistinctArtist
+            |> NList.groupBy (tryFirstUniqueArtist
                               >> Option.defaultValue (Artist "(Unknown Artist)"))
             |> NList.map extractArtistGenreInfo
             |> NList.sortByDescending _.GenreCount
