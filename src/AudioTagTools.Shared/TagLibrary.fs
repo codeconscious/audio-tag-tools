@@ -86,7 +86,7 @@ let allUniqueArtists tags : Artist list =
 let tryFirstUniqueArtist tags : Artist option =
     tags |> allUniqueArtists |> List.tryHead
 
-let mainArtists separator tags : string =
+let mainArtistSummary separator tags : string =
     let hasNoIgnoredAlbumArtists (Artist artist) =
         ignorableAlbumArtistNames
         |> List.exists _.Equals(artist, StringComparison.InvariantCultureIgnoreCase)

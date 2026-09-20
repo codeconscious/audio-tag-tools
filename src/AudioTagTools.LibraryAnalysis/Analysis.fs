@@ -202,7 +202,7 @@ let longestFileNames count tags : TableRowData =
     |> NList.sortByDescending fst
     |> NList.take count
     |> NList.map (fun (count, t) ->
-        [ $"""{mainArtists "; " t}{String.nl}↪︎ {t.Title}"""
+        [ $"""{mainArtistSummary "; " t}{String.nl}↪︎ {t.Title}"""
           t.FileName
           String.formatInt count ])
     |> Some

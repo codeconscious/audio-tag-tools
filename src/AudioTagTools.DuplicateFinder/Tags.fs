@@ -74,7 +74,7 @@ let private sanitizedTrackGroupingName (settings: Settings) fileTags =
             |> option Array.head artist
 
         fileTags
-        |> mainArtists String.Empty
+        |> mainArtistSummary String.Empty
         |> checkEquivalentArtists
         |> scrubText settings.ArtistReplacementPatterns
 
@@ -121,7 +121,7 @@ let printDuplicates groupedTracksOpt : unit =
         let printHeader () =
             tagList
             |> NList.head
-            |> mainArtists ", "
+            |> mainArtistSummary ", "
             |> printfn "%d. %s" (index + 1) // Start numbering at 1, not 0.
 
         let printTagData () =
