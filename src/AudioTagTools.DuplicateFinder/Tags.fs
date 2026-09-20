@@ -36,7 +36,7 @@ let discardExcluded exclusionPatterns libTagList : Result<LibraryTags nlist, Com
             | _ -> Invalid
 
         let containsArtist artistPattern =
-            [| tags.AlbumArtists; tags.Artists |]
+            [ tags.AlbumArtists; tags.Artists ]
             |> Array.concat
             |> Array.exists (fun artist -> Regex.IsMatch(artist, artistPattern, rgxOptions))
 
