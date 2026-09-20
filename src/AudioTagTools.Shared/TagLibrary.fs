@@ -83,10 +83,7 @@ let allDistinctArtists tags : Artist list =
     |> List.ofArray
     |> List.map Artist
 
-let firstDistinctArtist tags : Artist =
-    tags |> allDistinctArtists |> List.head
-
-let firstDistinctArtistSafe tags : Artist option =
+let tryFirstDistinctArtist tags : Artist option =
     tags |> allDistinctArtists |> List.tryHead
 
 let mainArtists separator tags : string =

@@ -129,7 +129,8 @@ let artistsWithMostGenres count tags : TableRowData =
 
         let! takenTags =
             tagsWithArtists
-            |> NList.groupBy firstDistinctArtist
+            |> NList.groupBy (tryFirstDistinctArtist
+                              >> Option.defaultValue (Artist "(Unknown Artist)"))
             |> NList.map extractArtistGenreInfo
             |> NList.sortByDescending _.GenreCount
             |> NList.tryTake count
