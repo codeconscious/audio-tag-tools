@@ -94,23 +94,6 @@ let tryFirstUniqueArtist tags : Artist option =
     tags |> allUniqueArtists |> List.tryHead
 
 let mainArtistSummary separator tags : string =
-    // match tags with
-    // | t when Array.isNotEmpty t.AlbumArtists
-    //          && isNotIgnoredArtist (Artist t.AlbumArtists[0]) ->
-    //     t.AlbumArtists
-    // | t ->
-    //     t.Artists
-    // |> String.concat separator
-
-    // tags.AlbumArtists
-    // |> Array.map Artist
-    // |> dropIgnoredArtists
-    // |> fun albumArtists ->
-    //     match albumArtists with
-    //     | [||] -> tags.Artists
-    //     | _    -> albumArtists |> Array.map (fun (Artist artistName) -> artistName)
-    // |> String.concat separator
-
     let albumArtists =
         tags.AlbumArtists
         |> Array.map Artist
