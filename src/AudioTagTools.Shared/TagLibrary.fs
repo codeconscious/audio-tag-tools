@@ -79,7 +79,10 @@ let ignorableArtists =
     |> List.map Artist
 
 let dropIgnoredArtists artists =
-    artists |> List.except ignorableArtists
+    artists |> Array.except ignorableArtists
+
+let isNotIgnoredArtist artist =
+    not (List.exists ((=) artist) ignorableArtists)
 
 let allUniqueArtists tags : Artist list =
     Array.concat [ tags.Artists; tags.AlbumArtists ]
@@ -91,15 +94,30 @@ let tryFirstUniqueArtist tags : Artist option =
     tags |> allUniqueArtists |> List.tryHead
 
 let mainArtistSummary separator tags : string =
-    let isNotIgnoredArtist artist =
-        not (List.exists ((=) artist) ignorableArtists)
+    // match tags with
+    // | t when Array.isNotEmpty t.AlbumArtists
+    //          && isNotIgnoredArtist (Artist t.AlbumArtists[0]) ->
+    //     t.AlbumArtists
+    // | t ->
+    //     t.Artists
+    // |> String.concat separator
 
-    match tags with
-    | t when Array.isNotEmpty t.AlbumArtists
-             && isNotIgnoredArtist (Artist t.AlbumArtists[0]) ->
-        t.AlbumArtists
-    | t ->
-        t.Artists
+    // tags.AlbumArtists
+    // |> Array.map Artist
+    // |> dropIgnoredArtists
+    // |> fun albumArtists ->
+    //     match albumArtists with
+    //     | [||] -> tags.Artists
+    //     | _    -> albumArtists |> Array.map (fun (Artist artistName) -> artistName)
+    // |> String.concat separator
+
+    let albumArtists =
+        tags.AlbumArtists
+        |> Array.map Artist
+        |> dropIgnoredArtists
+        |> Array.map (fun (Artist name) -> name)
+
+    (if Array.isNotEmpty albumArtists then albumArtists else tags.Artists)
     |> String.concat separator
 
 let hasAnyArtist tags : bool =
