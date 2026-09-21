@@ -36,9 +36,10 @@ let discardExcluded exclusionPatterns libTagList : Result<LibraryTags nlist, Com
             | _ -> Invalid
 
         let containsArtist artistPattern =
-            [ tags.AlbumArtists; tags.Artists ]
+            (Option.toArray tags.Artists)
+            |> Array.append (Option.toArray tags.AlbumArtists)
             |> Array.concat
-            |> Array.exists (fun artist -> Regex.IsMatch(artist, artistPattern, rgxOptions))
+            |> Array.exists (fun (Artist artist) -> Regex.IsMatch(artist, artistPattern, rgxOptions))
 
         let titleStartsWith pattern = Regex.IsMatch(tags.Title, pattern, rgxOptions)
 
@@ -102,9 +103,12 @@ let printDuplicates groupedTracksOpt : unit =
 
     let printGroup index (tagList: LibraryTags nlist) : unit =
         let artistSummary (tags: LibraryTags) : string =
-            if Array.isEmpty tags.Artists
-            then String.Empty
-            else String.Join(", ", tags.Artists)
+            match tags.Artists with
+            | None -> String.Empty
+            | Some artists ->
+                artists
+                |> Array.map (fun (Artist a) -> a)
+                |> fun a -> String.Join(", ", a)
 
         let printFileSummary fileTags =
             let artist = artistSummary fileTags

@@ -13,11 +13,16 @@ open Shared
 module NList = NonEmptyList
 
 let private mainArtist (fileTags: LibraryTags) : Artist option =
-    let hasValidValue xs = Array.isNotEmpty xs && String.hasText xs[0]
+    // let hasValidValue xs = Array.isNotEmpty xs && String.hasText xs[0]
 
-    match fileTags with
-    | a when a.Artists      |> hasValidValue -> Some (Artist a.Artists[0])
-    | a when a.AlbumArtists |> hasValidValue -> Some (Artist a.AlbumArtists[0])
+    // match fileTags with
+    // | a when a.Artists      |> hasValidValue -> Some (Artist a.Artists[0])
+    // | a when a.AlbumArtists |> hasValidValue -> Some (Artist a.AlbumArtists[0])
+    // | _ -> None
+
+    match fileTags.AlbumArtists, fileTags.Artists with
+    | Some albumArtists, _ -> Some <| Array.head albumArtists
+    | None, Some artists -> Some <| Array.head artists
     | _ -> None
 
 let printOldSummary (oldGenres: string list) : unit =

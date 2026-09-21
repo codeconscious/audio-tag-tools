@@ -15,8 +15,8 @@ type FilePath = string
 type LibraryTags =
     { FileName: string
       DirectoryName: string
-      Artists: string array
-      AlbumArtists: string array
+      Artists: Artist array option
+      AlbumArtists: Artist array option
       Album: string
       DiscNo: uint
       TrackNo: uint
@@ -35,8 +35,8 @@ type DuplicateTags = LibraryTags nlist nlist
 let emptyTags (fileInfo: FileInfo) : LibraryTags =
     { FileName = fileInfo.Name
       DirectoryName = fileInfo.DirectoryName
-      Artists = [| String.Empty |]
-      AlbumArtists = [| String.Empty |]
+      Artists = None
+      AlbumArtists = None
       Album = String.Empty
       DiscNo = 0u
       TrackNo = 0u
@@ -85,26 +85,25 @@ let isNotIgnoredArtist artist =
     not (List.exists ((=) artist) ignoredArtists)
 
 let allUniqueArtists tags : Artist list =
-    Array.concat [ tags.Artists; tags.AlbumArtists ]
+    [ Option.toArray tags.Artists; Option.toArray tags.AlbumArtists ]
+    |> Array.concat
+    |> Array.concat
     |> Array.distinct
     |> List.ofArray
-    |> List.map Artist
 
 let tryFirstUniqueArtist tags : Artist option =
     tags |> allUniqueArtists |> List.tryHead
 
 let mainArtistSummary separator tags : string =
-    let albumArtists =
-        tags.AlbumArtists
-        |> Array.map Artist
-        |> dropIgnoredArtists
-        |> Array.map (fun (Artist name) -> name)
-
-    (if Array.isNotEmpty albumArtists then albumArtists else tags.Artists)
+    match tags.AlbumArtists, tags.Artists with
+    | Some albumArtists, _ -> albumArtists
+    | None, Some artists -> artists
+    | _ -> [||]
+    |> Array.map (fun (Artist a) -> a)
     |> String.concat separator
 
 let hasAnyArtist tags : bool =
-    Array.anyNotEmpty [| tags.Artists; tags.AlbumArtists |]
+    tags.AlbumArtists.IsSome || tags.Artists.IsSome
 
 let hasTitle tags : bool =
     String.hasText tags.Title

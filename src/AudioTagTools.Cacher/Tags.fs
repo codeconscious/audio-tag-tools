@@ -39,8 +39,8 @@ let private generateLibTags (file: FileInfo) (fileTags: FileTags) : LibraryTags 
     {
         FileName = file.Name
         DirectoryName = file.DirectoryName
-        Artists = fileTags.Tag.Performers |> Array.map _.Normalize()
-        AlbumArtists = fileTags.Tag.AlbumArtists |> Array.map _.Normalize()
+        Artists = fileTags.Tag.Performers |> Array.map _.Normalize() |> Array.map Artist |> Array.toOption
+        AlbumArtists = fileTags.Tag.AlbumArtists |> Array.map _.Normalize() |> Array.map Artist |> Array.toOption
         Album = fileTags.Tag.Album |> Option.ofObj |> Option.defaultValue String.Empty |> _.Normalize()
         DiscNo = fileTags.Tag.Disc
         TrackNo = fileTags.Tag.Track

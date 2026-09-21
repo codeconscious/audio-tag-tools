@@ -7,6 +7,7 @@ open CCFSharpUtils.Collections
 open CCFSharpUtils.Text
 open FSharpPlus
 open FSharpPlus.Data
+open System
 open System.IO
 
 module NList = NonEmptyList
@@ -148,7 +149,13 @@ let largestFiles count tags : TableRowData =
     |> NList.sortByDescending _.FileSize
     |> NList.truncate count
     |> NList.map (fun file ->
-        let artists = String.concat ", " file.Artists
+        let artists =
+            match file.Artists with
+            | None -> String.Empty
+            | Some artists ->
+                artists
+                |> Array.map (fun (Artist a) -> a)
+                |> String.concat ", "
         [ $"{artists} / {file.Title}"
           String.formatBytes file.FileSize ])
     |> Some
