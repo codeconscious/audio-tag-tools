@@ -34,3 +34,4 @@ type Artist =
             match obj with
             | :? Artist as other -> (this :> IComparable<Artist>).CompareTo other
             | _ -> invalidArg (nameof obj) "Cannot compare Artist with non-Artist"
+

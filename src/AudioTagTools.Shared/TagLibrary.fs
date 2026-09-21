@@ -7,10 +7,31 @@ open CCFSharpUtils.Text
 open System
 open System.IO
 open System.Text.Json
+open System.Text.Json.Serialization
 open FSharpPlus
 
 type FileTags = TagLib.File
 type FilePath = string
+
+type ArtistConverter() =
+    inherit JsonConverter<Artist>()
+
+    override this.Read(reader: byref<Utf8JsonReader>, _typeToConvert: Type, _options: JsonSerializerOptions) : Artist =
+        match reader.TokenType with
+        | JsonTokenType.String ->
+            let value = reader.GetString()
+            Artist value
+        | _ ->
+            raise (JsonException "Artist must be serialized as a string")
+
+    override this.Write(writer: Utf8JsonWriter, value: Artist, _options: JsonSerializerOptions) : unit =
+        let (Artist name) = value
+        writer.WriteStringValue name
+
+let jsonOptions =
+    let opts = JsonSerializerOptions()
+    opts.Converters.Add(ArtistConverter())
+    opts
 
 type LibraryTags =
     { FileName: string
@@ -50,8 +71,12 @@ let emptyTags (fileInfo: FileInfo) : LibraryTags =
       ImageCount = 0
       LastWriteTime = DateTimeOffset fileInfo.LastWriteTime }
 
+// let parseJsonToTags (Json json) : Result<LibraryTags list, string> =
+//     try Ok (JsonSerializer.Deserialize<LibraryTags list> json)
+//     with exn -> Error exn.Message
+
 let parseJsonToTags (Json json) : Result<LibraryTags list, string> =
-    try Ok (JsonSerializer.Deserialize<LibraryTags list> json)
+    try Ok (JsonSerializer.Deserialize<LibraryTags list>(json, jsonOptions))
     with exn -> Error exn.Message
 
 let parseJsonToNonEmptyTags json : Result<LibraryTags nlist, string> =

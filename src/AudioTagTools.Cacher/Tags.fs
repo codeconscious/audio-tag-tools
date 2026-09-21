@@ -1,6 +1,9 @@
 module Cacher.Tags
 
 open System
+open System.Text.Encodings.Web
+open System.Text.Json
+open System.Text.Unicode
 open IO
 open Errors
 open Shared.TagLibrary
@@ -23,6 +26,11 @@ type private ComparisonResult = Unchanged | OutOfSync | NewFile
 type private CheckedLibTags = { Status: ComparisonResult; Tags: LibraryTags }
 
 type private DeletedCount = DeletedCount of uint
+
+let jsonOptions =
+    let opts = JsonSerializerOptions()
+    opts.Converters.Add(ArtistConverter())
+    opts
 
 let createTagLibMap (libFile: FileInfo) : Result<LibPathTagMap, CommandError> =
     if libFile.Exists
@@ -97,6 +105,16 @@ let private printCounts (categorizedTags, DeletedCount deletedCount) : unit =
     printfn "  Out of sync: %s" (countOf OutOfSync)
     printfn "  Unchanged:   %s" (countOf Unchanged)
     printfn "  New Total:   %s" newItemCount
+
+let private serializeToJson (writeIndented: bool) (x: 'a) : Result<string, string> =
+    let options =
+        JsonSerializerOptions(
+            WriteIndented = writeIndented,
+            Encoder = JavaScriptEncoder.Create UnicodeRanges.All)
+
+    options.Converters.Add(ArtistConverter())
+
+    ofTry (fun _ -> JsonSerializer.Serialize(x, options))
 
 let generateJson tagMap audioFiles : Result<string, CommandError> =
     audioFiles
