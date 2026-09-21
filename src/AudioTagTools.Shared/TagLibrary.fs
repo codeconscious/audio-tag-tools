@@ -96,7 +96,7 @@ let tryFirstUniqueArtist tags : Artist option =
 let mainArtistSummary separator tags : string =
     let isNotIgnoredArtist artist =
         ignorableArtists
-        |> List.exists _.Equals(artist, StringComparison.InvariantCultureIgnoreCase)
+        |> List.exists ((=) artist)
         |> not
 
     match tags with
