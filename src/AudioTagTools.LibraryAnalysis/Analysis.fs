@@ -35,7 +35,7 @@ let filteredArtists tags : Artist nlist option =
     |> NList.map (fun tags' ->
         tags'
         |> allUniqueArtists
-        |> List.except ignorableArtists)
+        |> List.except ignoredArtists)
     |> List.concat
     |> function [] -> None | artists -> Some (NList.ofList artists)
 

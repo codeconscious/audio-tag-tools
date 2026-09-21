@@ -70,7 +70,7 @@ let filePath tags : FilePath =
 let groupByPath tags : FilePath * LibraryTags =
     (filePath tags, tags)
 
-let ignorableArtists =
+let ignoredArtists =
     [ String.Empty
       "Various"
       "Various Artists"
@@ -79,10 +79,10 @@ let ignorableArtists =
     |> List.map Artist
 
 let dropIgnoredArtists artists =
-    artists |> Array.except ignorableArtists
+    artists |> Array.except ignoredArtists
 
 let isNotIgnoredArtist artist =
-    not (List.exists ((=) artist) ignorableArtists)
+    not (List.exists ((=) artist) ignoredArtists)
 
 let allUniqueArtists tags : Artist list =
     Array.concat [ tags.Artists; tags.AlbumArtists ]
