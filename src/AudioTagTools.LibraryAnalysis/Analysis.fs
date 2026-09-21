@@ -30,13 +30,12 @@ let private asPercentage ratioData : string =
     float ratioData.Count / float ratioData.Total
     |> String.formatPercent ratioData.DecimalPlaces
 
-let filteredArtists tags : string nlist option =
+let filteredArtists tags : Artist nlist option =
     tags
     |> NList.map (fun tags' ->
         tags'
         |> allUniqueArtists
-        |> List.map (fun (Artist artistName) -> artistName)
-        |> List.except ignorableArtistNames)
+        |> List.except ignorableArtists)
     |> List.concat
     |> function [] -> None | artists -> Some (NList.ofList artists)
 
@@ -64,7 +63,7 @@ let topArtists count tags : TableRowData =
 
         artists
         |> mostPopulous count id
-        |> NList.map (fun (artist, count) ->
+        |> NList.map (fun ((Artist artist), count) ->
             [ artist
               String.formatInt count
               asPercentage { Count = count; Total = artistCount; DecimalPlaces = 3 } ]) )

@@ -70,16 +70,9 @@ let filePath tags : FilePath =
 let groupByPath tags : FilePath * LibraryTags =
     (filePath tags, tags)
 
-// TODO: Consider if this can be replaced with the Artist-based version below.
-let ignorableArtistNames =
-    [ String.Empty
-      "Various"
-      "Various Artists"
-      "Multiple Artists"
-      "\u003Cunknown\u003E" ] // U+003C == `<` and \u003E == `>`
-
 let ignorableArtists =
-    ignorableArtistNames |> List.map Artist
+    [ String.Empty; "Various"; "Various Artists"; "Multiple Artists" ]
+    |> List.map Artist
 
 let dropIgnoredArtists artists =
     artists |> List.except ignorableArtists
