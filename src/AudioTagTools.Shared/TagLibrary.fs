@@ -71,7 +71,11 @@ let groupByPath tags : FilePath * LibraryTags =
     (filePath tags, tags)
 
 let ignorableArtists =
-    [ String.Empty; "Various"; "Various Artists"; "Multiple Artists" ]
+    [ String.Empty
+      "Various"
+      "Various Artists"
+      "Multiple Artists"
+      "\u003Cunknown\u003E" ] // U+003C == `<` and \u003E == `>` ]
     |> List.map Artist
 
 let dropIgnoredArtists artists =
