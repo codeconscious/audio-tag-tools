@@ -39,9 +39,10 @@ let private allGenres (fileTags: LibraryTags nlist) : string list =
     |> function None -> [] | Some gs -> gs |> toList
 
 let private mostCommon (xs: string list) : string option =
-    match xs with
-    | [] -> None
-    | _  -> Some (xs |> List.filter String.hasText |> groupBy id |> maxBy (snd >> length) |> fst)
+    xs
+    |> List.filter String.hasText
+    |> List.toOption
+    |> Option.map (groupBy id >> maxBy (snd >> length) >> fst)
 
 let private mostCommonGenre = allGenres >> mostCommon
 
