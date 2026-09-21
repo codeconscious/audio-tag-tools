@@ -70,12 +70,19 @@ let filePath tags : FilePath =
 let groupByPath tags : FilePath * LibraryTags =
     (filePath tags, tags)
 
-let ignorableAlbumArtistNames =
+// TODO: Consider if this can be replaced with the Artist-based version below.
+let ignorableArtistNames =
     [ String.Empty
       "Various"
       "Various Artists"
       "Multiple Artists"
       "\u003Cunknown\u003E" ] // U+003C == `<` and \u003E == `>`
+
+let ignorableArtists =
+    ignorableArtistNames |> List.map Artist
+
+let dropIgnoredArtists artists =
+    artists |> List.except ignorableArtists
 
 let allUniqueArtists tags : Artist list =
     Array.concat [ tags.Artists; tags.AlbumArtists ]
@@ -87,14 +94,14 @@ let tryFirstUniqueArtist tags : Artist option =
     tags |> allUniqueArtists |> List.tryHead
 
 let mainArtistSummary separator tags : string =
-    let hasNoIgnoredAlbumArtists (Artist artist) =
-        ignorableAlbumArtistNames
+    let isNotIgnoredArtist artist =
+        ignorableArtists
         |> List.exists _.Equals(artist, StringComparison.InvariantCultureIgnoreCase)
         |> not
 
     match tags with
     | t when Array.isNotEmpty t.AlbumArtists
-             && hasNoIgnoredAlbumArtists (Artist t.AlbumArtists[0]) ->
+             && isNotIgnoredArtist (Artist t.AlbumArtists[0]) ->
         t.AlbumArtists
     | t ->
         t.Artists
