@@ -92,9 +92,7 @@ let tryFirstUniqueArtist tags : Artist option =
 
 let mainArtistSummary separator tags : string =
     let isNotIgnoredArtist artist =
-        ignorableArtists
-        |> List.exists ((=) artist)
-        |> not
+        not (List.exists ((=) artist) ignorableArtists)
 
     match tags with
     | t when Array.isNotEmpty t.AlbumArtists
