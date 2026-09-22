@@ -15,14 +15,14 @@ type FilePath = string
 type LibraryTags =
     { FileName: string
       DirectoryName: string
-      Artists: string array
-      AlbumArtists: string array
+      Artists: string list
+      AlbumArtists: string list
       Album: string
       DiscNo: uint
       TrackNo: uint
       Title: string
       Year: uint
-      Genres: string array
+      Genres: string list
       Duration: TimeSpan
       BitRate: int
       SampleRate: int
@@ -35,14 +35,14 @@ type DuplicateTags = LibraryTags nlist nlist
 let emptyTags (fileInfo: FileInfo) : LibraryTags =
     { FileName = fileInfo.Name
       DirectoryName = fileInfo.DirectoryName
-      Artists = [| String.Empty |]
-      AlbumArtists = [| String.Empty |]
+      Artists = [String.Empty]
+      AlbumArtists = [String.Empty]
       Album = String.Empty
       DiscNo = 0u
       TrackNo = 0u
       Title = String.Empty
       Year = 0u
-      Genres = [| String.Empty |]
+      Genres = [String.Empty]
       Duration = TimeSpan.Zero
       BitRate = 0
       SampleRate = 0
@@ -79,15 +79,14 @@ let ignoredArtists =
     |> List.map Artist
 
 let dropIgnoredArtists artists =
-    artists |> Array.except ignoredArtists
+    artists |> List.except ignoredArtists
 
 let isNotIgnoredArtist artist =
     not (List.exists ((=) artist) ignoredArtists)
 
 let allUniqueArtists tags : Artist list =
-    Array.concat [ tags.Artists; tags.AlbumArtists ]
-    |> Array.distinct
-    |> List.ofArray
+    List.concat [ tags.Artists; tags.AlbumArtists ]
+    |> List.distinct
     |> List.map Artist
 
 let tryFirstUniqueArtist tags : Artist option =
@@ -96,15 +95,15 @@ let tryFirstUniqueArtist tags : Artist option =
 let mainArtistSummary separator tags : string =
     let albumArtists =
         tags.AlbumArtists
-        |> Array.map Artist
+        |> List.map Artist
         |> dropIgnoredArtists
-        |> Array.map (fun (Artist name) -> name)
+        |> List.map (fun (Artist name) -> name)
 
-    (if Array.isNotEmpty albumArtists then albumArtists else tags.Artists)
+    (if List.isNotEmpty albumArtists then albumArtists else tags.Artists)
     |> String.concat separator
 
 let hasAnyArtist tags : bool =
-    Array.anyNotEmpty [| tags.Artists; tags.AlbumArtists |]
+    List.anyNotEmpty [ tags.Artists; tags.AlbumArtists ]
 
 let hasTitle tags : bool =
     String.hasText tags.Title

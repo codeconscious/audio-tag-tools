@@ -22,7 +22,7 @@ let savePlaylist (settings: Settings) (maybeTags: DuplicateTags option) : Result
     /// Appends 2 lines to `sb` for the `tags`: a metadata summary and full file path.
     let appendFileData (sb: SB) (fileTags: LibraryTags) : SB =
         let seconds = fileTags.Duration.TotalSeconds
-        let artist = fileTags.Artists |> Array.append fileTags.AlbumArtists |> String.concat "; "
+        let artist = fileTags.Artists |> List.append fileTags.AlbumArtists |> String.concat "; "
         let artistWithTitle = $"{artist} - {fileTags.Title}"
         let extInf = $"#EXTINF:{seconds},{artistWithTitle}"
 

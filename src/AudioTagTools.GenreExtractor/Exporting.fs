@@ -7,13 +7,12 @@ open CCFSharpUtils.Collections
 open CCFSharpUtils.Text
 open FSharpPlus
 open FSharpPlus.Data
-open System
 open Shared
 
 module NList = NonEmptyList
 
 let private mainArtist (fileTags: LibraryTags) : Artist option =
-    let hasValidValue xs = Array.isNotEmpty xs && String.hasText xs[0]
+    let hasValidValue xs = List.isNotEmpty xs && String.hasText xs[0]
 
     match fileTags with
     | a when a.Artists      |> hasValidValue -> Some (Artist a.Artists[0])

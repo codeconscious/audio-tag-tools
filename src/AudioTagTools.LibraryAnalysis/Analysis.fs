@@ -89,10 +89,9 @@ let topTitles count tags : TableRowData =
 
 let topGenres count tags : TableRowData =
     tags
-    |> NList.tryFilter (fun t -> Array.isNotEmpty t.Genres)
+    |> NList.tryFilter (fun t -> List.isNotEmpty t.Genres)
     |> Option.map (fun t ->
-        let genres = t >>= fun xs -> xs.Genres |> NList.ofArray
-
+        let genres = t >>= fun xs -> xs.Genres |> NList.ofList
         genres
         |> mostPopulous count String.toLower
         |> NList.map (fun (genre, count) ->
@@ -112,9 +111,8 @@ let artistsWithMostGenres count tags : TableRowData =
         let genres =
             tags
             |> NList.map _.Genres
-            |> Array.concat
-            |> Array.map _.Trim()
-            |> List.ofArray
+            |> List.concat
+            |> List.map _.Trim()
 
         let uniqGenreCount genres =
             genres |> List.distinctIgnoreCase |> _.Length
