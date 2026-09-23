@@ -85,11 +85,9 @@ let isNotIgnoredArtist artist =
     not (List.exists ((=) artist) ignoredArtists)
 
 let tryMainArtistName tags : string option =
-    if   List.isNotEmpty tags.AlbumArtists
-    then Some (List.head tags.AlbumArtists)
-    elif List.isNotEmpty tags.Artists
-    then Some (List.head tags.Artists)
-    else None
+    tags.AlbumArtists
+    |> List.tryHead
+    |> Option.orElse (List.tryHead tags.Artists)
 
 let tryMainArtist tags : Artist option =
     tags |> tryMainArtistName |> Option.map Artist
