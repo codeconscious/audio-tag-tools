@@ -7,13 +7,12 @@ open CCFSharpUtils.Collections
 open CCFSharpUtils.Text
 open FSharpPlus
 open FSharpPlus.Data
-open System
 open Shared
 
 module NList = NonEmptyList
 
 let private mainArtist (fileTags: LibraryTags) : Artist option =
-    let hasValidValue xs = Array.isNotEmpty xs && String.hasText xs[0]
+    let hasValidValue xs = List.isNotEmpty xs && String.hasText xs[0]
 
     match fileTags with
     | a when a.Artists      |> hasValidValue -> Some (Artist a.Artists[0])
@@ -39,9 +38,10 @@ let private allGenres (fileTags: LibraryTags nlist) : string list =
     |> function None -> [] | Some gs -> gs |> toList
 
 let private mostCommon (xs: string list) : string option =
-    match xs with
-    | [] -> None
-    | _  -> Some (xs |> List.filter String.hasText |> groupBy id |> maxBy (snd >> length) |> fst)
+    xs
+    |> List.filter String.hasText
+    |> List.toOption
+    |> Option.map (groupBy id >> maxBy (snd >> length) >> fst)
 
 let private mostCommonGenre = allGenres >> mostCommon
 

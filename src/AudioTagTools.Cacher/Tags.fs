@@ -39,14 +39,14 @@ let private generateLibTags (file: FileInfo) (fileTags: FileTags) : LibraryTags 
     {
         FileName = file.Name
         DirectoryName = file.DirectoryName
-        Artists = fileTags.Tag.Performers |> Array.map _.Normalize()
-        AlbumArtists = fileTags.Tag.AlbumArtists |> Array.map _.Normalize()
+        Artists = fileTags.Tag.Performers |> List.ofArray |> List.map _.Normalize()
+        AlbumArtists = fileTags.Tag.AlbumArtists |> List.ofArray |> List.map _.Normalize()
         Album = fileTags.Tag.Album |> Option.ofObj |> Option.defaultValue String.Empty |> _.Normalize()
         DiscNo = fileTags.Tag.Disc
         TrackNo = fileTags.Tag.Track
         Title = fileTags.Tag.Title |> Option.ofObj |> Option.defaultValue String.Empty |> _.Normalize()
         Year = fileTags.Tag.Year
-        Genres = fileTags.Tag.Genres
+        Genres = fileTags.Tag.Genres |> List.ofArray
         Duration = fileTags.Properties.Duration
         BitRate = fileTags.Properties.AudioBitrate
         SampleRate = fileTags.Properties.AudioSampleRate

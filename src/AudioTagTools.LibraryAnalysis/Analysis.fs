@@ -5,8 +5,8 @@ open Shared.Types
 open CCFSharpUtils
 open CCFSharpUtils.Collections
 open CCFSharpUtils.Text
+open FSharpPlus
 open FSharpPlus.Data
-open FSharpPlus.Operators
 open System.IO
 
 module NList = NonEmptyList
@@ -14,7 +14,12 @@ module NList = NonEmptyList
 type TableRowData = string list nlist option
 type RatioData = { Count: int; Total: int; DecimalPlaces: int }
 
-let inline private mostPopulous (count: int) (grouper: 'a -> 'a) (items: 'a nlist) : NonEmptyList<'a * int> =
+let inline private mostPopulous
+    (count: int)
+    (grouper: 'a -> 'a)
+    (items: 'a nlist)
+    : NonEmptyList<'a * int> =
+
     items
     |> NList.groupBy grouper
     |> NList.map (fun (_, group) -> (group[0], group.Length))
@@ -25,13 +30,12 @@ let private asPercentage ratioData : string =
     float ratioData.Count / float ratioData.Total
     |> String.formatPercent ratioData.DecimalPlaces
 
-let filteredArtists tags : string nlist option =
+let filteredArtists tags : Artist nlist option =
     tags
     |> NList.map (fun tags' ->
         tags'
-        |> allDistinctArtists
-        |> List.map (fun (Artist artistName) -> artistName)
-        |> List.except ignorableAlbumArtistNames)
+        |> allUniqueArtists
+        |> List.except ignoredArtists)
     |> List.concat
     |> function [] -> None | artists -> Some (NList.ofList artists)
 
@@ -59,7 +63,7 @@ let topArtists count tags : TableRowData =
 
         artists
         |> mostPopulous count id
-        |> NList.map (fun (artist, count) ->
+        |> NList.map (fun ((Artist artist), count) ->
             [ artist
               String.formatInt count
               asPercentage { Count = count; Total = artistCount; DecimalPlaces = 3 } ]) )
@@ -85,10 +89,9 @@ let topTitles count tags : TableRowData =
 
 let topGenres count tags : TableRowData =
     tags
-    |> NList.tryFilter (fun t -> Array.isNotEmpty t.Genres)
+    |> NList.tryFilter (fun t -> List.isNotEmpty t.Genres)
     |> Option.map (fun t ->
-        let genres = t >>= fun xs -> xs.Genres |> NList.ofArray
-
+        let genres = t >>= fun xs -> xs.Genres |> NList.ofList
         genres
         |> mostPopulous count String.toLower
         |> NList.map (fun (genre, count) ->
@@ -97,7 +100,7 @@ let topGenres count tags : TableRowData =
               asPercentage { Count = count; Total = genres.Length; DecimalPlaces = 2 } ]))
 
 let artistsWithMostGenres count tags : TableRowData =
-    let genreCounts (genres: string list) : string =
+    let countsByGenre (genres: string list) : string =
         genres
         |> List.countBy id
         |> List.sortBy fst
@@ -105,37 +108,55 @@ let artistsWithMostGenres count tags : TableRowData =
         |> String.concat "; "
 
     let extractArtistGenreInfo (a, tags) =
-        let genres = tags |> NList.map _.Genres |> Array.concat |> Array.map _.Trim() |> List.ofArray
-        let uniqGenreCount genres = genres |> List.distinctIgnoreCase |> _.Length
-        (a, uniqGenreCount genres, genres)
+        let genres =
+            tags
+            |> NList.map _.Genres
+            |> List.concat
+            |> List.map _.Trim()
 
-    tags
-    |> NList.tryFilter hasAnyArtist
-    |> Option.map (NList.groupBy firstDistinctArtist >>
-                   NList.map extractArtistGenreInfo >>
-                   NList.sortByDescending item2 >>
-                   NList.take count >>
-                   NList.map (fun (Artist artist, uniqGenreCount, genres) ->
-                    [ artist
-                      String.formatInt uniqGenreCount
-                      genreCounts genres ]))
+        let uniqGenreCount genres =
+            genres |> List.distinctIgnoreCase |> _.Length
+
+        {| Artist = a
+           GenreCount = uniqGenreCount genres
+           Genres = genres |}
+
+    monad {
+        let! tagsWithArtists = tags |> NList.tryFilter hasAnyArtist
+
+        let! takenTags =
+            tagsWithArtists
+            |> NList.groupBy (tryFirstUniqueArtist
+                              >> Option.defaultValue (Artist "(Unknown Artist)"))
+            |> NList.map extractArtistGenreInfo
+            |> NList.sortByDescending _.GenreCount
+            |> NList.tryTake count
+
+        return
+            takenTags
+            |> NList.map (fun tags ->
+                   let (Artist artist) = tags.Artist
+                   [ artist
+                     String.formatInt tags.GenreCount
+                     countsByGenre tags.Genres ])
+    }
 
 let largestFiles count tags : TableRowData =
     tags
     |> NList.sortByDescending _.FileSize
     |> NList.truncate count
     |> NList.map (fun file ->
-        let artist = String.concat ", " file.Artists
-        [ $"{artist} / {file.Title}"
+        let artists = String.concat ", " file.Artists
+        [ $"{artists} / {file.Title}"
           String.formatBytes file.FileSize ])
     |> Some
 
-let uppercaseFileExtension tagFile =
+let private uppercaseFileExt tagFile =
     ((Path.GetExtension tagFile.FileName)[1..]).ToUpperInvariant()
 
 let topFormats count tags : TableRowData =
     tags
-    |> NList.map uppercaseFileExtension
+    |> NList.map uppercaseFileExt
     |> mostPopulous count id
     |> NList.map (fun (ext, count) -> [ $"{ext}"; String.formatInt count ])
     |> Some
@@ -163,7 +184,7 @@ let topQualityData count tags : TableRowData =
     |> NList.map (fun t ->
         {| BitRate    = t.BitRate
            SampleRate = t.SampleRate
-           Extension  = uppercaseFileExtension t |})
+           Extension  = uppercaseFileExt t |})
     |> mostPopulous count id
     |> NList.map (fun (data, count) ->
         [ data.Extension
@@ -178,7 +199,7 @@ let longestFileNames count tags : TableRowData =
     |> NList.sortByDescending fst
     |> NList.take count
     |> NList.map (fun (count, t) ->
-        [ $"""{mainArtists "; " t}{String.nl}↪︎ {t.Title}"""
+        [ $"""{mainArtistSummary "; " t}{String.nl}↪︎ {t.Title}"""
           t.FileName
           String.formatInt count ])
     |> Some

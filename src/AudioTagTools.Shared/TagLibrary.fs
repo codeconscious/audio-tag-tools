@@ -15,14 +15,14 @@ type FilePath = string
 type LibraryTags =
     { FileName: string
       DirectoryName: string
-      Artists: string array
-      AlbumArtists: string array
+      Artists: string list
+      AlbumArtists: string list
       Album: string
       DiscNo: uint
       TrackNo: uint
       Title: string
       Year: uint
-      Genres: string array
+      Genres: string list
       Duration: TimeSpan
       BitRate: int
       SampleRate: int
@@ -35,14 +35,14 @@ type DuplicateTags = LibraryTags nlist nlist
 let emptyTags (fileInfo: FileInfo) : LibraryTags =
     { FileName = fileInfo.Name
       DirectoryName = fileInfo.DirectoryName
-      Artists = [| String.Empty |]
-      AlbumArtists = [| String.Empty |]
+      Artists = [String.Empty]
+      AlbumArtists = [String.Empty]
       Album = String.Empty
       DiscNo = 0u
       TrackNo = 0u
       Title = String.Empty
       Year = 0u
-      Genres = [| String.Empty |]
+      Genres = [String.Empty]
       Duration = TimeSpan.Zero
       BitRate = 0
       SampleRate = 0
@@ -57,8 +57,9 @@ let parseJsonToTags (Json json) : Result<LibraryTags list, string> =
 let parseJsonToNonEmptyTags json : Result<LibraryTags nlist, string> =
     parseJsonToTags json >>= List.toNonEmptyListResult "No tags were found to parse."
 
-/// Creates an instance representing a file's tags. The file itself might or might not already contain tags.
-/// If it does, the tags are wrapped in Some. Otherwise (i.e., if the tags are null), then None is given.
+/// Creates an instance representing a file's tags. The file itself might
+/// or might not already contain tags. If it does, the tags are wrapped in Some.
+/// Otherwise (i.e., if the tags are null), then None is given.
 let parseFileTags (file: FileInfo) : Result<FileTags option, string> =
     try file.FullName |> FileTags.Create |> Option.ofObj |> Ok
     with exn -> Error exn.Message
@@ -69,37 +70,40 @@ let filePath tags : FilePath =
 let groupByPath tags : FilePath * LibraryTags =
     (filePath tags, tags)
 
-let ignorableAlbumArtistNames =
+let ignoredArtists =
     [ String.Empty
       "Various"
       "Various Artists"
       "Multiple Artists"
-      "\u003Cunknown\u003E" ] // U+003C == `<` and \u003E == `>`
-
-let allDistinctArtists tags : Artist list =
-    Array.concat [ tags.Artists; tags.AlbumArtists ]
-    |> Array.distinct
-    |> List.ofArray
+      "\u003Cunknown\u003E" ] // U+003C == `<` and \u003E == `>` ]
     |> List.map Artist
 
-let firstDistinctArtist tags : Artist =
-    tags |> allDistinctArtists |> List.head
+let dropIgnoredArtists artists =
+    artists |> List.except ignoredArtists
 
-let mainArtists separator tags : string =
-    let hasNoIgnoredAlbumArtists (Artist artist) =
-        ignorableAlbumArtistNames
-        |> List.exists _.Equals(artist, StringComparison.InvariantCultureIgnoreCase)
-        |> not
+let isNotIgnoredArtist artist =
+    not (List.exists ((=) artist) ignoredArtists)
 
-    match tags with
-    | t when Array.isNotEmpty t.AlbumArtists && hasNoIgnoredAlbumArtists (Artist t.AlbumArtists[0]) ->
-        t.AlbumArtists
-    | t ->
-        t.Artists
+let allUniqueArtists tags : Artist list =
+    List.concat [ tags.Artists; tags.AlbumArtists ]
+    |> List.distinct
+    |> List.map Artist
+
+let tryFirstUniqueArtist tags : Artist option =
+    tags |> allUniqueArtists |> List.tryHead
+
+let mainArtistSummary separator tags : string =
+    let albumArtists =
+        tags.AlbumArtists
+        |> List.map Artist
+        |> dropIgnoredArtists
+        |> List.map (fun (Artist name) -> name)
+
+    (if List.isNotEmpty albumArtists then albumArtists else tags.Artists)
     |> String.concat separator
 
 let hasAnyArtist tags : bool =
-    Array.anyNotEmpty [| tags.Artists; tags.AlbumArtists |]
+    List.anyNotEmpty [ tags.Artists; tags.AlbumArtists ]
 
 let hasTitle tags : bool =
     String.hasText tags.Title
