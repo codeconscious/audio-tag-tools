@@ -80,9 +80,12 @@ let private countDeletedFiles libMap categorizedTags : CheckedLibTags nseq * Del
     let deletedCount =
         libMap
         |> Map.filter (fun libPath _ -> not (filePaths |> Set.contains libPath))
-        |> Map.values |> _.Count |> uint
+        |> Map.values
+        |> _.Count
+        |> uint
+        |> DeletedCount
 
-    (categorizedTags, DeletedCount deletedCount)
+    (categorizedTags, deletedCount)
 
 let private printCounts (categorizedTags, DeletedCount deletedCount) : unit =
     let categoryTotals = categorizedTags |> NSeq.countBy _.Status |> Map.ofSeq
