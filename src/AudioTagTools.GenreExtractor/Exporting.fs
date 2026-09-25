@@ -60,11 +60,11 @@ let generateGenreData (separator: string) (allFileTags: LibraryTags nlist)
     |> Option.map NList.sort
     |> Option.toResultWith InsufficientGenreData
 
-let printChanges (oldGenres: string list) (newGenres: string nlist) =
+let printChanges formatNum oldGenres (newGenres: string nlist) =
     let newTotalCount = newGenres.Length
     let addedCount = newGenres |> NList.toList |> List.except oldGenres |> _.Length
     let deletedCount = oldGenres |> List.except newGenres |> _.Length
     printfn "Prepared %s artist-genre entries total (%s new, %s deleted)."
-        (String.formatInt newTotalCount)
-        (String.formatInt addedCount)
-        (String.formatInt deletedCount)
+        (formatNum newTotalCount)
+        (formatNum addedCount)
+        (formatNum deletedCount)

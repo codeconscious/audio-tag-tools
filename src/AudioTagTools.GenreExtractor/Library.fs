@@ -23,7 +23,7 @@ let private run args : Result<unit, CommandError> =
         let! tags = tagJson |> parseJsonToNonEmptyTags |-- printTagCount |!! TagParseError
         let! newGenres = tags |> generateGenreData separator
 
-        printChanges oldGenres newGenres
+        printChanges String.formatInt oldGenres newGenres
 
         do!
             backUpFile genreFile
