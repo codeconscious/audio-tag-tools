@@ -2,23 +2,26 @@ module Cacher.IO
 
 open Errors
 open CCFSharpUtils
+open CCFSharpUtils.Text
 open CCFSharpUtils.Collections
 open System.IO
 
-type FileTags = TagLib.File
+let private supportedAudioExtensions =
+    // Supported file format extensions from https://github.com/mono/taglib-sharp.
+    [ ".aa"; ".aax"; ".aac"; ".aiff"; ".ape"; ".dsf"; ".flac"; ".m4a"; ".m4b"; "m4p"
+      ".mp3"; ".mpc"; ".mpp"; ".ogg"; ".oga"; ".wav"; ".wma"; ".wv"; ".webm"
 
-let getFileInfos (dirPath: DirectoryInfo) : Result<FileInfo nseq, CommandError> =
-    let isSupportedAudioFile (fileInfo: FileInfo) =
-        // Supported file format extensions from https://github.com/mono/taglib-sharp,
-        // plus some additional ones. Initial periods are needed.
-        [ ".aa"; ".aax"; ".aac"; ".aiff"; ".ape"; ".dsf"; ".flac"; ".m4a"; ".m4b"; "m4p"
-          ".mp3"; ".mpc"; ".mpp"; ".ogg"; ".oga"; ".wav"; ".wma"; ".wv"; ".webm"
-          ".mp4"; ".opus" ] // This line contains additional custom ones.
-        |> List.contains (fileInfo.Extension.ToLowerInvariant())
+      // Additional custom extensions:
+      ".mp4"; ".opus" ]
 
+let private isSupportedAudioFile (fileInfo: FileInfo) =
+    supportedAudioExtensions
+    |> List.exists (String.equalIgnoreCase fileInfo.Extension)
+
+let getFileInfos (dir: DirectoryInfo) : Result<FileInfo nseq, CommandError> =
     try
-        dirPath.EnumerateFiles("*", SearchOption.AllDirectories)
+        dir.EnumerateFiles("*", SearchOption.AllDirectories)
         |> Seq.filter isSupportedAudioFile
-        |> Seq.toNonEmptySeqResult (NoFilesFound dirPath.FullName)
+        |> Seq.toNonEmptySeqResult (NoFilesFound dir.FullName)
     with
-    | e -> Error (GeneralIoError e.Message)
+    | exn -> Error (IoError exn.Message)

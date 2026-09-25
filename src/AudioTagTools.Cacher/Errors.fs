@@ -6,7 +6,7 @@ type CommandError =
     | FileReadError of string
     | FileWriteError of string
     | NoFilesFound of string
-    | GeneralIoError of string
+    | IoError of string
     | LibraryTagParseError of string
     | FileTagParseError of string
     | JsonSerializationError of string
@@ -17,7 +17,7 @@ let message = function
     | FileReadError msg -> $"Read failure: {msg}"
     | FileWriteError msg -> $"Write failure: {msg}"
     | NoFilesFound dir -> $"No files found in \"{dir}\"."
-    | GeneralIoError msg -> $"I/O failure: {msg}"
+    | IoError msg -> $"I/O failure: {msg}"
     | LibraryTagParseError msg -> $"Library tag parse error: {msg}"
     | FileTagParseError msg -> $"File tag parse error: {msg}"
     | JsonSerializationError msg -> $"JSON serialization error: {msg}"
