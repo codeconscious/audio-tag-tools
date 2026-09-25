@@ -9,9 +9,10 @@ open Shared.Types
 open Shared.IO
 open CCFSharpUtils.IO
 open CCFSharpUtils.Operators
+open CCFSharpUtils.Text
 open FSharpPlus
 
-// The separator character should be rare and highly unlikely to appear in files' tags.
+// The separator character should be rare and extremely unlikely to appear in files' tags.
 let private separator = "＼"
 
 let private run args : Result<unit, CommandError> =
@@ -25,15 +26,14 @@ let private run args : Result<unit, CommandError> =
 
         printChanges String.formatInt oldGenres newGenres
 
-        do!
-            backUpFile genreFile
-            |>> printfn "Created backup file \"%O\"." // %O formats with ToString().
-            |!! FileWriteError
+        if genreFile.Exists then
+            do! backUpFile genreFile
+                |>> printfn "Created backup file \"%O\"." // %O formats with ToString().
+                |!! FileWriteError
 
-        return!
-            newGenres
-            |> File.writeLines' genreFile
-            |!! FileWriteError
+        return! newGenres
+                |> File.writeLines' genreFile
+                |!! FileWriteError
     }
 
 let start args : Result<string, string> =
