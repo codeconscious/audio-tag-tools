@@ -67,7 +67,7 @@ let private checkAudioFiles libMap audioFiles : CheckedLibTags nseq =
     let prepareTagsToCache tagLibMap (audioFile: FileInfo) : CheckedLibTags =
         match tagLibMap |> Map.tryFind audioFile.FullName with
         | Some libTags ->
-            match audioFile.LastWriteTime |> compareWith libTags.LastWriteTime.DateTime with
+            match libTags.LastWriteTime.DateTime </compare'/> audioFile.LastWriteTime with
             | EQ -> { Status = Unchanged; Tags = copyLibTags libTags }
             | _  -> { Status = OutOfSync; Tags = generateNewTags audioFile }
         | None ->   { Status = NewFile;   Tags = generateNewTags audioFile }
