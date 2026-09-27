@@ -12,9 +12,16 @@ open FSharpPlus
 type FileTags = TagLib.File
 type FilePath = string
 
+/// Creates an instance representing a file's tags, which might or might not exists.
+/// If tags do exist, they are wrapped in Some. Otherwise, then None is given.
+let parseFileTags (file: FileInfo) : Result<FileTags option, string> =
+    try file.FullName |> FileTags.Create |> Option.ofObj |> Ok
+    with exn -> Error exn.Message
+
 type LibraryTags =
     { FileName: string
       DirectoryName: string
+      FileSize: int64
       Artists: string list
       AlbumArtists: string list
       Album: string
@@ -26,29 +33,64 @@ type LibraryTags =
       Duration: TimeSpan
       BitRate: int
       SampleRate: int
-      FileSize: int64
       ImageCount: int
       LastWriteTime: DateTimeOffset }
+    with
+        static member Empty (fileInfo: FileInfo) =
+            { FileName = fileInfo.Name
+              DirectoryName = fileInfo.DirectoryName
+              FileSize = 0
+              Artists = [String.Empty]
+              AlbumArtists = [String.Empty]
+              Album = String.Empty
+              DiscNo = 0u
+              TrackNo = 0u
+              Title = String.Empty
+              Year = 0u
+              Genres = [String.Empty]
+              Duration = TimeSpan.Zero
+              BitRate = 0
+              SampleRate = 0
+              ImageCount = 0
+              LastWriteTime = DateTimeOffset fileInfo.LastWriteTime }
+
+        static member NewFromFileTags (file: FileInfo) (fileTags: FileTags) =
+            { FileName = file.Name
+              DirectoryName = file.DirectoryName
+              FileSize = file.Length
+              Artists = fileTags.Tag.Performers
+                        |> List.ofArray
+                        |> List.map _.Normalize()
+              AlbumArtists = fileTags.Tag.AlbumArtists
+                             |> List.ofArray
+                             |> List.map _.Normalize()
+              Album = fileTags.Tag.Album
+                      |> Option.ofObj
+                      |> Option.defaultValue String.Empty
+                      |> _.Normalize()
+              DiscNo = fileTags.Tag.Disc
+              TrackNo = fileTags.Tag.Track
+              Title = fileTags.Tag.Title
+                      |> Option.ofObj
+                      |> Option.defaultValue String.Empty
+                      |> _.Normalize()
+              Year = fileTags.Tag.Year
+              Genres = fileTags.Tag.Genres |> List.ofArray
+              Duration = fileTags.Properties.Duration
+              BitRate = fileTags.Properties.AudioBitrate
+              SampleRate = fileTags.Properties.AudioSampleRate
+              ImageCount = fileTags.Tag.Pictures.Length
+              LastWriteTime = DateTimeOffset file.LastWriteTime }
+
+        static member Copy tags =
+            { tags with LastWriteTime = DateTimeOffset tags.LastWriteTime.DateTime }
+
+        static member Generate audioFile =
+            match parseFileTags audioFile with
+            | Ok (Some fileTags) -> LibraryTags.NewFromFileTags audioFile fileTags
+            | _                  -> LibraryTags.Empty audioFile
 
 type DuplicateTags = LibraryTags nlist nlist
-
-let emptyTags (fileInfo: FileInfo) : LibraryTags =
-    { FileName = fileInfo.Name
-      DirectoryName = fileInfo.DirectoryName
-      Artists = [String.Empty]
-      AlbumArtists = [String.Empty]
-      Album = String.Empty
-      DiscNo = 0u
-      TrackNo = 0u
-      Title = String.Empty
-      Year = 0u
-      Genres = [String.Empty]
-      Duration = TimeSpan.Zero
-      BitRate = 0
-      SampleRate = 0
-      FileSize = 0
-      ImageCount = 0
-      LastWriteTime = DateTimeOffset fileInfo.LastWriteTime }
 
 let parseJsonToTags (Json json) : Result<LibraryTags list, string> =
     try Ok (JsonSerializer.Deserialize<LibraryTags list> json)
@@ -56,13 +98,6 @@ let parseJsonToTags (Json json) : Result<LibraryTags list, string> =
 
 let parseJsonToNonEmptyTags json : Result<LibraryTags nlist, string> =
     parseJsonToTags json >>= List.toNonEmptyListResult "No tags were found to parse."
-
-/// Creates an instance representing a file's tags. The file itself might
-/// or might not already contain tags. If it does, the tags are wrapped in Some.
-/// Otherwise (i.e., if the tags are null), then None is given.
-let parseFileTags (file: FileInfo) : Result<FileTags option, string> =
-    try file.FullName |> FileTags.Create |> Option.ofObj |> Ok
-    with exn -> Error exn.Message
 
 let filePath tags : FilePath =
     Path.Combine [| tags.DirectoryName; tags.FileName |]

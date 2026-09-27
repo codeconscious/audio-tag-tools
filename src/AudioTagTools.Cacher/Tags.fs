@@ -34,43 +34,15 @@ let createTagLibMap (libFile: FileInfo) : Result<LibPathTagMap, CommandError> =
     else
         Ok Map.empty
 
-/// Gives new library tags that are tagged with the current time.
-let private generateLibTags (file: FileInfo) (fileTags: FileTags) : LibraryTags =
-    {
-        FileName = file.Name
-        DirectoryName = file.DirectoryName
-        Artists = fileTags.Tag.Performers |> List.ofArray |> List.map _.Normalize()
-        AlbumArtists = fileTags.Tag.AlbumArtists |> List.ofArray |> List.map _.Normalize()
-        Album = fileTags.Tag.Album |> Option.ofObj |> Option.defaultValue String.Empty |> _.Normalize()
-        DiscNo = fileTags.Tag.Disc
-        TrackNo = fileTags.Tag.Track
-        Title = fileTags.Tag.Title |> Option.ofObj |> Option.defaultValue String.Empty |> _.Normalize()
-        Year = fileTags.Tag.Year
-        Genres = fileTags.Tag.Genres |> List.ofArray
-        Duration = fileTags.Properties.Duration
-        BitRate = fileTags.Properties.AudioBitrate
-        SampleRate = fileTags.Properties.AudioSampleRate
-        FileSize = file.Length
-        ImageCount = fileTags.Tag.Pictures.Length
-        LastWriteTime = DateTimeOffset file.LastWriteTime
-    }
-
-let private generateNewTags (audioFile: FileInfo) : LibraryTags =
-    match parseFileTags audioFile with
-    | Ok (Some tags) -> generateLibTags audioFile tags
-    | _              -> emptyTags audioFile
-
+// TODO: Likely to relocate this to TagLibrary as well.
 let private checkAudioFiles libMap audioFiles : CheckedLibTags nseq =
-    let copyLibTags tags =
-        { tags with LastWriteTime = DateTimeOffset tags.LastWriteTime.DateTime }
-
     let prepareTagsToCache tagLibMap (audioFile: FileInfo) : CheckedLibTags =
         match tagLibMap |> Map.tryFind audioFile.FullName with
         | Some libTags ->
             match libTags.LastWriteTime.DateTime </compare'/> audioFile.LastWriteTime with
-            | EQ -> { Status = Unchanged; Tags = copyLibTags libTags }
-            | _  -> { Status = OutOfSync; Tags = generateNewTags audioFile }
-        | None ->   { Status = NewFile;   Tags = generateNewTags audioFile }
+            | EQ -> { Status = Unchanged; Tags = LibraryTags.Copy libTags }
+            | _  -> { Status = OutOfSync; Tags = LibraryTags.Generate audioFile }
+        | None ->   { Status = NewFile;   Tags = LibraryTags.Generate audioFile }
 
     audioFiles |> NSeq.map (prepareTagsToCache libMap)
 
