@@ -8,6 +8,9 @@ open System
 open System.IO
 open System.Text.Json
 open FSharpPlus
+open FSharpPlus.Data
+
+module NSeq = NonEmptySeq
 
 type FileTags = TagLib.File
 type FilePath = string
@@ -89,6 +92,21 @@ type LibraryTags =
             match parseFileTags audioFile with
             | Ok (Some fileTags) -> LibraryTags.NewFromFileTags audioFile fileTags
             | _                  -> LibraryTags.Empty audioFile
+
+type ComparisonResult = Unchanged | OutOfSync | NewFile
+
+type CheckedLibTags = { Status: ComparisonResult; Tags: LibraryTags }
+
+let checkAudioFiles libMap audioFiles : CheckedLibTags nseq =
+    let prepareTagsToCache tagLibMap (audioFile: FileInfo) : CheckedLibTags =
+        match tagLibMap |> Map.tryFind audioFile.FullName with
+        | Some libTags ->
+            match libTags.LastWriteTime.DateTime </compare'/> audioFile.LastWriteTime with
+            | EQ -> { Status = Unchanged; Tags = LibraryTags.Copy libTags }
+            | _  -> { Status = OutOfSync; Tags = LibraryTags.Generate audioFile }
+        | None ->   { Status = NewFile;   Tags = LibraryTags.Generate audioFile }
+
+    audioFiles |> NSeq.map (prepareTagsToCache libMap)
 
 type DuplicateTags = LibraryTags nlist nlist
 

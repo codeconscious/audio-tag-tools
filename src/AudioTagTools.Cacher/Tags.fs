@@ -14,13 +14,9 @@ open FSharpPlus.Data
 open FSharpPlus.Operators
 
 module NList = NonEmptyList
-module NSeq =  NonEmptySeq
+module NSeq  = NonEmptySeq
 
 type private LibPathTagMap = Map<FilePath, LibraryTags>
-
-type private ComparisonResult = Unchanged | OutOfSync | NewFile
-
-type private CheckedLibTags = { Status: ComparisonResult; Tags: LibraryTags }
 
 type private DeletedCount = DeletedCount of uint
 
@@ -33,18 +29,6 @@ let createTagLibMap (libFile: FileInfo) : Result<LibPathTagMap, CommandError> =
         |!! LibraryTagParseError
     else
         Ok Map.empty
-
-// TODO: Likely to relocate this to TagLibrary as well.
-let private checkAudioFiles libMap audioFiles : CheckedLibTags nseq =
-    let prepareTagsToCache tagLibMap (audioFile: FileInfo) : CheckedLibTags =
-        match tagLibMap |> Map.tryFind audioFile.FullName with
-        | Some libTags ->
-            match libTags.LastWriteTime.DateTime </compare'/> audioFile.LastWriteTime with
-            | EQ -> { Status = Unchanged; Tags = LibraryTags.Copy libTags }
-            | _  -> { Status = OutOfSync; Tags = LibraryTags.Generate audioFile }
-        | None ->   { Status = NewFile;   Tags = LibraryTags.Generate audioFile }
-
-    audioFiles |> NSeq.map (prepareTagsToCache libMap)
 
 let private countDeletedFiles libMap categorizedTags : CheckedLibTags nseq * DeletedCount =
     let filePaths = categorizedTags |> NSeq.map (fun t -> filePath t.Tags) |> set
@@ -61,7 +45,6 @@ let private countDeletedFiles libMap categorizedTags : CheckedLibTags nseq * Del
 
 let private printCounts (categorizedTags, DeletedCount deletedCount) : unit =
     let categoryTotals = categorizedTags |> NSeq.countBy _.Status |> Map.ofSeq
-
     let newItemCount = categoryTotals |> Map.values |> sum |> String.formatInt
 
     let countOf category = categoryTotals |> Map.tryFindElse category 0 |> String.formatInt
