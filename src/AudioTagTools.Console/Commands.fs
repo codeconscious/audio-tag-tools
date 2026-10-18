@@ -3,11 +3,11 @@ module Console.Commands
 type Command = string array -> Result<string, string>
 
 let commandMap =
-    [ "cache-tags", Cacher.Library.start
-      "analyze-library", LibraryAnalysis.Library.start
-      "find-duplicates", DuplicateFinder.Library.start
-      "export-genres", GenreExtractor.Library.start ]
-    |> Map.ofList
+    Map.ofList
+        [ "cache-tags", Cacher.Library.start
+          "analyze-library", LibraryAnalysis.Library.start
+          "find-duplicates", DuplicateFinder.Library.start
+          "export-genres", GenreExtractor.Library.start ]
 
 let (|ValidCommand|InvalidCommand|) requestedCommand =
     commandMap
