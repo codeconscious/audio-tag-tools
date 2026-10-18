@@ -8,13 +8,23 @@ open System
 open System.IO
 open System.Text.Json
 open FSharpPlus
+open FSharpPlus.Data
+
+module NSeq = NonEmptySeq
 
 type FileTags = TagLib.File
 type FilePath = string
 
+/// Creates an instance representing a file's tags, which might or might not exists.
+/// If tags do exist, they are wrapped in Some. Otherwise, then None is given.
+let parseFileTags (file: FileInfo) : Result<FileTags option, string> =
+    try file.FullName |> FileTags.Create |> Option.ofObj |> Ok
+    with exn -> Error exn.Message
+
 type LibraryTags =
     { FileName: string
       DirectoryName: string
+      FileSize: int64
       Artists: string list
       AlbumArtists: string list
       Album: string
@@ -26,29 +36,80 @@ type LibraryTags =
       Duration: TimeSpan
       BitRate: int
       SampleRate: int
-      FileSize: int64
       ImageCount: int
       LastWriteTime: DateTimeOffset }
 
-type DuplicateTags = LibraryTags nlist nlist
+module LibraryTags =
+    let empty (fileInfo: FileInfo) : LibraryTags =
+        { FileName = fileInfo.Name
+          DirectoryName = fileInfo.DirectoryName
+          FileSize = fileInfo.Length
+          Artists = []
+          AlbumArtists = []
+          Album = String.Empty
+          DiscNo = 0u
+          TrackNo = 0u
+          Title = String.Empty
+          Year = 0u
+          Genres = []
+          Duration = TimeSpan.Zero
+          BitRate = 0
+          SampleRate = 0
+          ImageCount = 0
+          LastWriteTime = DateTimeOffset fileInfo.LastWriteTime }
 
-let emptyTags (fileInfo: FileInfo) : LibraryTags =
-    { FileName = fileInfo.Name
-      DirectoryName = fileInfo.DirectoryName
-      Artists = [String.Empty]
-      AlbumArtists = [String.Empty]
-      Album = String.Empty
-      DiscNo = 0u
-      TrackNo = 0u
-      Title = String.Empty
-      Year = 0u
-      Genres = [String.Empty]
-      Duration = TimeSpan.Zero
-      BitRate = 0
-      SampleRate = 0
-      FileSize = 0
-      ImageCount = 0
-      LastWriteTime = DateTimeOffset fileInfo.LastWriteTime }
+    let ofFileTags (file: FileInfo) (fileTags: FileTags) : LibraryTags =
+        { FileName = file.Name
+          DirectoryName = file.DirectoryName
+          FileSize = file.Length
+          Artists = fileTags.Tag.Performers
+                    |> List.ofArray
+                    |> List.map _.Normalize()
+          AlbumArtists = fileTags.Tag.AlbumArtists
+                         |> List.ofArray
+                         |> List.map _.Normalize()
+          Album = fileTags.Tag.Album
+                  |> Option.ofObj
+                  |> Option.defaultValue String.Empty
+                  |> _.Normalize()
+          DiscNo = fileTags.Tag.Disc
+          TrackNo = fileTags.Tag.Track
+          Title = fileTags.Tag.Title
+                  |> Option.ofObj
+                  |> Option.defaultValue String.Empty
+                  |> _.Normalize()
+          Year = fileTags.Tag.Year
+          Genres = fileTags.Tag.Genres |> List.ofArray
+          Duration = fileTags.Properties.Duration
+          BitRate = fileTags.Properties.AudioBitrate
+          SampleRate = fileTags.Properties.AudioSampleRate
+          ImageCount = fileTags.Tag.Pictures.Length
+          LastWriteTime = DateTimeOffset file.LastWriteTime }
+
+    let copy (tags: LibraryTags) : LibraryTags =
+        { tags with LastWriteTime = DateTimeOffset tags.LastWriteTime.DateTime }
+
+    let generate (audioFile: FileInfo) : LibraryTags =
+        match parseFileTags audioFile with
+        | Ok (Some fileTags) -> ofFileTags audioFile fileTags
+        | _                  -> empty audioFile
+
+type ComparisonResult = Unchanged | OutOfSync | NewFile
+
+type CheckedLibTags = { Status: ComparisonResult; Tags: LibraryTags }
+
+let checkAudioFiles libMap audioFiles : CheckedLibTags nseq =
+    let prepareTagsToCache tagLibMap (audioFile: FileInfo) : CheckedLibTags =
+        match tagLibMap |> Map.tryFind audioFile.FullName with
+        | Some libTags ->
+            match libTags.LastWriteTime.DateTime </compare'/> audioFile.LastWriteTime with
+            | EQ -> { Status = Unchanged; Tags = LibraryTags.copy libTags }
+            | _  -> { Status = OutOfSync; Tags = LibraryTags.generate audioFile }
+        | None ->   { Status = NewFile;   Tags = LibraryTags.generate audioFile }
+
+    audioFiles |> NSeq.map (prepareTagsToCache libMap)
+
+type DuplicateTags = LibraryTags nlist nlist
 
 let parseJsonToTags (Json json) : Result<LibraryTags list, string> =
     try Ok (JsonSerializer.Deserialize<LibraryTags list> json)
@@ -56,13 +117,6 @@ let parseJsonToTags (Json json) : Result<LibraryTags list, string> =
 
 let parseJsonToNonEmptyTags json : Result<LibraryTags nlist, string> =
     parseJsonToTags json >>= List.toNonEmptyListResult "No tags were found to parse."
-
-/// Creates an instance representing a file's tags. The file itself might
-/// or might not already contain tags. If it does, the tags are wrapped in Some.
-/// Otherwise (i.e., if the tags are null), then None is given.
-let parseFileTags (file: FileInfo) : Result<FileTags option, string> =
-    try file.FullName |> FileTags.Create |> Option.ofObj |> Ok
-    with exn -> Error exn.Message
 
 let filePath tags : FilePath =
     Path.Combine [| tags.DirectoryName; tags.FileName |]

@@ -14,13 +14,9 @@ open FSharpPlus.Data
 open FSharpPlus.Operators
 
 module NList = NonEmptyList
-module NSeq =  NonEmptySeq
+module NSeq  = NonEmptySeq
 
 type private LibPathTagMap = Map<FilePath, LibraryTags>
-
-type private ComparisonResult = Unchanged | OutOfSync | NewFile
-
-type private CheckedLibTags = { Status: ComparisonResult; Tags: LibraryTags }
 
 type private DeletedCount = DeletedCount of uint
 
@@ -33,46 +29,6 @@ let createTagLibMap (libFile: FileInfo) : Result<LibPathTagMap, CommandError> =
         |!! LibraryTagParseError
     else
         Ok Map.empty
-
-/// Gives new library tags that are tagged with the current time.
-let private generateLibTags (file: FileInfo) (fileTags: FileTags) : LibraryTags =
-    {
-        FileName = file.Name
-        DirectoryName = file.DirectoryName
-        Artists = fileTags.Tag.Performers |> List.ofArray |> List.map _.Normalize()
-        AlbumArtists = fileTags.Tag.AlbumArtists |> List.ofArray |> List.map _.Normalize()
-        Album = fileTags.Tag.Album |> Option.ofObj |> Option.defaultValue String.Empty |> _.Normalize()
-        DiscNo = fileTags.Tag.Disc
-        TrackNo = fileTags.Tag.Track
-        Title = fileTags.Tag.Title |> Option.ofObj |> Option.defaultValue String.Empty |> _.Normalize()
-        Year = fileTags.Tag.Year
-        Genres = fileTags.Tag.Genres |> List.ofArray
-        Duration = fileTags.Properties.Duration
-        BitRate = fileTags.Properties.AudioBitrate
-        SampleRate = fileTags.Properties.AudioSampleRate
-        FileSize = file.Length
-        ImageCount = fileTags.Tag.Pictures.Length
-        LastWriteTime = DateTimeOffset file.LastWriteTime
-    }
-
-let private generateNewTags (audioFile: FileInfo) : LibraryTags =
-    match parseFileTags audioFile with
-    | Ok (Some tags) -> generateLibTags audioFile tags
-    | _              -> emptyTags audioFile
-
-let private checkAudioFiles libMap audioFiles : CheckedLibTags nseq =
-    let copyLibTags tags =
-        { tags with LastWriteTime = DateTimeOffset tags.LastWriteTime.DateTime }
-
-    let prepareTagsToCache tagLibMap (audioFile: FileInfo) : CheckedLibTags =
-        match tagLibMap |> Map.tryFind audioFile.FullName with
-        | Some libTags ->
-            match libTags.LastWriteTime.DateTime </compare'/> audioFile.LastWriteTime with
-            | EQ -> { Status = Unchanged; Tags = copyLibTags libTags }
-            | _  -> { Status = OutOfSync; Tags = generateNewTags audioFile }
-        | None ->   { Status = NewFile;   Tags = generateNewTags audioFile }
-
-    audioFiles |> NSeq.map (prepareTagsToCache libMap)
 
 let private countDeletedFiles libMap categorizedTags : CheckedLibTags nseq * DeletedCount =
     let filePaths = categorizedTags |> NSeq.map (fun t -> filePath t.Tags) |> set
@@ -89,7 +45,6 @@ let private countDeletedFiles libMap categorizedTags : CheckedLibTags nseq * Del
 
 let private printCounts (categorizedTags, DeletedCount deletedCount) : unit =
     let categoryTotals = categorizedTags |> NSeq.countBy _.Status |> Map.ofSeq
-
     let newItemCount = categoryTotals |> Map.values |> sum |> String.formatInt
 
     let countOf category = categoryTotals |> Map.tryFindElse category 0 |> String.formatInt
