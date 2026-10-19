@@ -161,7 +161,9 @@ let mainArtistSummary separator tags : string =
         |> dropIgnoredArtists
         |> List.map (fun (Artist name) -> name)
 
-    (if List.isNotEmpty albumArtists then albumArtists else tags.Artists)
+    match albumArtists with
+    | [] -> tags.Artists
+    | _  -> albumArtists
     |> String.concat separator
 
 let hasAnyArtist tags : bool =
