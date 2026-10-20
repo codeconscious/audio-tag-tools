@@ -136,7 +136,7 @@ let dropIgnoredArtists artists =
     artists |> List.except ignoredArtists
 
 let isNotIgnoredArtist artist =
-    not (List.exists ((=) artist) ignoredArtists)
+    not (List.contains artist ignoredArtists)
 
 let tryMainArtistName tags : string option =
     tags.AlbumArtists
