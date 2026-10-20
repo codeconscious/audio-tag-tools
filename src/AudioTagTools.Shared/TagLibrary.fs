@@ -129,7 +129,7 @@ let ignoredArtists =
       "Various"
       "Various Artists"
       "Multiple Artists"
-      "\u003Cunknown\u003E" ] // U+003C == `<` and \u003E == `>` ]
+      "\u003Cunknown\u003E" ] // `<unknown>`
     |> List.map Artist
 
 let dropIgnoredArtists artists =
