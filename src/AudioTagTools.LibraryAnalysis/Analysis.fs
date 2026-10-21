@@ -87,16 +87,24 @@ let topTitles count tags : TableRowData =
     |> Some
 
 let topGenres count tags : TableRowData =
+    let extractGenres ts =
+        ts >>= fun t -> t.Genres |> NList.ofList
+
+    let formatGenreRow (genres: string NonEmptyList) (genre, genreCount) =
+        [ genre
+          String.formatInt genreCount
+          asPercentage { Count = genreCount
+                         Total = genres.Length
+                         DecimalPlaces = 2 } ]
+
     tags
     |> NList.tryFilter (fun t -> List.isNotEmpty t.Genres)
-    |> Option.map (fun t ->
-        let genres = t >>= fun xs -> xs.Genres |> NList.ofList
+    |> Option.map (fun ts ->
+        let genres = extractGenres ts
         genres
         |> mostPopulous count String.toLower
-        |> NList.map (fun (genre, count) ->
-            [ genre
-              String.formatInt count
-              asPercentage { Count = count; Total = genres.Length; DecimalPlaces = 2 } ]))
+        |> NList.map (formatGenreRow genres))
+
 
 let artistsWithMostGenres count tags : TableRowData =
     let countsByGenre (genres: string list) : string =
