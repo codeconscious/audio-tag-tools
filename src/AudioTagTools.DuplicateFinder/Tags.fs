@@ -68,14 +68,14 @@ let private sanitizedTrackGroupingName (settings: Settings) fileTags =
         >> String.stripDiacritics
 
     let artist =
-        let checkEquivalentArtists artist =
+        let equivalentArtistIfAny artist =
             settings.EquivalentArtists
             |> Array.tryFind (Array.contains artist)
             |> option Array.head artist
 
         fileTags
         |> mainArtistSummary String.Empty
-        |> checkEquivalentArtists
+        |> equivalentArtistIfAny
         |> scrubText settings.ArtistReplacementPatterns
 
     let title = fileTags.Title |> scrubText settings.TitleReplacementPatterns
