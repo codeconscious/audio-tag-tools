@@ -124,11 +124,11 @@ let printDuplicates groupedTracksOpt : unit =
             |> mainArtistSummary ", "
             |> printfn "%d. %s" (index + 1) // Start numbering at 1, not 0.
 
-        let printTagData () =
+        let printTags () =
             tagList |> NList.iter printFileSummary
 
         printHeader ()
-        printTagData ()
+        printTags ()
 
     match groupedTracksOpt with
     | Some group -> group |> NList.iteri printGroup
