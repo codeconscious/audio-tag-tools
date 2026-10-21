@@ -157,9 +157,9 @@ let tryFirstUniqueArtist tags : Artist option =
 let mainArtistSummary separator tags : string =
     let albumArtists =
         tags.AlbumArtists
-        |> List.map Artist
+        |> map Artist
         |> dropIgnoredArtists
-        |> List.map (fun (Artist name) -> name)
+        |> map (fun (Artist name) -> name)
 
     match albumArtists with
     | [] -> tags.Artists
