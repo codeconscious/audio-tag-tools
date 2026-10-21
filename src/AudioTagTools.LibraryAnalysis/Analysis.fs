@@ -62,7 +62,7 @@ let topArtists count tags : TableRowData =
 
         artists
         |> mostPopulous count id
-        |> NList.map (fun ((Artist artist), count) ->
+        |> NList.map (fun (Artist artist, count) ->
             [ artist
               String.formatInt count
               asPercentage { Count = count; Total = artistCount; DecimalPlaces = 3 } ]) )
