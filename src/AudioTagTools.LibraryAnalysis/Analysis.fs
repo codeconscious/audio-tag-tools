@@ -86,7 +86,7 @@ let topTitles count tags : TableRowData =
     |> NList.map (fun (title, count) -> [ title; String.formatInt count ])
     |> Some
 
-let topGenres count tags : TableRowData =
+let topGenres count (tags: LibraryTags NonEmptyList) : TableRowData =
     let extractGenres ts =
         ts >>= fun t -> t.Genres |> NList.ofList
 
