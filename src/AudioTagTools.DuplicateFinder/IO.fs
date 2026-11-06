@@ -13,13 +13,13 @@ open System
 open System.IO
 
 let savePlaylist (settings: Settings) (maybeTags: DuplicateTags option) : Result<unit, CommandError> =
-    let makeFileInfo count =
+    let makeFileInfo count : FileInfo =
         let now = DateTime.Now.ToString timeStampFormat
         let itemLabel = String.pluralizeSWithCount "item" count
         let fileName = $"Duplicates by AudioTagTools - {now} - {itemLabel}.m3u"
         FileInfo <| Path.Combine(settings.Playlist.SaveDirectory, fileName)
 
-    /// Appends 2 lines to `sb` for the `tags`: a metadata summary and full file path.
+    /// Appends 2 lines to `sb` for the `fileTags`: a metadata summary and full file path.
     let appendFileData (sb: SB) (fileTags: LibraryTags) : SB =
         let seconds = fileTags.Duration.TotalSeconds
         let artist = fileTags.Artists @ fileTags.AlbumArtists |> String.concat "; "
@@ -31,7 +31,8 @@ let savePlaylist (settings: Settings) (maybeTags: DuplicateTags option) : Result
         let filePath =
             let originalPath = Path.Combine(fileTags.DirectoryName, fileTags.FileName)
             match settings.Playlist.PathSearchFor,
-                  settings.Playlist.PathReplaceWith with
+                  settings.Playlist.PathReplaceWith
+            with
             | s, _ when String.hasNoText s -> originalPath
             | s, r -> originalPath.Replace(s, r)
 
