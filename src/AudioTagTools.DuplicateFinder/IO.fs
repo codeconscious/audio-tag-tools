@@ -12,7 +12,11 @@ open FSharpPlus.Data
 open System
 open System.IO
 
-let savePlaylist (settings: Settings) (maybeTags: DuplicateTags option) : Result<unit, CommandError> =
+let savePlaylist
+    (settings: Settings)
+    (maybeTagDupes: DuplicateTags option)
+    : Result<unit, CommandError> =
+
     let makeFileInfo count : FileInfo =
         let now = DateTime.Now.ToString timeStampFormat
         let itemLabel = String.pluralizeSWithCount "item" count
@@ -38,7 +42,7 @@ let savePlaylist (settings: Settings) (maybeTags: DuplicateTags option) : Result
 
         sb.AppendLine filePath
 
-    match maybeTags with
+    match maybeTagDupes with
     | None ->
         Ok ()
     | Some duplicateGroups ->
