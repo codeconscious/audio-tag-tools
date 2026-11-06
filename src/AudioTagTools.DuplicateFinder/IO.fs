@@ -26,7 +26,9 @@ let savePlaylist
     /// Appends 2 lines to `sb` for the `fileTags`: a metadata summary and full file path.
     let appendFileData (sb: SB) (fileTags: LibraryTags) : SB =
         let seconds = fileTags.Duration.TotalSeconds
-        let artist = fileTags.Artists @ fileTags.AlbumArtists |> String.concat "; "
+        let artist = fileTags.Artists @ fileTags.AlbumArtists
+                     |> List.distinct
+                     |> String.concat "; "
         let artistWithTitle = $"{artist} - {fileTags.Title}"
         let extInf = $"#EXTINF:{seconds},{artistWithTitle}"
 
