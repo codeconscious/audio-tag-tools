@@ -2,7 +2,7 @@ module DuplicateFinder.IO
 
 open Errors
 open Settings
-open Shared.Constants
+open Shared
 open Shared.TagLibrary
 open CCFSharpUtils
 open CCFSharpUtils.IO
@@ -26,8 +26,9 @@ let savePlaylist
     /// Appends 2 lines to `sb` for the `fileTags`: a metadata summary and full file path.
     let appendFileData (sb: SB) (fileTags: LibraryTags) : SB =
         let seconds = fileTags.Duration.TotalSeconds
-        let artist = fileTags.Artists @ fileTags.AlbumArtists
-                     |> List.distinct
+        let artist = fileTags
+                     |> allUniqueArtists
+                     |> List.map (fun (Artist a) -> a)
                      |> String.concat "; "
         let artistWithTitle = $"{artist} - {fileTags.Title}"
         let extInf = $"#EXTINF:{seconds},{artistWithTitle}"
