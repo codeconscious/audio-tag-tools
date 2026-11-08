@@ -19,7 +19,7 @@ let savePlaylist
 
     let makeFileInfo count : FileInfo =
         let now = DateTime.Now.ToString timeStampFormat
-        let itemLabel = String.pluralizeSWithCount "item" count
+        let itemLabel = String.plur' "item" S count
         let fileName = $"Duplicates by AudioTagTools - {now} - {itemLabel}.m3u"
         FileInfo <| Path.Combine(settings.Playlist.SaveDirectory, fileName)
 
