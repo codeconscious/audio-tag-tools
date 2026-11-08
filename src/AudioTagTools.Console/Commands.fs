@@ -1,5 +1,7 @@
 module Console.Commands
 
+open FSharpPlus
+
 type Command = string array -> Result<string, string>
 
 let commandMap =
@@ -12,9 +14,7 @@ let commandMap =
 let (|ValidCommand|InvalidCommand|) requestedCommand =
     commandMap
     |> Map.tryFind requestedCommand
-    |> function
-       | Some command -> ValidCommand command
-       | None -> InvalidCommand
+    |> option (fun command -> ValidCommand command) InvalidCommand
 
 let instructions =
     commandMap

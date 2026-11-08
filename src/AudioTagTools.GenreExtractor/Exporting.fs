@@ -33,8 +33,8 @@ let printTagCount (tags: LibraryTags nlist) =
 
 let private allGenres (fileTags: LibraryTags nlist) : string list =
     fileTags
-    |> NList.tryCollect (fun t -> t.Genres |> toList)
-    |> function None -> [] | Some gs -> gs |> toList
+    |> NList.tryCollect (fun t -> toList t.Genres)
+    |> option toList []
 
 let private mostCommon (xs: string list) : string option =
     xs
