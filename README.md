@@ -12,7 +12,7 @@ I originally created this tool to practice with [F#](https://fsharp.org/) [JSON 
 # Requirements
 
 - A directory containing audio files (Note: No audio file writes are performed)
-- [.NET 10 runtime](https://dotnet.microsoft.com/en-us/download/dotnet/10.0)
+- [.NET 11 runtime](https://dotnet.microsoft.com/en-us/download/dotnet/11.0)
 - JSON settings file (only for the duplicate search) — plus comfort manually editing such files
 
 
