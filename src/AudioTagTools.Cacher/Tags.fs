@@ -30,12 +30,18 @@ let createTagLibMap (libFile: FileInfo) : Result<LibPathTagMap, CommandError> =
     else
         Ok Map.empty
 
-let private countDeletedFiles libMap categorizedTags : CheckedLibTags nseq * DeletedCount =
-    let filePaths = categorizedTags |> NSeq.map (fun t -> filePath t.Tags) |> set
+let private countDeleted libMap categorizedTags : CheckedLibTags nseq * DeletedCount =
+    let filePaths =
+        categorizedTags
+        |> NSeq.map (fun t -> filePath t.Tags)
+        |> set
+
+    let isAudioFileMissing libPath _ =
+        filePaths |> Set.doesNotContain libPath
 
     let deletedCount =
         libMap
-        |> Map.filter (fun libPath _ -> not (filePaths |> Set.contains libPath))
+        |> Map.filter isAudioFileMissing
         |> Map.values
         |> _.Count
         |> uint
@@ -44,22 +50,26 @@ let private countDeletedFiles libMap categorizedTags : CheckedLibTags nseq * Del
     (categorizedTags, deletedCount)
 
 let private printCounts (categorizedTags, DeletedCount deletedCount) : unit =
-    let categoryTotals = categorizedTags |> NSeq.countBy _.Status |> Map.ofSeq
-    let newItemCount = categoryTotals |> Map.values |> sum |> String.formatInt
+    let categoryTotals =
+        categorizedTags |> NSeq.countBy _.Status |> Map.ofSeq
 
-    let countOf category = categoryTotals |> Map.tryFindElse category 0 |> String.formatInt
+    let newFileCount =
+        categoryTotals.Values |> sum |> String.formatInt
+
+    let countOf category =
+        categoryTotals |> Map.tryFindElse category 0 |> String.formatInt
 
     printfn "Results:"
     printfn "  Deleted:     %s" (String.formatNumber deletedCount)
     printfn "  New:         %s" (countOf NewFile)
     printfn "  Out of sync: %s" (countOf OutOfSync)
     printfn "  Unchanged:   %s" (countOf Unchanged)
-    printfn "  New Total:   %s" newItemCount
+    printfn "  New Total:   %s" newFileCount
 
 let generateJson tagMap audioFiles : Result<string, CommandError> =
     audioFiles
-    |> checkAudioFiles tagMap
-    |> countDeletedFiles tagMap
+    |> categorize tagMap
+    |> countDeleted tagMap
     |- printCounts
     |> (fst >> map _.Tags)
     |> String.toJson

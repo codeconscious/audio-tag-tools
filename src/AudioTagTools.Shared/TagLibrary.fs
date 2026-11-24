@@ -98,16 +98,16 @@ type ComparisonResult = Unchanged | OutOfSync | NewFile
 
 type CheckedLibTags = { Status: ComparisonResult; Tags: LibraryTags }
 
-let checkAudioFiles libMap audioFiles : CheckedLibTags nseq =
-    let prepareTagsToCache tagLibMap (audioFile: FileInfo) : CheckedLibTags =
-        match tagLibMap |> Map.tryFind audioFile.FullName with
+let categorize libMap audioFiles : CheckedLibTags nseq =
+    let categorizeFile tagLibMap (file: FileInfo) : CheckedLibTags =
+        match tagLibMap |> Map.tryFind file.FullName with
         | Some libTags ->
-            match libTags.LastWriteTime.DateTime </compare'/> audioFile.LastWriteTime with
+            match libTags.LastWriteTime.DateTime </compare'/> file.LastWriteTime with
             | EQ -> { Status = Unchanged; Tags = LibraryTags.copy libTags }
-            | _  -> { Status = OutOfSync; Tags = LibraryTags.generate audioFile }
-        | None ->   { Status = NewFile;   Tags = LibraryTags.generate audioFile }
+            | _  -> { Status = OutOfSync; Tags = LibraryTags.generate file }
+        | None ->   { Status = NewFile;   Tags = LibraryTags.generate file }
 
-    audioFiles |> NSeq.map (prepareTagsToCache libMap)
+    audioFiles |> NSeq.map (categorizeFile libMap)
 
 type DuplicateTags = LibraryTags nlist nlist
 
