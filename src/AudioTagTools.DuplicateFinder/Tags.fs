@@ -44,9 +44,9 @@ let discardExcluded exclusionPatterns libTagList : Result<LibraryTags nlist, Com
 
         let checkIfExcluded = function
             | ArtistTitlePair (a, t) -> containsArtist a && titleStartsWith t
-            | ArtistOnly a -> containsArtist a
-            | TitleOnly t -> titleStartsWith t
-            | Invalid -> false
+            | ArtistOnly a           -> containsArtist a
+            | TitleOnly  t           -> titleStartsWith t
+            | Invalid                -> false
 
         exclusionPatterns |> Array.exists checkIfExcluded
 
