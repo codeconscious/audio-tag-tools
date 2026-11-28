@@ -20,7 +20,7 @@
     <ItemGroup>
       <PackageReference Update="FSharp.Core" Version="11.0.101" />
       <PackageReference Include="FSharpPlus" Version="1.9.1" />
-      <PackageReference Include="CCFSharpUtils" Version="0.5.4" />
+      <PackageReference Include="CCFSharpUtils" Version="0.6.0" />
     </ItemGroup>
 
 </Project>
