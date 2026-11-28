@@ -9,7 +9,6 @@ open Shared.Types
 open CCFSharpUtils.IO
 open CCFSharpUtils.Operators
 open FSharpPlus
-open FsToolkit.ErrorHandling.Operator.Result
 
 let private run args : Result<unit, CommandError> =
     monad {
